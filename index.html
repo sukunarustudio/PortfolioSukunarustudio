@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sukunaru Studio | Desain Grafis, Poster Cetak & Produk Digital</title>
+  <meta name="description" content="Sukunaru Studio menyediakan layanan desain grafis Social Media Feeds & Poster Cetak, serta produk digital Vectonaru dan Sukunaru Filter Studio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="halftone-canvas" class="halftone-canvas" aria-hidden="true"></canvas>
+  <div id="studio-cursor" class="studio-cursor" aria-hidden="true">
+    <span class="cursor-crosshair">+</span>
+    <span class="cursor-coords" id="cursor-coords">X:0 Y:0</span>
+  </div>
+  <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
+
+  <header class="site-header" id="top">
+    <div class="header-inner container">
+      <a href="#top" class="brand-mark" aria-label="Sukunaru Studio Beranda">
+        <span class="brand-crop" aria-hidden="true">+</span>
+        <span class="brand-name">SUKUNARU</span>
+        <span class="brand-sub">STUDIO</span>
+      </a>
+
+      <nav class="primary-nav" id="primary-nav" aria-label="Navigasi Utama">
+        <ul class="nav-list">
+          <li><a href="#produk" class="nav-link">Produk Digital</a></li>
+          <li><a href="#karya" class="nav-link">Karya &amp; Portfolio</a></li>
+          <li><a href="#jasa" class="nav-link">Layanan Desain</a></li>
+          <li><a href="#sosmed" class="nav-link">Kontak &amp; Sosmed</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Ganti tema warna terang atau gelap" aria-pressed="false">
+          <svg class="icon-theme icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+          </svg>
+          <svg class="icon-theme icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span class="theme-label" id="theme-label">Mode Kertas</span>
+        </button>
+
+        <a href="#brief-wa" class="btn btn-accent btn-header-wa">Diskusi via WA</a>
+
+        <button type="button" class="mobile-menu-btn" id="mobile-menu-btn" aria-expanded="false" aria-controls="primary-nav">
+          <span class="menu-btn-text">Menu</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path class="menu-line-1" d="M3 7h18"></path>
+            <path class="menu-line-2" d="M3 12h18"></path>
+            <path class="menu-line-3" d="M3 17h18"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero-section container" aria-labelledby="hero-heading">
+      <div class="hero-grid">
+        <div class="hero-copy-col">
+          <h1 id="hero-heading" class="hero-title">
+            Visual cetak, konten sosmed &amp; <em>tools kreator</em> dalam satu studio.
+          </h1>
+          <p class="hero-lead">
+            Sukunaru Studio mengerjakan desain antarmuka feed sosial media dan poster siap cetak untuk brand, sekaligus merakit produk digital bagi desainer dan kontributor microstock.
+          </p>
+          <div class="hero-meta-strip">
+            <span class="spec-chip">CMYK 300 DPI PRINT</span>
+            <span class="spec-chip">SOCIAL FEED SYSTEM</span>
+            <span class="spec-chip">CREATOR TOOLS</span>
+          </div>
+        </div>
+
+        <div class="hero-split-tracks" aria-label="Pilih Jalur Kebutuhan Anda">
+          <article class="track-panel track-products">
+            <div class="track-header">
+              <span class="track-index">JALUR A / PRODUK DIGITAL</span>
+              <span class="track-tag">Direct Download</span>
+            </div>
+            <h2 class="track-title">Beli Aplikasi &amp; Filter Sukunaru</h2>
+            <p class="track-desc">
+              Akses langsung ke dua produk utama kami: <strong>Vectonaru</strong> untuk vectorizing dan metadata microstock, serta <strong>Sukunaru Filter Studio</strong> untuk olah tekstur poster instan.
+            </p>
+            <div class="track-links">
+              <a href="#produk" class="btn btn-accent">Lihat 2 Produk Digital</a>
+              <button type="button" class="btn btn-outline" data-open-brief="Tanya Produk Digital (Vectonaru / Filter Studio)">Tanya Lisensi di WA</button>
+            </div>
+          </article>
+
+          <article class="track-panel track-services">
+            <div class="track-header">
+              <span class="track-index">JALUR B / JASA DESAIN GRAFIS</span>
+              <span class="track-tag">Custom Project</span>
+            </div>
+            <h2 class="track-title">Pesan Desain Sosmed &amp; Poster</h2>
+            <p class="track-desc">
+              Produksi visual konten Instagram/TikTok terstruktur dan desain poster acara atau kampanye rilis produk dengan file master siap naik cetak.
+            </p>
+            <div class="track-links">
+              <a href="#jasa" class="btn btn-solid">Cek Paket &amp; Estimasi</a>
+              <a href="#karya" class="btn btn-outline">Telusuri Karya</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="products-section" id="produk" aria-labelledby="products-heading">
+      <div class="container">
+        <div class="section-header-bar">
+          <div>
+            <h2 id="products-heading" class="section-title">Produk Digital <em>Sukunaru</em></h2>
+            <p class="section-subtitle">Dua software dan engine visual yang dirancang dari alur kerja internal studio kami. Pembelian langsung via direct link.</p>
+          </div>
+          <div class="product-mode-control" role="group" aria-label="Simulasi Status Etalase Produk">
+            <span class="control-caption">Tampilan Etalase:</span>
+            <button type="button" class="state-pill is-active" data-product-state="ready">Tersedia (2)</button>
+            <button type="button" class="state-pill" data-product-state="loading">Simulasi Muat</button>
+            <button type="button" class="state-pill" data-product-state="error">Simulasi Gangguan</button>
+          </div>
+        </div>
+
+        <div id="products-state-loading" class="ui-state-box" hidden aria-live="polite">
+          <div class="state-spinner" aria-hidden="true"></div>
+          <p class="state-title">Memuat katalog produk digital Sukunaru Studio...</p>
+          <p class="state-desc">Menyinkronkan status lisensi dan tautan unduhan langsung untuk Vectonaru dan Sukunaru Filter Studio.</p>
+        </div>
+
+        <div id="products-state-error" class="ui-state-box state-error" hidden aria-live="polite">
+          <p class="state-title">Gagal memuat tautan checkout otomatis.</p>
+          <p class="state-desc">Koneksi ke server tautan produk sedang terputus. Anda tetap dapat memesan lisensi langsung melalui WhatsApp resmi Sukunaru Studio atau muat ulang daftar produk.</p>
+          <div class="state-actions">
+            <button type="button" class="btn btn-accent" data-product-state="ready">Muat Ulang Produk</button>
+            <button type="button" class="btn btn-outline" data-open-brief="Pembelian Manual Produk Digital">Pesan Manual via WA</button>
+          </div>
+        </div>
+
+        <div class="flagship-duet" id="products-content">
+          <article class="flagship-item flagship-vectonaru">
+            <div class="flagship-visual" aria-label="Ilustrasi teknis alur kerja Vectonaru">
+              <div class="spec-frame-bar">
+                <span>PRODUCT ID: SKN-PRD-01</span>
+                <span>BUILD: [PLACEHOLDER VERSI]</span>
+              </div>
+              <svg class="product-schematic" viewBox="0 0 560 280" role="img" aria-label="Skema konversi bitmap ke vector path dan metadata otomatis pada Vectonaru">
+                <rect x="8" y="8" width="544" height="264" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <g transform="translate(28, 36)">
+                  <rect x="0" y="0" width="140" height="150" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  <text x="12" y="22" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">01. RASTER INPUT</text>
+                  <rect x="24" y="42" width="92" height="72" fill="none" stroke="currentColor" stroke-width="1"/>
+                  <path d="M24 98 L56 64 L84 88 L102 72 L116 98" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  <text x="12" y="136" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor">JPG / PNG STOCK</text>
+                </g>
+                <g transform="translate(190, 96)">
+                  <line x1="0" y1="15" x2="40" y2="15" stroke="#FF5E0E" stroke-width="2"/>
+                  <polygon points="40,10 50,15 40,20" fill="#FF5E0E"/>
+                </g>
+                <g transform="translate(254, 36)">
+                  <rect x="0" y="0" width="140" height="150" fill="none" stroke="#FF5E0E" stroke-width="2"/>
+                  <text x="12" y="22" font-family="JetBrains Mono, monospace" font-size="11" fill="#FF5E0E">02. ULTRA TRACE</text>
+                  <path d="M26 105 C36 52, 82 52, 114 105 Z" fill="none" stroke="#FF5E0E" stroke-width="2"/>
+                  <circle cx="26" cy="105" r="4" fill="#FF5E0E"/>
+                  <circle cx="58" cy="65" r="4" fill="#FF5E0E"/>
+                  <circle cx="114" cy="105" r="4" fill="#FF5E0E"/>
+                  <text x="12" y="136" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor">CLEAN EPS / SVG</text>
+                </g>
+                <g transform="translate(414, 36)">
+                  <rect x="0" y="0" width="118" height="150" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  <text x="10" y="22" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">03. METADATA</text>
+                  <line x1="12" y1="44" x2="98" y2="44" stroke="currentColor" stroke-width="1.5"/>
+                  <line x1="12" y1="62" x2="86" y2="62" stroke="currentColor" stroke-width="1.5"/>
+                  <line x1="12" y1="80" x2="104" y2="80" stroke="currentColor" stroke-width="1.5"/>
+                  <rect x="12" y="102" width="94" height="24" fill="none" stroke="#FF5E0E" stroke-width="1.5"/>
+                  <text x="20" y="118" font-family="JetBrains Mono, monospace" font-size="10" fill="#FF5E0E">SEO TAGS CSV</text>
+                </g>
+                <text x="28" y="224" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">[PREVIEW WORKFLOW VECTONARU: TRACE STOCK + BATCH TRACE + ULTRA VECTORIZE + AUTO METADATA]</text>
+                <text x="28" y="246" font-family="JetBrains Mono, monospace" font-size="11" fill="#FF5E0E">STATUS: READY FOR DIRECT ACCESS</text>
+              </svg>
+            </div>
+
+            <div class="flagship-body">
+              <div class="flagship-meta-row">
+                <span class="product-category">MICROSTOCK &amp; VECTOR AUTOMATION</span>
+                <span class="product-price">Rp [PLACEHOLDER HARGA]</span>
+              </div>
+              <h3 class="flagship-name">Vectonaru</h3>
+              <p class="flagship-summary">
+                Aplikasi utilitas khusus desainer vektor dan kontributor microstock untuk mempercepat proses konversi gambar raster menjadi vektor bersih sekaligus menyusun metadata siap unggah.
+              </p>
+
+              <ul class="feature-spec-list">
+                <li><strong>Single &amp; Batch Stock Tracing:</strong> Konversi banyak aset gambar sekaligus menjadi path vektor yang rapi untuk standar microstock.</li>
+                <li><strong>Ultra Vectorize Engine:</strong> Presisi kurva dan pemisahan detail warna tinggi tanpa anchor point berlebih.</li>
+                <li><strong>Auto Metadata Generator:</strong> Buat judul dan kata kunci relevan secara otomatis untuk mempercepat submit ke agensi microstock.</li>
+              </ul>
+
+              <div class="flagship-actions">
+                <a href="#checkout-vectonaru" class="btn btn-accent" data-direct-product="Vectonaru" data-direct-url="[DIRECT LINK VECTONARU]">
+                  Beli Vectonaru (Direct Link)
+                </a>
+                <button type="button" class="btn btn-outline" data-open-brief="Tanya Produk Digital: Vectonaru">
+                  Tanya via WhatsApp
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <article class="flagship-item flagship-filter">
+            <div class="flagship-visual" aria-label="Ilustrasi teknis efek Sukunaru Filter Studio">
+              <div class="spec-frame-bar">
+                <span>PRODUCT ID: SKN-PRD-02</span>
+                <span>BUILD: [PLACEHOLDER VERSI]</span>
+              </div>
+              <svg class="product-schematic" viewBox="0 0 560 280" role="img" aria-label="Skema pengolahan tekstur halftone dan risograph pada Sukunaru Filter Studio">
+                <rect x="8" y="8" width="544" height="264" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <g transform="translate(28, 34)">
+                  <rect x="0" y="0" width="230" height="154" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  <text x="14" y="24" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">RAW ARTWORK LAYER</text>
+                  <circle cx="72" cy="92" r="36" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  <rect x="122" y="56" width="80" height="72" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                </g>
+                <g transform="translate(298, 34)">
+                  <rect x="0" y="0" width="234" height="154" fill="none" stroke="#FF5E0E" stroke-width="2"/>
+                  <text x="14" y="24" font-family="JetBrains Mono, monospace" font-size="11" fill="#FF5E0E">FILTER STUDIO ENGINE</text>
+                  <circle cx="52" cy="66" r="3" fill="#FF5E0E"/>
+                  <circle cx="68" cy="66" r="4" fill="#FF5E0E"/>
+                  <circle cx="84" cy="66" r="5" fill="#FF5E0E"/>
+                  <circle cx="100" cy="66" r="4" fill="#FF5E0E"/>
+                  <circle cx="52" cy="84" r="4" fill="#FF5E0E"/>
+                  <circle cx="68" cy="84" r="6" fill="#FF5E0E"/>
+                  <circle cx="84" cy="84" r="6" fill="#FF5E0E"/>
+                  <circle cx="100" cy="84" r="4" fill="#FF5E0E"/>
+                  <circle cx="52" cy="102" r="3" fill="#FF5E0E"/>
+                  <circle cx="68" cy="102" r="4" fill="#FF5E0E"/>
+                  <circle cx="84" cy="102" r="5" fill="#FF5E0E"/>
+                  <circle cx="100" cy="102" r="3" fill="#FF5E0E"/>
+                  <line x1="130" y1="58" x2="208" y2="58" stroke="currentColor" stroke-width="2"/>
+                  <line x1="130" y1="78" x2="194" y2="78" stroke="#FF5E0E" stroke-width="2"/>
+                  <line x1="130" y1="98" x2="212" y2="98" stroke="currentColor" stroke-width="2"/>
+                  <text x="14" y="138" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor">HALFTONE + INK GRAIN + LUT</text>
+                </g>
+                <text x="28" y="224" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">[PREVIEW SUKUNARU FILTER STUDIO: PRINT TEXTURE, RISOGRAPH GRAIN &amp; POSTER GRADE]</text>
+                <text x="28" y="246" font-family="JetBrains Mono, monospace" font-size="11" fill="#FF5E0E">STATUS: READY FOR DIRECT ACCESS</text>
+              </svg>
+            </div>
+
+            <div class="flagship-body">
+              <div class="flagship-meta-row">
+                <span class="product-category">VISUAL EFFECTS &amp; POSTER ENGINE</span>
+                <span class="product-price">Rp [PLACEHOLDER HARGA]</span>
+              </div>
+              <h3 class="flagship-name">Sukunaru Filter Studio</h3>
+              <p class="flagship-summary">
+                Studio pengolahan filter visual untuk menyuntikkan karakter cetak risograph, raster halftone, distorsi tinta, dan gradasi warna poster editorial secara instan.
+              </p>
+
+              <ul class="feature-spec-list">
+                <li><strong>Real-Time Halftone &amp; Ink Bleed:</strong> Atur kerapatan titik raster, sudut cetak, dan tekstur kertas tanpa merusak komposisi asli.</li>
+                <li><strong>Preset Poster &amp; Social Media:</strong> Dilengkapi preset siap pakai untuk mempercepat pembuatan visual feed dan poster acara.</li>
+                <li><strong>High-Resolution Output:</strong> Ekspor hasil olahan dengan ketajaman tinggi yang siap dicetak maupun diunggah ke media sosial.</li>
+              </ul>
+
+              <div class="flagship-actions">
+                <a href="#checkout-filter-studio" class="btn btn-accent" data-direct-product="Sukunaru Filter Studio" data-direct-url="[DIRECT LINK SUKUNARU FILTER STUDIO]">
+                  Beli Filter Studio (Direct Link)
+                </a>
+                <button type="button" class="btn btn-outline" data-open-brief="Tanya Produk Digital: Sukunaru Filter Studio">
+                  Tanya via WhatsApp
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="portfolio-section container" id="karya" aria-labelledby="portfolio-heading">
+      <div class="portfolio-top-bar">
+        <div>
+          <h2 id="portfolio-heading" class="section-title">Arsip Karya &amp; <em>Eksekusi Visual</em></h2>
+          <p class="section-subtitle">Kombinasi karya poster cetak berformat vertikal dan sistem konten media sosial. Klik item karya untuk melihat spesifikasi produksi.</p>
+        </div>
+
+        <div class="portfolio-controls" role="tablist" aria-label="Filter Kategori Karya">
+          <button type="button" role="tab" aria-selected="true" class="filter-tab is-active" data-filter="all">Semua Karya (6)</button>
+          <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="poster">Poster Print (3)</button>
+          <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="socmed">Social Media Design (3)</button>
+          <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="archive-2025">Arsip 2025 (0)</button>
+        </div>
+      </div>
+
+      <div id="portfolio-state-loading" class="ui-state-box" hidden aria-live="polite">
+        <div class="state-spinner" aria-hidden="true"></div>
+        <p class="state-title">Menyusun lembar karya Sukunaru Studio...</p>
+        <p class="state-desc">Menyiapkan pratinjau spesifikasi cetak dan grid sosial media.</p>
+      </div>
+
+      <div id="portfolio-state-empty" class="ui-state-box" hidden aria-live="polite">
+        <p class="state-title">Belum ada karya pada kategori Arsip 2025.</p>
+        <p class="state-desc">Karya pada kategori ini belum diunggah ke galeri publik. Tampilkan kembali seluruh karya aktif atau hubungi kami untuk melihat sampel PDF sesuai industri Anda.</p>
+        <div class="state-actions">
+          <button type="button" class="btn btn-accent" data-reset-filter>Tampilkan Semua Karya Aktif</button>
+          <button type="button" class="btn btn-outline" data-open-brief="Minta Sampel Portfolio PDF via WA">Minta Sampel PDF di WA</button>
+        </div>
+      </div>
+
+      <div class="poster-wall" id="portfolio-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="services-section" id="jasa" aria-labelledby="services-heading">
+      <div class="container">
+        <div class="services-intro">
+          <h2 id="services-heading" class="section-title">Penawaran Jasa <em>Desain Grafis</em></h2>
+          <p class="section-subtitle">
+            Spesifikasi pengerjaan yang transparan untuk kebutuhan rutin konten media sosial maupun produksi poster cetak. Setiap paket langsung terhubung ke diskusi WhatsApp.
+          </p>
+        </div>
+
+        <div class="service-ledger" role="list">
+          <article class="ledger-row" role="listitem">
+            <div class="ledger-index-col">
+              <span class="ledger-code">SRV / 01</span>
+              <span class="ledger-type">SOCIAL MEDIA DESIGN</span>
+            </div>
+            <div class="ledger-main-col">
+              <h3 class="ledger-title">Sukunaru Feed Starter Pack</h3>
+              <p class="ledger-desc">
+                Penyusunan fondasi visual feed Instagram atau TikTok untuk brand baru, kampanye rilis produk, atau perapihan identitas visual bulanan.
+              </p>
+              <ul class="ledger-deliverables">
+                <li>9 Desain Feed (Single Post atau Carousel bersambung rasio 4:5)</li>
+                <li>3 Desain Story Pendamping untuk interaksi/promosi</li>
+                <li>Panduan palet warna &amp; tipografi dasar untuk konsistensi</li>
+                <li>2x Sesi revisi + File siap unggah (PNG/JPG High-Res) &amp; source file</li>
+              </ul>
+            </div>
+            <div class="ledger-action-col">
+              <div class="price-block">
+                <span class="price-caption">Estimasi Mulai Dari</span>
+                <strong class="price-value">Rp [450.000]</strong>
+                <span class="price-note">[PLACEHOLDER HARGA]</span>
+              </div>
+              <button type="button" class="btn btn-accent btn-full" data-open-brief="Paket Jasa: Sukunaru Feed Starter Pack">
+                Pesan Paket Ini di WA
+              </button>
+            </div>
+          </article>
+
+          <article class="ledger-row" role="listitem">
+            <div class="ledger-index-col">
+              <span class="ledger-code">SRV / 02</span>
+              <span class="ledger-type">SOCIAL MEDIA RETAINER</span>
+            </div>
+            <div class="ledger-main-col">
+              <h3 class="ledger-title">Monthly Content &amp; Carousel Production</h3>
+              <p class="ledger-desc">
+                Produksi konten visual penuh selama satu bulan bagi bisnis yang membutuhkan aliran konten edukasi, katalog produk, dan pengumuman rutin tanpa repot memikirkan tata letak.
+              </p>
+              <ul class="ledger-deliverables">
+                <li>18 Desain Feed (Termasuk microblog carousel hingga 5 slide per post)</li>
+                <li>8 Desain Story pengumuman &amp; promo interaktif</li>
+                <li>Penjadwalan visual grid agar tampilan profil menyatu</li>
+                <li>3x Sesi revisi per batch + File Master (PSD / AI / Figma / Canva)</li>
+              </ul>
+            </div>
+            <div class="ledger-action-col">
+              <div class="price-block">
+                <span class="price-caption">Estimasi Mulai Dari</span>
+                <strong class="price-value">Rp [1.200.000]</strong>
+                <span class="price-note">[PLACEHOLDER HARGA]</span>
+              </div>
+              <button type="button" class="btn btn-accent btn-full" data-open-brief="Paket Jasa: Monthly Content & Carousel Production">
+                Pesan Paket Ini di WA
+              </button>
+            </div>
+          </article>
+
+          <article class="ledger-row" role="listitem">
+            <div class="ledger-index-col">
+              <span class="ledger-code">SRV / 03</span>
+              <span class="ledger-type">POSTER DESIGN PRINT</span>
+            </div>
+            <div class="ledger-main-col">
+              <h3 class="ledger-title">Key Visual &amp; Event Poster Print</h3>
+              <p class="ledger-desc">
+                Desain poster utama dengan pendekatan tipografi bold dan ilustrasi grafis untuk konser musik, pameran, perilisan merchandise, atau poster promosi fisik di toko.
+              </p>
+              <ul class="ledger-deliverables">
+                <li>1 Desain Key Visual Poster Utama (Ukuran A3 / A2 / Custom)</li>
+                <li>File Siap Naik Cetak (CMYK, 300 DPI, PDF/TIFF dengan bleed &amp; crop marks)</li>
+                <li>Bonus 1 ukuran adaptasi RGB untuk unggahan Instagram Feed &amp; Story</li>
+                <li>3x Sesi revisi komposisi dan detail teks</li>
+              </ul>
+            </div>
+            <div class="ledger-action-col">
+              <div class="price-block">
+                <span class="price-caption">Estimasi Mulai Dari</span>
+                <strong class="price-value">Rp [350.000]</strong>
+                <span class="price-note">[PLACEHOLDER HARGA]</span>
+              </div>
+              <button type="button" class="btn btn-accent btn-full" data-open-brief="Paket Jasa: Key Visual & Event Poster Print">
+                Pesan Paket Ini di WA
+              </button>
+            </div>
+          </article>
+
+          <article class="ledger-row" role="listitem">
+            <div class="ledger-index-col">
+              <span class="ledger-code">SRV / 04</span>
+              <span class="ledger-type">PRINT CAMPAIGN KIT</span>
+            </div>
+            <div class="ledger-main-col">
+              <h3 class="ledger-title">Full Print &amp; Promo Visual Suite</h3>
+              <p class="ledger-desc">
+                Paket terpadu untuk acara atau peluncuran produk yang memerlukan satu identitas poster utama beserta seluruh turunan media cetak dan digitalnya.
+              </p>
+              <ul class="ledger-deliverables">
+                <li>1 Key Visual Poster Cetak Utama (CMYK 300 DPI)</li>
+                <li>3 Media Cetak Turunan (Flyer A5, X-Banner/Backdrop, Tiket/Stiker Kemasan)</li>
+                <li>1 Set pengumuman media sosial (3 Feed + 3 Story)</li>
+                <li>File Master Lengkap siap cetak dan arsip sumber terbuka</li>
+              </ul>
+            </div>
+            <div class="ledger-action-col">
+              <div class="price-block">
+                <span class="price-caption">Estimasi Mulai Dari</span>
+                <strong class="price-value">Rp [950.000]</strong>
+                <span class="price-note">[PLACEHOLDER HARGA]</span>
+              </div>
+              <button type="button" class="btn btn-accent btn-full" data-open-brief="Paket Jasa: Full Print & Promo Visual Suite">
+                Pesan Paket Ini di WA
+              </button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-hub-section container" id="sosmed" aria-labelledby="contact-heading">
+      <div class="hub-grid">
+        <div class="wa-brief-box" id="brief-wa">
+          <div class="box-tag-row">
+            <span class="spec-chip">DIRECT WHATSAPP DISPATCH</span>
+            <span class="spec-chip">RESPON CEPAT STUDIO</span>
+          </div>
+          <h2 id="contact-heading" class="hub-title">Mulai Proyek atau Tanya Produk di <em>WhatsApp</em></h2>
+          <p class="hub-desc">
+            Isi ringkasan kebutuhanmu di bawah ini. Formulir akan langsung menyusun format pesan rapi dan membuka aplikasi WhatsApp menuju nomor resmi <strong>Sukunaru Studio</strong> (<code>[+62-8XX-XXXX-XXXX]</code>).
+          </p>
+
+          <form id="wa-brief-form" class="brief-form" novalidate>
+            <div class="form-row">
+              <label for="client-name" class="form-label">Nama Anda / Brand *</label>
+              <input type="text" id="client-name" name="clientName" class="form-input" placeholder="Ketik nama Anda atau nama brand..." required autocomplete="name">
+              <p class="field-error" id="error-client-name" hidden></p>
+            </div>
+
+            <div class="form-row">
+              <label for="inquiry-topic" class="form-label">Kebutuhan Utama *</label>
+              <select id="inquiry-topic" name="inquiryTopic" class="form-select" required>
+                <option value="">Pilih topik diskusi...</option>
+                <option value="Paket Jasa: Sukunaru Feed Starter Pack">Jasa Desain: Sukunaru Feed Starter Pack</option>
+                <option value="Paket Jasa: Monthly Content & Carousel Production">Jasa Desain: Monthly Content &amp; Carousel Production</option>
+                <option value="Paket Jasa: Key Visual & Event Poster Print">Jasa Desain: Key Visual &amp; Event Poster Print</option>
+                <option value="Paket Jasa: Full Print & Promo Visual Suite">Jasa Desain: Full Print &amp; Promo Visual Suite</option>
+                <option value="Tanya Produk Digital: Vectonaru">Produk Digital: Vectonaru (Microstock &amp; Vector Tool)</option>
+                <option value="Tanya Produk Digital: Sukunaru Filter Studio">Produk Digital: Sukunaru Filter Studio</option>
+                <option value="Custom Project / Kolaborasi Lainnya">Custom Project / Kolaborasi Lainnya</option>
+              </select>
+              <p class="field-error" id="error-inquiry-topic" hidden></p>
+            </div>
+
+            <div class="form-row">
+              <label for="project-details" class="form-label">Detail Singkat / Pertanyaan *</label>
+              <textarea id="project-details" name="projectDetails" rows="3" class="form-textarea" placeholder="Ceritakan target waktu, jumlah desain yang dibutuhkan, atau pertanyaan seputar lisensi produk..." required></textarea>
+              <p class="field-error" id="error-project-details" hidden></p>
+            </div>
+
+            <div id="form-feedback" class="form-feedback" hidden aria-live="polite"></div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-accent btn-large">
+                Kirim Brief ke WhatsApp Sekarang
+              </button>
+              <a href="https://wa.me/6281200000000?text=Halo%20Sukunaru%20Studio,%20saya%20ingin%20konsultasi%20mengenai%20jasa%20desain%20/%20produk%20digital." target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                Chat WA Tanpa Isi Form
+              </a>
+            </div>
+          </form>
+        </div>
+
+        <div class="social-directory-box" aria-labelledby="social-dir-heading">
+          <div class="box-tag-row">
+            <span class="spec-chip">OFFICIAL CHANNELS</span>
+            <span class="spec-chip">ALL NETWORKS</span>
+          </div>
+          <h3 id="social-dir-heading" class="hub-subtitle">Jejaring Sosial Media <em>Sukunaru Studio</em></h3>
+          <p class="hub-desc">
+            Ikuti kanal resmi kami untuk melihat arsip poster terbaru, eksperimen visual, tutorial penggunaan <strong>Vectonaru</strong> &amp; <strong>Sukunaru Filter Studio</strong>, serta pembaruan rilis produk.
+          </p>
+
+          <ul class="social-directory-list">
+            <li>
+              <a href="https://instagram.com/sukunarustudio" target="_blank" rel="noopener noreferrer" class="social-row">
+                <div class="social-info">
+                  <span class="social-platform">INSTAGRAM</span>
+                  <strong class="social-handle">@sukunarustudio</strong>
+                  <span class="social-purpose">Katalog karya poster harian, rekap feed klien, dan info rilis produk.</span>
+                </div>
+                <span class="social-action-label">Buka Profil</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://behance.net/sukunarustudio" target="_blank" rel="noopener noreferrer" class="social-row">
+                <div class="social-info">
+                  <span class="social-platform">BEHANCE PORTFOLIO</span>
+                  <strong class="social-handle">@sukunarustudio</strong>
+                  <span class="social-purpose">Dokumentasi studi kasus penuh, rincian grid, dan pameran cetak resolusi tinggi.</span>
+                </div>
+                <span class="social-action-label">Lihat Studi Kasus</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://tiktok.com/@sukunarustudio" target="_blank" rel="noopener noreferrer" class="social-row">
+                <div class="social-info">
+                  <span class="social-platform">TIKTOK &amp; REELS</span>
+                  <strong class="social-handle">@sukunarustudio</strong>
+                  <span class="social-purpose">Video proses pembuatan poster, bedah workflow Vectonaru, dan demo Filter Studio.</span>
+                </div>
+                <span class="social-action-label">Tonton Video</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://youtube.com/@sukunarustudio" target="_blank" rel="noopener noreferrer" class="social-row">
+                <div class="social-info">
+                  <span class="social-platform">YOUTUBE CHANNEL</span>
+                  <strong class="social-handle">@sukunarustudio</strong>
+                  <span class="social-purpose">Panduan lengkap instalasi dan penggunaan aplikasi Vectonaru &amp; Sukunaru Filter Studio.</span>
+                </div>
+                <span class="social-action-label">Buka Channel</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://x.com/sukunarustudio" target="_blank" rel="noopener noreferrer" class="social-row">
+                <div class="social-info">
+                  <span class="social-platform">X / THREADS</span>
+                  <strong class="social-handle">@sukunarustudio</strong>
+                  <span class="social-purpose">Catatan harian studio, update fitur Vectonaru &amp; Filter Studio, serta diskusi desain.</span>
+                </div>
+                <span class="social-action-label">Ikuti Update</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="brand-crop" aria-hidden="true">+</span>
+        <strong>SUKUNARU STUDIO</strong>
+        <span class="footer-copy">Desain Grafis (Social Media &amp; Poster Print) &amp; Produk Digital Kreator.</span>
+      </div>
+      <div class="footer-links">
+        <a href="#produk">Vectonaru</a>
+        <a href="#produk">Sukunaru Filter Studio</a>
+        <a href="#karya">Portfolio</a>
+        <a href="#jasa">Paket Layanan</a>
+        <a href="#sosmed">WhatsApp &amp; Sosmed</a>
+      </div>
+    </div>
+  </footer>
+
+  <dialog class="studio-dialog" id="work-dialog" aria-labelledby="dialog-work-title">
+    <div class="dialog-inner">
+      <div class="dialog-top-bar">
+        <span class="dialog-code" id="dialog-work-code">WRK / 01</span>
+        <button type="button" class="dialog-close-btn" id="close-work-dialog" aria-label="Tutup detail karya">
+          Tutup [ESC]
+        </button>
+      </div>
+      <div class="dialog-content">
+        <span class="dialog-category" id="dialog-work-category">POSTER PRINT</span>
+        <h2 class="dialog-title" id="dialog-work-title">Judul Karya</h2>
+        <p class="dialog-desc" id="dialog-work-desc"></p>
+        <div class="dialog-specs" id="dialog-work-specs"></div>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-accent" id="dialog-order-similar">
+            Pesan Desain Serupa via WA
+          </button>
+          <button type="button" class="btn btn-outline" id="dialog-close-secondary">
+            Kembali ke Galeri
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="studio-dialog" id="product-dialog" aria-labelledby="dialog-product-title">
+    <div class="dialog-inner">
+      <div class="dialog-top-bar">
+        <span class="dialog-code">DIRECT CHECKOUT GATEWAY</span>
+        <button type="button" class="dialog-close-btn" id="close-product-dialog" aria-label="Tutup jendela produk">
+          Tutup [ESC]
+        </button>
+      </div>
+      <div class="dialog-content">
+        <span class="dialog-category">PRODUK DIGITAL SUKUNARU STUDIO</span>
+        <h2 class="dialog-title" id="dialog-product-title">Nama Produk</h2>
+        <p class="dialog-desc" id="dialog-product-desc">
+          Tautan pembelian langsung (Direct Link) disiapkan pada atribut placeholder <code>[DIRECT LINK]</code>. Anda dapat menggantinya dengan tautan Lynk.id, Gumroad, atau halaman pembayaran Anda, atau langsung menyelesaikan pembelian melalui WhatsApp.
+        </p>
+        <div class="dialog-specs">
+          <span class="spec-chip" id="dialog-product-url-chip">Target URL: [DIRECT LINK]</span>
+        </div>
+        <div class="dialog-actions">
+          <a href="https://wa.me/6281200000000" target="_blank" rel="noopener noreferrer" class="btn btn-accent" id="dialog-product-wa-link">
+            Beli Langsung via WhatsApp
+          </a>
+          <button type="button" class="btn btn-outline" id="dialog-product-close-secondary">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
