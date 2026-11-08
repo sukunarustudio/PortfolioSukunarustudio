@@ -419,10 +419,14 @@ function initInteractiveBackgroundAndCursor() {
   if (!canvas) return;
 
   const canUseFinePointer = window.matchMedia("(pointer: fine)").matches;
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d", { alpha: true });
+  const offscreenCanvas = document.createElement("canvas");
+  const offscreenCtx = offscreenCanvas.getContext("2d");
+
   let width = 0;
   let height = 0;
-  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let lastWidth = 0;
+  let dpr = 1;
   let fadeTimer = null;
 
   const pointer = {
@@ -432,73 +436,134 @@ function initInteractiveBackgroundAndCursor() {
     smoothY: -1000,
     strength: 0,
     targetStrength: 0,
+    isTouchMode: false,
     active: false,
     rafPending: false
   };
 
-  function resizeCanvas() {
-    width = window.innerWidth;
-    height = window.innerHeight;
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+  function getGridConfig() {
+    const isCompact = width < 720;
+    return {
+      spacing: isCompact ? 34 : 36,
+      influenceRadius: isCompact ? 120 : 160
+    };
+  }
+
+  function buildStaticGridBuffer() {
+    offscreenCanvas.width = canvas.width;
+    offscreenCanvas.height = canvas.height;
+    offscreenCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    offscreenCtx.clearRect(0, 0, width, height);
+
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+    const baseDotColor = isLight ? "rgba(17, 17, 17, 0.14)" : "rgba(245, 242, 235, 0.11)";
+    const { spacing } = getGridConfig();
+
+    offscreenCtx.fillStyle = baseDotColor;
+    offscreenCtx.beginPath();
+    for (let x = spacing / 2; x < width; x += spacing) {
+      for (let y = spacing / 2; y < height; y += spacing) {
+        offscreenCtx.moveTo(x + 1.15, y);
+        offscreenCtx.arc(x, y, 1.15, 0, Math.PI * 2);
+      }
+    }
+    offscreenCtx.fill();
+  }
+
+  function resizeCanvas(forceRebuild) {
+    const newWidth = window.innerWidth;
+    const newHeight = Math.max(window.innerHeight, document.documentElement.clientHeight || 0);
+
+    // Ignore minor vertical URL-bar resize jumps during mobile scroll
+    if (!forceRebuild && newWidth === lastWidth && Math.abs(newHeight - height) < 140) {
+      return;
+    }
+
+    lastWidth = newWidth;
+    width = newWidth;
+    height = newHeight;
+    dpr = width < 720 ? 1 : Math.min(window.devicePixelRatio || 1, 1.75);
+
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    buildStaticGridBuffer();
     scheduleFrame();
   }
 
   function renderFrame() {
     pointer.rafPending = false;
 
+    const lerpSpeed = pointer.isTouchMode ? 0.42 : 0.25;
+    const fadeSpeed = pointer.isTouchMode
+      ? pointer.targetStrength === 0
+        ? 0.34
+        : 0.38
+      : 0.16;
+
     const dxCursor = pointer.x - pointer.smoothX;
     const dyCursor = pointer.y - pointer.smoothY;
-    pointer.smoothX += dxCursor * 0.25;
-    pointer.smoothY += dyCursor * 0.25;
-    pointer.strength += (pointer.targetStrength - pointer.strength) * 0.14;
+    pointer.smoothX += dxCursor * lerpSpeed;
+    pointer.smoothY += dyCursor * lerpSpeed;
+    pointer.strength += (pointer.targetStrength - pointer.strength) * fadeSpeed;
 
-    if (canUseFinePointer && cursorEl && pointer.active) {
+    if (canUseFinePointer && !pointer.isTouchMode && cursorEl && pointer.active) {
       const halfSize = cursorEl.classList.contains("is-interactive") ? 26 : 17;
       cursorEl.style.transform = `translate3d(${(pointer.smoothX - halfSize).toFixed(1)}px, ${(pointer.smoothY - halfSize).toFixed(1)}px, 0)`;
     }
 
     ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(offscreenCanvas, 0, 0, width, height);
 
-    const isLight = document.documentElement.getAttribute("data-theme") === "light";
-    const baseDotColor = isLight ? "rgba(17, 17, 17, 0.14)" : "rgba(245, 242, 235, 0.12)";
-    const isCompactScreen = width < 720;
-    const spacing = isCompactScreen ? 28 : 36;
-    const influenceRadius = isCompactScreen ? 150 : 165;
+    if (pointer.strength > 0.015) {
+      const { spacing, influenceRadius } = getGridConfig();
+      const isLight = document.documentElement.getAttribute("data-theme") === "light";
+      const bgEraser = isLight ? "#F5F2EB" : "#0C0C0C";
 
-    for (let x = spacing / 2; x < width; x += spacing) {
-      for (let y = spacing / 2; y < height; y += spacing) {
-        const dx = x - pointer.smoothX;
-        const dy = y - pointer.smoothY;
-        const dist = Math.hypot(dx, dy);
+      const startX = Math.max(
+        spacing / 2,
+        Math.floor((pointer.smoothX - influenceRadius) / spacing) * spacing + spacing / 2
+      );
+      const endX = Math.min(width, pointer.smoothX + influenceRadius);
+      const startY = Math.max(
+        spacing / 2,
+        Math.floor((pointer.smoothY - influenceRadius) / spacing) * spacing + spacing / 2
+      );
+      const endY = Math.min(height, pointer.smoothY + influenceRadius);
 
-        if (pointer.strength > 0.02 && dist < influenceRadius) {
-          const factor = (1 - dist / influenceRadius) * pointer.strength;
-          const push = factor * 11;
-          const angle = Math.atan2(dy, dx);
-          const drawX = x + Math.cos(angle) * push;
-          const drawY = y + Math.sin(angle) * push;
-          const radius = 1.2 + factor * 3.4;
+      for (let x = startX; x <= endX; x += spacing) {
+        for (let y = startY; y <= endY; y += spacing) {
+          const dx = x - pointer.smoothX;
+          const dy = y - pointer.smoothY;
+          const dist = Math.hypot(dx, dy);
 
-          ctx.beginPath();
-          ctx.arc(drawX, drawY, radius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 142, 0, ${(0.28 + factor * 0.65).toFixed(2)})`;
-          ctx.fill();
-        } else {
-          ctx.beginPath();
-          ctx.arc(x, y, 1.15, 0, Math.PI * 2);
-          ctx.fillStyle = baseDotColor;
-          ctx.fill();
+          if (dist < influenceRadius) {
+            const factor = (1 - dist / influenceRadius) * pointer.strength;
+            const push = factor * 10;
+            const angle = Math.atan2(dy, dx);
+            const drawX = x + Math.cos(angle) * push;
+            const drawY = y + Math.sin(angle) * push;
+            const radius = 1.2 + factor * 3.1;
+
+            ctx.fillStyle = bgEraser;
+            ctx.fillRect(x - 2, y - 2, 4, 4);
+
+            ctx.beginPath();
+            ctx.arc(drawX, drawY, radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 142, 0, ${(0.28 + factor * 0.65).toFixed(2)})`;
+            ctx.fill();
+          }
         }
       }
+    } else {
+      pointer.strength = 0;
     }
 
-    const stillMoving = Math.abs(dxCursor) > 0.35 || Math.abs(dyCursor) > 0.35;
-    const stillFading = Math.abs(pointer.targetStrength - pointer.strength) > 0.02;
+    const stillMoving = Math.abs(dxCursor) > 0.45 || Math.abs(dyCursor) > 0.45;
+    const stillFading = Math.abs(pointer.targetStrength - pointer.strength) > 0.015;
 
-    if (stillMoving || stillFading) {
+    if ((pointer.active && stillMoving) || stillFading) {
       scheduleFrame();
     }
   }
@@ -515,6 +580,7 @@ function initInteractiveBackgroundAndCursor() {
       clearTimeout(fadeTimer);
       fadeTimer = null;
     }
+    pointer.isTouchMode = Boolean(isTouch);
     pointer.x = clientX;
     pointer.y = clientY;
     if (!pointer.active || pointer.strength < 0.08 || isTouch) {
@@ -524,10 +590,25 @@ function initInteractiveBackgroundAndCursor() {
     pointer.active = true;
     pointer.targetStrength = 1;
     scheduleFrame();
+
+    if (isTouch) {
+      // Auto-hide quickly on mobile if finger holds still or finishes scrolling
+      fadeTimer = setTimeout(() => {
+        pointer.active = false;
+        pointer.targetStrength = 0;
+        scheduleFrame();
+      }, 130);
+    }
   }
 
   function releasePoint(delayMs) {
     if (fadeTimer) clearTimeout(fadeTimer);
+    if (delayMs <= 0) {
+      pointer.active = false;
+      pointer.targetStrength = 0;
+      scheduleFrame();
+      return;
+    }
     fadeTimer = setTimeout(() => {
       pointer.active = false;
       pointer.targetStrength = 0;
@@ -535,29 +616,41 @@ function initInteractiveBackgroundAndCursor() {
     }, delayMs);
   }
 
-  window.addEventListener("pointermove", (event) => {
-    const isTouch = event.pointerType === "touch";
-    activatePoint(event.clientX, event.clientY, isTouch);
+  window.addEventListener(
+    "pointermove",
+    (event) => {
+      const isTouch = event.pointerType === "touch";
+      activatePoint(event.clientX, event.clientY, isTouch);
 
-    if (!isTouch && canUseFinePointer && cursorEl) {
-      cursorEl.classList.add("is-visible");
-      if (coordsEl) {
-        coordsEl.textContent = `X:${Math.round(event.clientX)} Y:${Math.round(event.clientY)}`;
+      if (!isTouch && canUseFinePointer && cursorEl) {
+        cursorEl.classList.add("is-visible");
+        if (coordsEl) {
+          coordsEl.textContent = `X:${Math.round(event.clientX)} Y:${Math.round(event.clientY)}`;
+        }
+        const interactiveTarget = event.target.closest("a, button, input, select, textarea, .work-piece, .flagship-item");
+        cursorEl.classList.toggle("is-interactive", Boolean(interactiveTarget));
       }
-      const interactiveTarget = event.target.closest("a, button, input, select, textarea, .work-piece, .flagship-item");
-      cursorEl.classList.toggle("is-interactive", Boolean(interactiveTarget));
-    }
-  });
+    },
+    { passive: true }
+  );
 
-  window.addEventListener("pointerdown", (event) => {
-    activatePoint(event.clientX, event.clientY, event.pointerType === "touch");
-  });
+  window.addEventListener(
+    "pointerdown",
+    (event) => {
+      activatePoint(event.clientX, event.clientY, event.pointerType === "touch");
+    },
+    { passive: true }
+  );
 
-  window.addEventListener("pointerup", (event) => {
-    if (event.pointerType === "touch") {
-      releasePoint(700);
-    }
-  });
+  window.addEventListener(
+    "pointerup",
+    (event) => {
+      if (event.pointerType === "touch") {
+        releasePoint(0);
+      }
+    },
+    { passive: true }
+  );
 
   window.addEventListener(
     "touchstart",
@@ -582,7 +675,7 @@ function initInteractiveBackgroundAndCursor() {
   window.addEventListener(
     "touchend",
     () => {
-      releasePoint(700);
+      releasePoint(0);
     },
     { passive: true }
   );
@@ -590,26 +683,31 @@ function initInteractiveBackgroundAndCursor() {
   window.addEventListener(
     "touchcancel",
     () => {
-      releasePoint(300);
+      releasePoint(0);
     },
     { passive: true }
   );
 
   document.addEventListener("mouseleave", () => {
-    releasePoint(100);
+    releasePoint(60);
     if (cursorEl) {
       cursorEl.classList.remove("is-visible");
     }
   });
 
-  window.addEventListener("resize", resizeCanvas);
+  window.addEventListener("resize", () => resizeCanvas(false));
 
   const themeBtn = document.getElementById("theme-toggle");
   if (themeBtn) {
-    themeBtn.addEventListener("click", () => setTimeout(scheduleFrame, 20));
+    themeBtn.addEventListener("click", () => {
+      setTimeout(() => {
+        buildStaticGridBuffer();
+        scheduleFrame();
+      }, 20);
+    });
   }
 
-  resizeCanvas();
+  resizeCanvas(true);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
