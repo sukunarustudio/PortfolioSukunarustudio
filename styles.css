@@ -156,7 +156,13 @@ main,
   border: 1px solid var(--border-subtle);
 }
 
-@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+@media (pointer: coarse) {
+  .studio-cursor {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
   .halftone-canvas,
   .studio-cursor {
     display: none !important;
@@ -519,8 +525,13 @@ dialog {
 /* Digital Products Flagship Section */
 .products-section {
   padding-block: clamp(3.5rem, 7vw, 6.5rem);
-  background-color: var(--bg-elevated);
+  background-color: rgba(22, 22, 22, 0.72);
   border-bottom: 1px solid var(--border-structural);
+}
+
+[data-theme="light"] .products-section,
+[data-theme="light"] .services-section {
+  background-color: rgba(234, 229, 217, 0.72);
 }
 
 .section-header-bar {
@@ -866,7 +877,7 @@ dialog {
 /* Services Ledger Section */
 .services-section {
   padding-block: clamp(3.5rem, 7vw, 6.5rem);
-  background-color: var(--bg-elevated);
+  background-color: rgba(22, 22, 22, 0.72);
   border-bottom: 1px solid var(--border-structural);
 }
 

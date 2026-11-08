@@ -413,25 +413,25 @@ function initBriefForm() {
 }
 
 function initInteractiveBackgroundAndCursor() {
-  const canUseFinePointer = window.matchMedia("(pointer: fine)").matches;
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!canUseFinePointer || prefersReducedMotion) return;
-
   const canvas = document.getElementById("halftone-canvas");
   const cursorEl = document.getElementById("studio-cursor");
   const coordsEl = document.getElementById("cursor-coords");
-  if (!canvas || !cursorEl || !coordsEl) return;
+  if (!canvas) return;
 
+  const canUseFinePointer = window.matchMedia("(pointer: fine)").matches;
   const ctx = canvas.getContext("2d");
   let width = 0;
   let height = 0;
   let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let fadeTimer = null;
 
   const pointer = {
     x: -1000,
     y: -1000,
     smoothX: -1000,
     smoothY: -1000,
+    strength: 0,
+    targetStrength: 0,
     active: false,
     rafPending: false
   };
@@ -451,10 +451,11 @@ function initInteractiveBackgroundAndCursor() {
 
     const dxCursor = pointer.x - pointer.smoothX;
     const dyCursor = pointer.y - pointer.smoothY;
-    pointer.smoothX += dxCursor * 0.22;
-    pointer.smoothY += dyCursor * 0.22;
+    pointer.smoothX += dxCursor * 0.25;
+    pointer.smoothY += dyCursor * 0.25;
+    pointer.strength += (pointer.targetStrength - pointer.strength) * 0.14;
 
-    if (pointer.active) {
+    if (canUseFinePointer && cursorEl && pointer.active) {
       const halfSize = cursorEl.classList.contains("is-interactive") ? 26 : 17;
       cursorEl.style.transform = `translate3d(${(pointer.smoothX - halfSize).toFixed(1)}px, ${(pointer.smoothY - halfSize).toFixed(1)}px, 0)`;
     }
@@ -462,9 +463,10 @@ function initInteractiveBackgroundAndCursor() {
     ctx.clearRect(0, 0, width, height);
 
     const isLight = document.documentElement.getAttribute("data-theme") === "light";
-    const baseDotColor = isLight ? "rgba(17, 17, 17, 0.10)" : "rgba(245, 242, 235, 0.08)";
-    const spacing = 38;
-    const influenceRadius = 155;
+    const baseDotColor = isLight ? "rgba(17, 17, 17, 0.14)" : "rgba(245, 242, 235, 0.12)";
+    const isCompactScreen = width < 720;
+    const spacing = isCompactScreen ? 28 : 36;
+    const influenceRadius = isCompactScreen ? 150 : 165;
 
     for (let x = spacing / 2; x < width; x += spacing) {
       for (let y = spacing / 2; y < height; y += spacing) {
@@ -472,28 +474,31 @@ function initInteractiveBackgroundAndCursor() {
         const dy = y - pointer.smoothY;
         const dist = Math.hypot(dx, dy);
 
-        if (pointer.active && dist < influenceRadius) {
-          const factor = 1 - dist / influenceRadius;
-          const push = factor * 9;
+        if (pointer.strength > 0.02 && dist < influenceRadius) {
+          const factor = (1 - dist / influenceRadius) * pointer.strength;
+          const push = factor * 11;
           const angle = Math.atan2(dy, dx);
           const drawX = x + Math.cos(angle) * push;
           const drawY = y + Math.sin(angle) * push;
-          const radius = 1 + factor * 2.8;
+          const radius = 1.2 + factor * 3.4;
 
           ctx.beginPath();
           ctx.arc(drawX, drawY, radius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 142, 0, ${(0.18 + factor * 0.55).toFixed(2)})`;
+          ctx.fillStyle = `rgba(255, 142, 0, ${(0.28 + factor * 0.65).toFixed(2)})`;
           ctx.fill();
         } else {
           ctx.beginPath();
-          ctx.arc(x, y, 1, 0, Math.PI * 2);
+          ctx.arc(x, y, 1.15, 0, Math.PI * 2);
           ctx.fillStyle = baseDotColor;
           ctx.fill();
         }
       }
     }
 
-    if (pointer.active && (Math.abs(dxCursor) > 0.35 || Math.abs(dyCursor) > 0.35)) {
+    const stillMoving = Math.abs(dxCursor) > 0.35 || Math.abs(dyCursor) > 0.35;
+    const stillFading = Math.abs(pointer.targetStrength - pointer.strength) > 0.02;
+
+    if (stillMoving || stillFading) {
       scheduleFrame();
     }
   }
@@ -505,28 +510,96 @@ function initInteractiveBackgroundAndCursor() {
     }
   }
 
-  window.addEventListener("mousemove", (event) => {
-    pointer.x = event.clientX;
-    pointer.y = event.clientY;
-    if (!pointer.active) {
-      pointer.smoothX = pointer.x;
-      pointer.smoothY = pointer.y;
-      pointer.active = true;
-      cursorEl.classList.add("is-visible");
+  function activatePoint(clientX, clientY, isTouch) {
+    if (fadeTimer) {
+      clearTimeout(fadeTimer);
+      fadeTimer = null;
     }
-
-    coordsEl.textContent = `X:${Math.round(pointer.x)} Y:${Math.round(pointer.y)}`;
-
-    const interactiveTarget = event.target.closest("a, button, input, select, textarea, .work-piece, .flagship-item");
-    cursorEl.classList.toggle("is-interactive", Boolean(interactiveTarget));
-
+    pointer.x = clientX;
+    pointer.y = clientY;
+    if (!pointer.active || pointer.strength < 0.08 || isTouch) {
+      pointer.smoothX = clientX;
+      pointer.smoothY = clientY;
+    }
+    pointer.active = true;
+    pointer.targetStrength = 1;
     scheduleFrame();
+  }
+
+  function releasePoint(delayMs) {
+    if (fadeTimer) clearTimeout(fadeTimer);
+    fadeTimer = setTimeout(() => {
+      pointer.active = false;
+      pointer.targetStrength = 0;
+      scheduleFrame();
+    }, delayMs);
+  }
+
+  window.addEventListener("pointermove", (event) => {
+    const isTouch = event.pointerType === "touch";
+    activatePoint(event.clientX, event.clientY, isTouch);
+
+    if (!isTouch && canUseFinePointer && cursorEl) {
+      cursorEl.classList.add("is-visible");
+      if (coordsEl) {
+        coordsEl.textContent = `X:${Math.round(event.clientX)} Y:${Math.round(event.clientY)}`;
+      }
+      const interactiveTarget = event.target.closest("a, button, input, select, textarea, .work-piece, .flagship-item");
+      cursorEl.classList.toggle("is-interactive", Boolean(interactiveTarget));
+    }
   });
 
+  window.addEventListener("pointerdown", (event) => {
+    activatePoint(event.clientX, event.clientY, event.pointerType === "touch");
+  });
+
+  window.addEventListener("pointerup", (event) => {
+    if (event.pointerType === "touch") {
+      releasePoint(700);
+    }
+  });
+
+  window.addEventListener(
+    "touchstart",
+    (event) => {
+      if (event.touches && event.touches.length > 0) {
+        activatePoint(event.touches[0].clientX, event.touches[0].clientY, true);
+      }
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "touchmove",
+    (event) => {
+      if (event.touches && event.touches.length > 0) {
+        activatePoint(event.touches[0].clientX, event.touches[0].clientY, true);
+      }
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "touchend",
+    () => {
+      releasePoint(700);
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "touchcancel",
+    () => {
+      releasePoint(300);
+    },
+    { passive: true }
+  );
+
   document.addEventListener("mouseleave", () => {
-    pointer.active = false;
-    cursorEl.classList.remove("is-visible");
-    scheduleFrame();
+    releasePoint(100);
+    if (cursorEl) {
+      cursorEl.classList.remove("is-visible");
+    }
   });
 
   window.addEventListener("resize", resizeCanvas);
