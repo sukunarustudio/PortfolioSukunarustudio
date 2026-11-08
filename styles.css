@@ -5,12 +5,12 @@
   --bg-panel: #1D1C1A;
   --text-primary: #F5F2EB;
   --text-secondary: #BDB7AC;
-  --accent-brand: #FF5E0E;
-  --accent-text-on-surface: #FF5E0E;
+  --accent-brand: #FF8E00;
+  --accent-text-on-surface: #FF8E00;
   --accent-contrast-ink: #0C0C0C;
   --border-structural: #57534C;
   --border-subtle: #33312D;
-  --focus-ring: #FF5E0E;
+  --focus-ring: #FF8E00;
   --error-surface: #2B1212;
   --error-border: #FF6B6B;
   --error-text: #FFD2D2;
@@ -26,12 +26,12 @@
   --bg-panel: #E1DBD0;
   --text-primary: #111111;
   --text-secondary: #4A463F;
-  --accent-brand: #FF5E0E;
-  --accent-text-on-surface: #B83B00;
+  --accent-brand: #FF8E00;
+  --accent-text-on-surface: #944E00;
   --accent-contrast-ink: #0C0C0C;
   --border-structural: #787268;
   --border-subtle: #C4BDB0;
-  --focus-ring: #B83B00;
+  --focus-ring: #944E00;
   --error-surface: #FDECEC;
   --error-border: #B81D1D;
   --error-text: #6E0B0B;
@@ -131,7 +131,7 @@ main,
   width: 52px;
   height: 52px;
   border-radius: 4px;
-  background-color: rgba(255, 94, 14, 0.12);
+  background-color: rgba(255, 142, 0, 0.14);
 }
 
 .cursor-crosshair {
@@ -281,15 +281,13 @@ dialog {
 .theme-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  min-height: 44px;
-  padding: 0.5rem 0.85rem;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
   background-color: var(--bg-elevated);
   border: 1px solid var(--border-structural);
   cursor: pointer;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.8rem;
-  font-weight: 500;
 }
 
 .theme-toggle:hover {
@@ -346,8 +344,8 @@ dialog {
 }
 
 .btn-accent:hover {
-  background-color: #ff742e;
-  border-color: #ff742e;
+  background-color: #FFA024;
+  border-color: #FFA024;
 }
 
 .btn-solid {

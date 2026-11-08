@@ -16,15 +16,15 @@ Every color pairing is mathematically verified against WCAG 2.x AA contrast stan
 - **Core 1 (Canvas Ink):** `#0C0C0C` (Surface Primary) / `#161616` (Surface Elevated)
 - **Core 2 (Warm Paper Foreground):** `#F5F2EB` (Contrast on `#0C0C0C`: `17.50:1`, on `#161616`: `16.19:1`)
 - **Secondary Text (Warm Stone):** `#BDB7AC` (Contrast on `#0C0C0C`: `9.81:1`, on `#161616`: `9.08:1`)
-- **Accent (Sukunaru Orange):** `#FF5E0E` (Contrast on `#0C0C0C`: `6.39:1`; `#0C0C0C` text on `#FF5E0E` button: `6.39:1`)
+- **Accent (Sukunaru Orange):** `#FF8E00` (Contrast on `#0C0C0C`: `8.50:1`, on `#161616`: `7.86:1`; `#0C0C0C` text on `#FF8E00` button: `8.50:1`)
 - **Structural Hairline Border:** `#3D3A35` (`3.12:1` non-text contrast for interactive boundaries: `#57534C`)
 
 ### Light Theme (Paper Proof Sheet)
 - **Core 1 (Warm Paper Canvas):** `#F5F2EB` (Surface Primary) / `#EAE5D9` (Surface Elevated)
 - **Core 2 (Deep Ink Foreground):** `#111111` (Contrast on `#F5F2EB`: `16.89:1`)
 - **Secondary Text (Charcoal Ink):** `#4A463F` (Contrast on `#F5F2EB`: `8.39:1`)
-- **Accent (Sukunaru Orange for Text/Links on Light):** `#B83B00` (Contrast on `#F5F2EB`: `5.13:1`)
-- **Accent Surface (Buttons on Light):** `#FF5E0E` with `#0C0C0C` text (`6.39:1`)
+- **Accent (Sukunaru Amber Ink for Text/Links on Light):** `#944E00` (Contrast on `#F5F2EB`: `5.61:1`, on `#EAE5D9`: `4.99:1`)
+- **Accent Surface (Buttons on Light):** `#FF8E00` with `#0C0C0C` text (`8.50:1`)
 
 ## Typography & Hierarchy
 - **Display / Headlines (`Instrument Serif` & `Plus Jakarta Sans`, 600-700):** `Instrument Serif` paired with clean geometric `Plus Jakarta Sans` replaces the overly brutalist wide display type, giving headlines a refined contemporary design-agency and editorial magazine poise without harshness.
@@ -32,7 +32,7 @@ Every color pairing is mathematically verified against WCAG 2.x AA contrast stan
 - **Technical Specs (`JetBrains Mono`, 500):** Used strictly for print dimensions (`A2 / 420x594mm`), DPI ratings (`300 DPI CMYK`), version tags, and price figures.
 
 ## Written Reasons for Major Design Decisions (R-31)
-1. **Why this color palette?** Deep ink black (`#0C0C0C`), warm paper (`#F5F2EB`), and Sukunaru Orange (`#FF5E0E`) evoke physical screen-printing ink on archival paper while maintaining >6:1 contrast on primary actions.
+1. **Why this color palette?** Deep ink black (`#0C0C0C`), warm paper (`#F5F2EB`), and Sukunaru Brand Orange (`#FF8E00`) evoke physical screen-printing ink on archival paper while achieving `8.50:1` WCAG AAA contrast on dark surfaces and primary buttons.
 2. **Why this layout structure?** Sections follow a 50:50 dual-track buyer journey (Split Hero -> Flagship 2-Product Showcase -> Asymmetric Poster/Feed Wall -> Editorial Service Ledger -> Direct WA Brief Builder & Social Directory), avoiding uniform template grids.
 3. **Why this typography?** `Plus Jakarta Sans` (600-700) combined with `Instrument Serif` accents delivers a sleek, modern design-studio voice that avoids harsh brutalism while keeping strong hierarchy.
 4. **Why this spacing?** Fluid `clamp()` spacing creates tight specification groupings separated by generous gallery pauses so each section breathes differently (RHYTHM 3).

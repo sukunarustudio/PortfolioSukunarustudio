@@ -70,22 +70,22 @@ function createWorkSvg(work) {
       <rect x="6" y="6" width="468" height="248" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/>
       <line x1="6" y1="38" x2="474" y2="38" stroke="currentColor" stroke-width="1"/>
       <text x="18" y="26" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">${work.id} // ${work.categoryLabel}</text>
-      <text x="340" y="26" font-family="JetBrains Mono, monospace" font-size="11" fill="#FF5E0E">[PLACEHOLDER KARYA]</text>
+      <text x="340" y="26" font-family="JetBrains Mono, monospace" font-size="11" fill="#FF8E00">[PLACEHOLDER KARYA]</text>
       ${
         isPoster
           ? `
-            <rect x="165" y="54" width="150" height="184" fill="none" stroke="#FF5E0E" stroke-width="2"/>
+            <rect x="165" y="54" width="150" height="184" fill="none" stroke="#FF8E00" stroke-width="2"/>
             <line x1="178" y1="80" x2="288" y2="80" stroke="currentColor" stroke-width="3"/>
-            <line x1="178" y1="96" x2="260" y2="96" stroke="#FF5E0E" stroke-width="3"/>
+            <line x1="178" y1="96" x2="260" y2="96" stroke="#FF8E00" stroke-width="3"/>
             <circle cx="240" cy="154" r="32" fill="none" stroke="currentColor" stroke-width="1.5"/>
             <text x="178" y="222" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor">${work.svgLabel}</text>
           `
           : `
             <rect x="34" y="64" width="124" height="148" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <rect x="178" y="64" width="124" height="148" fill="none" stroke="#FF5E0E" stroke-width="2"/>
+            <rect x="178" y="64" width="124" height="148" fill="none" stroke="#FF8E00" stroke-width="2"/>
             <rect x="322" y="64" width="124" height="148" fill="none" stroke="currentColor" stroke-width="1.5"/>
             <text x="48" y="142" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor">SLIDE 01</text>
-            <text x="192" y="142" font-family="JetBrains Mono, monospace" font-size="10" fill="#FF5E0E">${work.svgLabel}</text>
+            <text x="192" y="142" font-family="JetBrains Mono, monospace" font-size="10" fill="#FF8E00">${work.svgLabel}</text>
             <text x="336" y="142" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor">SLIDE 03</text>
           `
       }
@@ -145,8 +145,8 @@ function renderPortfolio(filterKey) {
 
 function initThemeToggle() {
   const toggleBtn = document.getElementById("theme-toggle");
-  const themeLabel = document.getElementById("theme-label");
   const root = document.documentElement;
+  if (!toggleBtn) return;
 
   const savedTheme = localStorage.getItem("sukunaru_theme");
   if (savedTheme === "light" || savedTheme === "dark") {
@@ -157,7 +157,9 @@ function initThemeToggle() {
     const current = root.getAttribute("data-theme") || "dark";
     const isLight = current === "light";
     toggleBtn.setAttribute("aria-pressed", String(isLight));
-    themeLabel.textContent = isLight ? "Mode Tinta Gelap" : "Mode Kertas";
+    const labelText = isLight ? "Ganti ke mode gelap" : "Ganti ke mode terang";
+    toggleBtn.setAttribute("aria-label", labelText);
+    toggleBtn.setAttribute("title", labelText);
   }
 
   syncThemeUI();
@@ -480,7 +482,7 @@ function initInteractiveBackgroundAndCursor() {
 
           ctx.beginPath();
           ctx.arc(drawX, drawY, radius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 94, 14, ${(0.18 + factor * 0.55).toFixed(2)})`;
+          ctx.fillStyle = `rgba(255, 142, 0, ${(0.18 + factor * 0.55).toFixed(2)})`;
           ctx.fill();
         } else {
           ctx.beginPath();
