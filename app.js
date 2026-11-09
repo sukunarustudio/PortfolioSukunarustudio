@@ -206,20 +206,41 @@ function initThemeToggle() {
 function initMobileMenu() {
   const menuBtn = document.getElementById("mobile-menu-btn");
   const nav = document.getElementById("primary-nav");
+  const menuText = menuBtn ? menuBtn.querySelector(".menu-btn-text") : null;
 
   if (!menuBtn || !nav) return;
 
+  function setMenuState(open) {
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.classList.toggle("is-active", open);
+    nav.classList.toggle("is-open", open);
+    if (menuText) {
+      menuText.textContent = open ? "Tutup" : "Menu";
+    }
+  }
+
   menuBtn.addEventListener("click", () => {
-    const expanded = menuBtn.getAttribute("aria-expanded") === "true";
-    menuBtn.setAttribute("aria-expanded", String(!expanded));
-    nav.classList.toggle("is-open", !expanded);
+    const isExpanded = menuBtn.getAttribute("aria-expanded") === "true";
+    setMenuState(!isExpanded);
   });
 
   nav.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
-      menuBtn.setAttribute("aria-expanded", "false");
-      nav.classList.remove("is-open");
+      setMenuState(false);
     });
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!nav.contains(e.target) && !menuBtn.contains(e.target) && nav.classList.contains("is-open")) {
+      setMenuState(false);
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && nav.classList.contains("is-open")) {
+      setMenuState(false);
+      menuBtn.focus();
+    }
   });
 }
 
