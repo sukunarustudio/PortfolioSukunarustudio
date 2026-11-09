@@ -384,7 +384,7 @@ function initDialogsAndTriggers() {
       event.preventDefault();
       const productName = directProductBtn.getAttribute("data-direct-product");
       document.getElementById("dialog-product-title").textContent = productName;
-      document.getElementById("dialog-product-url-chip").textContent = `Official License • Direct WhatsApp Checkout`;
+      document.getElementById("dialog-product-url-chip").textContent = "Lisensi Resmi • Pemesanan via WhatsApp";
       const waMsg = encodeURIComponent(
         `Halo Sukunaru Studio, saya ingin membeli lisensi produk digital *${productName}*. Mohon info langkah pembayarannya.`
       );
