@@ -2,96 +2,126 @@ const STUDIO_WA_NUMBER = "6289519203345";
 
 const PORTFOLIO_WORKS = [
   {
-    id: "WRK-01",
+    id: "SKN-01",
     category: "poster",
-    categoryLabel: "POSTER DESIGN PRINT",
-    spanClass: "span-poster",
-    title: "Nocturnal Sound Fest: Key Visual Poster",
-    summary: "Poster cetak ukuran A2 untuk pertunjukan musik independen dengan komposisi tipografi vertikal dan separasi warna risograph.",
-    specs: ["A2 (420x594mm)", "CMYK 300 DPI", "[PLACEHOLDER KARYA ASLI]"],
-    svgLabel: "POSTER A2 / NOCTURNAL SOUND"
+    categoryLabel: "SPORTS EDITORIAL POSTER",
+    spanClass: "span-4",
+    image: "assets/works/deligt-manutd.jpg",
+    title: "Matthijs de Ligt #04: Manchester United Tribute",
+    summary: "Komposisi poster olahraga bergaya Swiss editorial dengan blok warna kontras tinggi, potongan tiga gestur subjek, dan kolofon naratif.",
+    specs: ["Rasio 4:5 (1080x1350)", "CMYK & RGB Ready", "Sports Key Visual"]
   },
   {
-    id: "WRK-02",
-    category: "socmed",
-    categoryLabel: "SOCIAL MEDIA DESIGN",
-    spanClass: "span-socmed",
-    title: "Kopi Bara: 30-Day Modular Feed System",
-    summary: "Perancangan ulang tata letak feed Instagram dan sistem carousel produk agar pengumuman menu baru tetap terbaca jelas di layar ponsel.",
-    specs: ["27 Feed Posts", "Rasio 4:5 (1080x1350px)", "[PLACEHOLDER KARYA ASLI]"],
-    svgLabel: "SOCIAL GRID 4:5 / KOPI BARA"
-  },
-  {
-    id: "WRK-03",
-    category: "socmed",
-    categoryLabel: "SOCIAL MEDIA DESIGN",
-    spanClass: "span-socmed",
-    title: "TechTalks ID: Educational Carousel Identity",
-    summary: "Template dan eksekusi desain microblog carousel 5-slide dengan hierarki tipografi tegas untuk meningkatkan simpanan konten.",
-    specs: ["Carousel 5 Slide", "Source PSD & Figma", "[PLACEHOLDER KARYA ASLI]"],
-    svgLabel: "CAROUSEL SYSTEM / TECHTALKS"
-  },
-  {
-    id: "WRK-04",
+    id: "SKN-02",
     category: "poster",
-    categoryLabel: "POSTER DESIGN PRINT",
-    spanClass: "span-poster",
-    title: "Monolith Streetwear: Capsule Drop Print Poster",
-    summary: "Poster fisik edisi rilis pakaian dan selebaran lipat dalam kemasan dengan efek halftone dari Sukunaru Filter Studio.",
-    specs: ["A3 Print + Insert", "Spot Orange Ink", "[PLACEHOLDER KARYA ASLI]"],
-    svgLabel: "PRINT A3 / MONOLITH DROP"
+    categoryLabel: "AUTOMOTIVE PRINT POSTER",
+    spanClass: "span-4",
+    image: "assets/works/lamborghini-svj.jpg",
+    title: "Lamborghini Aventador SVJ Roadster",
+    summary: "Desain poster otomotif dengan pemenggalan panel triptych vertikal di atas kanvas kuning Giallo Orion untuk menonjolkan siluet aerodinamika V12.",
+    specs: ["Format A3/A2", "300 DPI Print", "Automotive Series"]
   },
   {
-    id: "WRK-05",
+    id: "SKN-03",
     category: "poster",
-    categoryLabel: "POSTER DESIGN PRINT",
-    spanClass: "span-half",
-    title: "Pameran Garis & Ruang: Triptych Poster Series",
-    summary: "Seri tiga poster cetak untuk pameran desain grafis dengan sistem grid Swiss dan tanda registrasi cetak terbuka.",
-    specs: ["Seri 3 Poster A2", "Print-Ready PDF", "[PLACEHOLDER KARYA ASLI]"],
-    svgLabel: "TRIPTYCH SERIES / GARIS & RUANG"
+    categoryLabel: "AUTOMOTIVE SPEC SHEET",
+    spanClass: "span-4",
+    image: "assets/works/huracan-evo.jpg",
+    title: "Lamborghini Huracán EVO: V10 Technical Sheet",
+    summary: "Eksplorasi tata letak lembar spesifikasi otomotif dengan tiga sudut pandang sinematik, tipografi outline tegas, dan data performa terstruktur.",
+    specs: ["Format A3/A2", "300 DPI Print", "Editorial Grid"]
   },
   {
-    id: "WRK-06",
+    id: "SKN-04",
+    category: "poster",
+    categoryLabel: "BOTANICAL TYPOGRAPHY",
+    spanClass: "span-4",
+    image: "assets/works/sakura-spring.jpg",
+    title: "Sakura (散る花の哲学): Ephemeral Spring",
+    summary: "Perpaduan tipografi display Jepang-Inggris, potongan objek kelopak sakura berlapis, dan tata letak teks terbelah yang mengelilingi subjek.",
+    specs: ["Poster No. 03", "Mixed Typography", "Print & Exhibition"]
+  },
+  {
+    id: "SKN-05",
+    category: "poster",
+    categoryLabel: "BOTANICAL TYPOGRAPHY",
+    spanClass: "span-4",
+    image: "assets/works/lavender-botanical.jpg",
+    title: "Hana Shizen (花自然): Lavender Essence",
+    summary: "Studi kontras warna ungu-kuning dengan komposisi fotografi botani yang menembus bingkai horizon dan tipografi kanji berkarakter tebal.",
+    specs: ["Poster No. 03B", "Botanical Series", "Print & Exhibition"]
+  },
+  {
+    id: "SKN-06",
+    category: "poster",
+    categoryLabel: "HALFTONE PRINT EDITION",
+    spanClass: "span-4",
+    image: "assets/works/always-believe-halftone.jpg",
+    title: "Always Believe: Green Raster Halftone Portrait",
+    summary: "Pengolahan potret menjadi matriks titik raster halftone hijau zamrud di atas tekstur kertas hangat menggunakan teknik Sukunaru Filter Studio.",
+    specs: ["Halftone Raster", "Risograph Style", "A3 Print"]
+  },
+  {
+    id: "SKN-07",
     category: "socmed",
-    categoryLabel: "SOCIAL MEDIA DESIGN",
-    spanClass: "span-half",
-    title: "Sukunaru Visual Lab: Release Campaign Kit",
-    summary: "Paket pengumuman peluncuran produk digital untuk feed, story, dan sampul sorotan profil studio.",
-    specs: ["12 Feed + 6 Story", "RGB High-Res", "[PLACEHOLDER KARYA ASLI]"],
-    svgLabel: "CAMPAIGN KIT / VISUAL LAB"
+    categoryLabel: "CONCEPTUAL SOCIAL VISUAL",
+    spanClass: "span-4",
+    image: "assets/works/clarity-focus.jpg",
+    title: "Clarity Over Noise: Bounding-Box Visual",
+    summary: "Visual kampanye media sosial bertema fokus kreatif dengan teknik directional motion blur, grain tekstur, dan penanda seleksi vektor.",
+    specs: ["Social Campaign", "Motion Blur & Grain", "High-Engagement Post"]
+  },
+  {
+    id: "SKN-08",
+    category: "socmed",
+    categoryLabel: "EDITORIAL FEED VISUAL",
+    spanClass: "span-4",
+    image: "assets/works/find-your-focus.jpg",
+    title: "Pause, Breathe, Aim: Find Your Focus",
+    summary: "Konten visual reflektif dengan permainan kedalaman bidang (depth-of-field), bingkai bidik minimalis, dan kontras tipografi serif.",
+    specs: ["Instagram & Pinterest", "Editorial Portrait", "Color Graded"]
+  },
+  {
+    id: "SKN-09",
+    category: "socmed",
+    categoryLabel: "HALFTONE & GLOW SERIES",
+    spanClass: "span-4",
+    image: "assets/works/presence-stillness.jpg",
+    title: "Presence in Stillness: Luminous Silhouette",
+    summary: "Eksperimen tekstur dot-matrix pada langit gradien biru dengan siluet subjek bercahaya untuk konten visual penceritaan (visual storytelling).",
+    specs: ["Poster No. 07", "Dot-Matrix Sky", "Visual Storytelling"]
+  },
+  {
+    id: "SKN-10",
+    category: "socmed",
+    categoryLabel: "ARCHIVE ZINE VISUAL",
+    spanClass: "span-4",
+    image: "assets/works/stillness-reflection.jpg",
+    title: "Stillness Reflection: Vintage Paper Grain",
+    summary: "Desain konten bergaya sampul zine dengan tekstur kertas distress, indeks metadata di bagian kop, dan efek masking tipografi pada lanskap.",
+    specs: ["Poster No. 02", "Paper Texture", "Zine Aesthetic"]
+  },
+  {
+    id: "SKN-11",
+    category: "socmed",
+    categoryLabel: "OUTDOOR VISUAL STORY",
+    spanClass: "span-4",
+    image: "assets/works/back-to-nature.jpg",
+    title: "Back to Nature: Misty Highlands Edition",
+    summary: "Komposisi visual petualangan dengan tipografi putih yang menyatu di balik kabut pegunungan, dilengkapi elemen kode batang edisi.",
+    specs: ["Rasio 4:5 Feed", "Atmospheric Grade", "Series No. 002"]
+  },
+  {
+    id: "SKN-12",
+    category: "socmed",
+    categoryLabel: "CONCEPTUAL SERIES",
+    spanClass: "span-4",
+    image: "assets/works/embrace-the-light.jpg",
+    title: "Embrace The Light: Twilight Dock Series",
+    summary: "Seri penutup kampanye visual dengan kontras siluet cahaya di dermaga senja dan tipografi serif berpendar lembut.",
+    specs: ["Series No. 05", "Conceptual Art", "Social & Print"]
   }
 ];
-
-function createWorkSvg(work) {
-  const isPoster = work.category === "poster";
-  return `
-    <svg class="work-svg-preview" viewBox="0 0 480 260" role="img" aria-label="Placeholder karya ${work.title}">
-      <rect x="6" y="6" width="468" height="248" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="6" y1="38" x2="474" y2="38" stroke="currentColor" stroke-width="1"/>
-      <text x="18" y="26" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">${work.id} // ${work.categoryLabel}</text>
-      <text x="340" y="26" font-family="JetBrains Mono, monospace" font-size="11" fill="#FF8E00">[PLACEHOLDER KARYA]</text>
-      ${
-        isPoster
-          ? `
-            <rect x="165" y="54" width="150" height="184" fill="none" stroke="#FF8E00" stroke-width="2"/>
-            <line x1="178" y1="80" x2="288" y2="80" stroke="currentColor" stroke-width="3"/>
-            <line x1="178" y1="96" x2="260" y2="96" stroke="#FF8E00" stroke-width="3"/>
-            <circle cx="240" cy="154" r="32" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text x="178" y="222" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor">${work.svgLabel}</text>
-          `
-          : `
-            <rect x="34" y="64" width="124" height="148" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <rect x="178" y="64" width="124" height="148" fill="none" stroke="#FF8E00" stroke-width="2"/>
-            <rect x="322" y="64" width="124" height="148" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text x="48" y="142" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor">SLIDE 01</text>
-            <text x="192" y="142" font-family="JetBrains Mono, monospace" font-size="10" fill="#FF8E00">${work.svgLabel}</text>
-            <text x="336" y="142" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor">SLIDE 03</text>
-          `
-      }
-    </svg>
-  `;
-}
 
 function renderPortfolio(filterKey) {
   const grid = document.getElementById("portfolio-grid");
@@ -120,8 +150,8 @@ function renderPortfolio(filterKey) {
     .map(
       (work) => `
       <article class="work-piece ${work.spanClass}">
-        <div class="work-canvas">
-          ${createWorkSvg(work)}
+        <div class="work-canvas" data-work-id="${work.id}" role="button" tabindex="0" aria-label="Perbesar karya ${work.title}">
+          <img src="${work.image}" alt="${work.title}" class="work-poster-img" loading="lazy" width="540" height="720">
         </div>
         <div class="work-info">
           <div class="work-meta-line">
@@ -133,7 +163,7 @@ function renderPortfolio(filterKey) {
           <div class="work-footer">
             <span class="work-spec-tag">${work.specs.join(" • ")}</span>
             <button type="button" class="btn btn-outline" data-work-id="${work.id}">
-              Detail &amp; Spesifikasi
+              Lihat Poster Penuh
             </button>
           </div>
         </div>
@@ -290,25 +320,34 @@ function initDialogsAndTriggers() {
 
   let activeWorkTopic = "";
 
+  function openWorkModal(workId) {
+    if (!workDialog) return;
+    const found = PORTFOLIO_WORKS.find((item) => item.id === workId);
+    if (!found) return;
+
+    document.getElementById("dialog-work-code").textContent = found.id;
+    document.getElementById("dialog-work-category").textContent = found.categoryLabel;
+    document.getElementById("dialog-work-title").textContent = found.title;
+    document.getElementById("dialog-work-desc").textContent = found.summary;
+    const imgEl = document.getElementById("dialog-work-image");
+    if (imgEl) {
+      imgEl.src = found.image;
+      imgEl.alt = found.title;
+    }
+    document.getElementById("dialog-work-specs").innerHTML = found.specs
+      .map((s) => `<span class="spec-chip">${s}</span>`)
+      .join("");
+    activeWorkTopic =
+      found.category === "poster"
+        ? "Paket Jasa: Key Visual & Event Poster Print"
+        : "Paket Jasa: Sukunaru Feed Starter Pack";
+    workDialog.showModal();
+  }
+
   document.addEventListener("click", (event) => {
     const workBtn = event.target.closest("[data-work-id]");
     if (workBtn && workDialog) {
-      const workId = workBtn.getAttribute("data-work-id");
-      const found = PORTFOLIO_WORKS.find((item) => item.id === workId);
-      if (found) {
-        document.getElementById("dialog-work-code").textContent = found.id;
-        document.getElementById("dialog-work-category").textContent = found.categoryLabel;
-        document.getElementById("dialog-work-title").textContent = found.title;
-        document.getElementById("dialog-work-desc").textContent = found.summary;
-        document.getElementById("dialog-work-specs").innerHTML = found.specs
-          .map((s) => `<span class="spec-chip">${s}</span>`)
-          .join("");
-        activeWorkTopic =
-          found.category === "poster"
-            ? "Paket Jasa: Key Visual & Event Poster Print"
-            : "Paket Jasa: Sukunaru Feed Starter Pack";
-        workDialog.showModal();
-      }
+      openWorkModal(workBtn.getAttribute("data-work-id"));
       return;
     }
 
@@ -323,14 +362,23 @@ function initDialogsAndTriggers() {
     if (directProductBtn && productDialog) {
       event.preventDefault();
       const productName = directProductBtn.getAttribute("data-direct-product");
-      const targetUrl = directProductBtn.getAttribute("data-direct-url");
       document.getElementById("dialog-product-title").textContent = productName;
-      document.getElementById("dialog-product-url-chip").textContent = `Direct Link Placeholder: ${targetUrl}`;
+      document.getElementById("dialog-product-url-chip").textContent = `Official License • Direct WhatsApp Checkout`;
       const waMsg = encodeURIComponent(
-        `Halo Sukunaru Studio, saya ingin membeli produk digital *${productName}*. Mohon info link pembayaran / lisensinya.`
+        `Halo Sukunaru Studio, saya ingin membeli lisensi produk digital *${productName}*. Mohon info langkah pembayarannya.`
       );
       document.getElementById("dialog-product-wa-link").href = `https://wa.me/${STUDIO_WA_NUMBER}?text=${waMsg}`;
       productDialog.showModal();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      const workCanvas = event.target.closest(".work-canvas[data-work-id]");
+      if (workCanvas) {
+        event.preventDefault();
+        openWorkModal(workCanvas.getAttribute("data-work-id"));
+      }
     }
   });
 
