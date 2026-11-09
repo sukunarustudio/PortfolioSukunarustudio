@@ -159,7 +159,7 @@ main,
   border: 1px solid var(--border-subtle);
 }
 
-@media (pointer: coarse) {
+@media (pointer: coarse), (hover: none), (max-width: 768px) {
   .studio-cursor {
     display: none !important;
   }
@@ -1378,7 +1378,21 @@ dialog {
 /* Mobile Reflow (< 720px) */
 @media (max-width: 720px) {
   .container {
-    width: min(100% - 1.5rem, 1280px);
+    width: min(100% - 1.25rem, 1280px);
+  }
+
+  .header-inner {
+    min-height: 4rem;
+    gap: 0.5rem;
+  }
+
+  .brand-name {
+    font-size: 1.02rem;
+  }
+
+  .brand-sub {
+    font-size: 0.68rem;
+    padding: 0.1rem 0.32rem;
   }
 
   .btn-header-wa {
@@ -1414,21 +1428,123 @@ dialog {
     border-color: var(--border-subtle);
   }
 
+  .hero-section,
+  .products-section,
+  .portfolio-section,
+  .services-section,
+  .contact-hub-section {
+    padding-block: 2.25rem;
+  }
+
+  .hero-title {
+    font-size: clamp(1.75rem, 7vw, 2.25rem);
+    margin-bottom: 1rem;
+  }
+
+  .hero-lead {
+    font-size: 0.96rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-sublead {
+    font-size: 0.88rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .track-panel {
+    padding: 1.15rem;
+  }
+
+  .track-links .btn,
+  .flagship-actions .btn,
+  .form-actions .btn {
+    width: 100%;
+  }
+
+  .portfolio-top-bar {
+    gap: 1rem;
+    margin-bottom: 1.35rem;
+  }
+
+  .portfolio-controls {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .filter-tab {
+    padding: 0.45rem 0.5rem;
+    font-size: 0.73rem;
+    text-align: center;
+  }
+
+  .poster-wall {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
   .work-piece.span-4,
   .work-piece.span-poster,
   .work-piece.span-socmed,
   .work-piece.span-half {
-    grid-column: span 12;
+    grid-column: span 1;
+  }
+
+  .work-info {
+    padding: 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .work-meta-line {
+    font-size: 0.65rem;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+  }
+
+  .work-meta-line span:last-child {
+    display: none;
+  }
+
+  .work-title {
+    font-size: 0.92rem;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .work-summary,
+  .work-spec-tag {
+    display: none;
+  }
+
+  .work-footer {
+    padding-top: 0.45rem;
+    border-top: none;
+  }
+
+  .work-footer .btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.76rem;
   }
 
   .dialog-work-layout {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .dialog-work-image {
+    max-height: 52vh;
   }
 
   .ledger-row {
     grid-template-columns: 1fr;
-    gap: 1.25rem;
-    padding-block: 1.5rem;
+    gap: 1rem;
+    padding-block: 1.35rem;
   }
 
   .social-row {

@@ -556,7 +556,7 @@ function initInteractiveBackgroundAndCursor() {
     pointer.smoothY += dyCursor * lerpSpeed;
     pointer.strength += (pointer.targetStrength - pointer.strength) * fadeSpeed;
 
-    if (canUseFinePointer && !pointer.isTouchMode && cursorEl && pointer.active) {
+    if (canUseFinePointer && !pointer.isTouchMode && width > 768 && cursorEl && pointer.active) {
       const halfSize = cursorEl.classList.contains("is-interactive") ? 26 : 17;
       cursorEl.style.transform = `translate3d(${(pointer.smoothX - halfSize).toFixed(1)}px, ${(pointer.smoothY - halfSize).toFixed(1)}px, 0)`;
     }
@@ -670,7 +670,10 @@ function initInteractiveBackgroundAndCursor() {
       const isTouch = event.pointerType === "touch";
       activatePoint(event.clientX, event.clientY, isTouch);
 
-      if (!isTouch && canUseFinePointer && cursorEl) {
+      if (isTouch && cursorEl) {
+      cursorEl.classList.remove("is-visible");
+    }
+    if (!isTouch && canUseFinePointer && width > 768 && cursorEl) {
         cursorEl.classList.add("is-visible");
         if (coordsEl) {
           coordsEl.textContent = `X:${Math.round(event.clientX)} Y:${Math.round(event.clientY)}`;
