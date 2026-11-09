@@ -782,8 +782,43 @@ function initInteractiveBackgroundAndCursor() {
   resizeCanvas(true);
 }
 
+function initScrollToTop() {
+  const brandLinks = document.querySelectorAll(".brand-mark, .footer-brand-link");
+
+  brandLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "smooth"
+      });
+
+      // Close mobile navigation drawer if open
+      const nav = document.getElementById("primary-nav");
+      const menuBtn = document.getElementById("mobile-menu-btn");
+      if (nav && nav.classList.contains("is-open")) {
+        nav.classList.remove("is-open");
+        if (menuBtn) {
+          menuBtn.setAttribute("aria-expanded", "false");
+          menuBtn.classList.remove("is-active");
+          const menuText = menuBtn.querySelector(".menu-btn-text");
+          if (menuText) menuText.textContent = "Menu";
+        }
+      }
+
+      // Reset URL hash to top
+      if (window.location.hash) {
+        history.pushState(null, "", window.location.pathname + window.location.search);
+      }
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
+  initScrollToTop();
   initMobileMenu();
   initProductStateControls();
   initPortfolioControls();
