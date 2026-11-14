@@ -134,11 +134,8 @@ type Layout = { width: number; unit: number; carousel: boolean; railTop: number;
 
 function layoutFor(shapes: Shape[], drops: number[], width: number): Layout {
   const n = shapes.length;
-  const sumW = shapes.reduce((sum, s) => sum + s.w, 0);
-  const maxW = shapes.reduce((m, s) => Math.max(m, s.w), 0);
-  const fit = n ? (width - 2 * EDGE) / (sumW + Math.max(0, n - 1) * GAP + 2 * BREATH + maxW * (LIFT_GROW - 1)) : RAIL_MAX_UNIT;
-  const carousel = fit < RAIL_MIN_UNIT;
-  const unit = carousel ? clamp(width * 0.2, 92, CAROUSEL_MAX_UNIT) : Math.min(RAIL_MAX_UNIT, fit);
+  const carousel = true;
+  const unit = Math.round(width < 640 ? Math.max(110, width * 0.28) : Math.max(130, Math.min(165, width * 0.135)));
   const railTop = 6;
   const railT = Math.round(clamp(unit * 0.11, 9, 16));
   const pivotY = railTop + railT + Math.round(unit * 0.045) + 2;
@@ -146,7 +143,7 @@ function layoutFor(shapes: Shape[], drops: number[], width: number): Layout {
   const centre = pivotY + unit * 0.22 + maxH / 2;
   const tops = shapes.map((s, i) => Math.round(Math.max(pivotY + unit * 0.08, centre - (s.h * unit) / 2 + clamp(drops[i] ?? 0, -0.15, 0.6) * unit)));
   const bottom = shapes.reduce((m, s, i) => Math.max(m, (tops[i] ?? 0) + s.h * unit), pivotY);
-  return { width, unit, carousel, railTop, railT, pivotY, tops, stageH: Math.round(bottom + 34) };
+  return { width, unit, carousel, railTop, railT, pivotY, tops, stageH: Math.round(bottom + 42) };
 }
 
 type Sim = {
@@ -179,51 +176,28 @@ function reach(s: Sim, lay: Layout, shape: Shape, i: number) {
 
 function resolveContacts(s: Sim, lay: Layout, list: Shape[], margin: number) {
   const n = list.length;
-  for (let pass = 0; pass < 3; pass++) {
+  if (n <= 1) return;
+  for (let pass = 0; pass < 2; pass++) {
     for (let i = 0; i < n - 1; i++) {
       const a = list[i];
       const b = list[i + 1];
       if (!a || !b) continue;
-      const overlap = (s.x[i] ?? 0) + reach(s, lay, a, i)[1] - ((s.x[i + 1] ?? 0) + reach(s, lay, b, i + 1)[0]) + margin;
-      if (overlap <= 0) continue;
-      if (i === s.drag) s.x[i + 1] = (s.x[i + 1] ?? 0) + overlap;
-      else if (i + 1 === s.drag) s.x[i] = (s.x[i] ?? 0) - overlap;
-      else { s.x[i] = (s.x[i] ?? 0) - overlap / 2; s.x[i + 1] = (s.x[i + 1] ?? 0) + overlap / 2; }
-      const va = s.vx[i] ?? 0;
-      const vb = s.vx[i + 1] ?? 0;
-      if (va > vb) {
-        const shared = (va + vb) / 2;
-        if (i !== s.drag) s.vx[i] = shared;
-        if (i + 1 !== s.drag) s.vx[i + 1] = shared;
+      const reachA = reach(s, lay, a, i);
+      const reachB = reach(s, lay, b, i + 1);
+      const minDistance = reachA[1] - reachB[0] + margin;
+      const currentDist = (s.x[i + 1] ?? 0) - (s.x[i] ?? 0);
+      const overlap = minDistance - currentDist;
+      if (overlap > 0) {
+        s.x[i] = (s.x[i] ?? 0) - overlap * 0.5;
+        s.x[i + 1] = (s.x[i + 1] ?? 0) + overlap * 0.5;
+        const va = s.vx[i] ?? 0;
+        const vb = s.vx[i + 1] ?? 0;
+        if (va > vb) {
+          const shared = (va + vb) * 0.5;
+          s.vx[i] = shared;
+          s.vx[i + 1] = shared;
+        }
       }
-    }
-  }
-  if (!lay.carousel && n > 0) {
-    const lo = 6;
-    const hi = lay.width - 6;
-    const first = list[0];
-    const last = list[n - 1];
-    if (first) {
-      const l0 = reach(s, lay, first, 0)[0];
-      if ((s.x[0] ?? 0) + l0 < lo) { s.x[0] = lo - l0; s.vx[0] = Math.abs(s.vx[0] ?? 0) * 0.3; }
-    }
-    for (let i = 0; i < n - 1; i++) {
-      const a = list[i];
-      const b = list[i + 1];
-      if (!a || !b) continue;
-      const min = (s.x[i] ?? 0) + reach(s, lay, a, i)[1] - reach(s, lay, b, i + 1)[0] + margin;
-      if ((s.x[i + 1] ?? 0) < min) s.x[i + 1] = min;
-    }
-    if (last) {
-      const rn = reach(s, lay, last, n - 1)[1];
-      if ((s.x[n - 1] ?? 0) + rn > hi) { s.x[n - 1] = hi - rn; s.vx[n - 1] = -Math.abs(s.vx[n - 1] ?? 0) * 0.3; }
-    }
-    for (let i = n - 2; i >= 0; i--) {
-      const a = list[i];
-      const b = list[i + 1];
-      if (!a || !b) continue;
-      const max = (s.x[i + 1] ?? 0) + reach(s, lay, b, i + 1)[0] - reach(s, lay, a, i)[1] - margin;
-      if ((s.x[i] ?? 0) > max) s.x[i] = max;
     }
   }
 }

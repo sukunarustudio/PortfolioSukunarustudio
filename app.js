@@ -274,39 +274,48 @@ function shapeOfWork(item) {
 
 function computeRailLayout(shapes, drops, width) {
   const n = shapes.length;
-  const sumW = shapes.reduce((sum, s) => sum + s.w, 0);
-  const maxW = shapes.reduce((m, s) => Math.max(m, s.w), 0);
-  const fit = n ? (width - 2 * RAIL_CONSTANTS.EDGE) / (sumW + Math.max(0, n - 1) * RAIL_CONSTANTS.GAP + 2 * RAIL_CONSTANTS.BREATH + maxW * (RAIL_CONSTANTS.LIFT_GROW - 1)) : RAIL_CONSTANTS.RAIL_MAX_UNIT;
-  const carousel = fit < RAIL_CONSTANTS.RAIL_MIN_UNIT;
-  const unit = carousel ? Math.max(92, Math.min(RAIL_CONSTANTS.CAROUSEL_MAX_UNIT, width * 0.22)) : Math.min(RAIL_CONSTANTS.RAIL_MAX_UNIT, fit);
+  // Always active sliding gallery so frames maintain generous size and never fold
+  const carousel = true;
+  const unit = Math.round(
+    width < 640
+      ? Math.max(110, width * 0.28)
+      : Math.max(130, Math.min(165, width * 0.135))
+  );
   const railTop = 6;
   const railT = Math.round(Math.max(9, Math.min(16, unit * 0.11)));
   const pivotY = railTop + railT + Math.round(unit * 0.045) + 2;
   const maxH = shapes.reduce((m, s) => Math.max(m, s.h), 0) * unit;
   const centre = pivotY + unit * 0.22 + maxH / 2;
-  const tops = shapes.map((s, i) => Math.round(Math.max(pivotY + unit * 0.08, centre - (s.h * unit) / 2 + Math.max(-0.15, Math.min(0.6, drops[i] ?? 0)) * unit)));
+  const tops = shapes.map((s, i) =>
+    Math.round(
+      Math.max(
+        pivotY + unit * 0.08,
+        centre - (s.h * unit) / 2 + Math.max(-0.15, Math.min(0.6, drops[i] ?? 0)) * unit
+      )
+    )
+  );
   const bottom = shapes.reduce((m, s, i) => Math.max(m, (tops[i] ?? 0) + s.h * unit), pivotY);
   return { width, unit, carousel, railTop, railT, pivotY, tops, stageH: Math.round(bottom + 42) };
 }
 
 function computeRailTargets(lay, shapes, front, centreIndex) {
   const n = shapes.length;
+  if (n === 0) return [];
   const feet = shapes.map((s, i) => s.w * lay.unit * (i === front ? RAIL_CONSTANTS.LIFT_GROW : 1));
   const gapAfter = (a) => lay.unit * (RAIL_CONSTANTS.GAP + (front !== null && (a === front || a + 1 === front) ? RAIL_CONSTANTS.BREATH : 0));
   const xs = feet.map(() => 0);
-  if (lay.carousel) {
-    const c = Math.max(0, Math.min(n - 1, front !== null ? front : centreIndex));
-    xs[c] = lay.width / 2;
-    for (let i = c + 1; i < n; i++) xs[i] = (xs[i - 1] ?? 0) + ((feet[i - 1] ?? 0) + (feet[i] ?? 0)) / 2 + gapAfter(i - 1);
-    for (let i = c - 1; i >= 0; i--) xs[i] = (xs[i + 1] ?? 0) - ((feet[i + 1] ?? 0) + (feet[i] ?? 0)) / 2 - gapAfter(i);
-    return xs;
+
+  // Center active frame at stage horizontal center
+  const c = Math.max(0, Math.min(n - 1, front !== null ? front : (centreIndex ?? 0)));
+  xs[c] = lay.width / 2;
+
+  // Distribute subsequent frames smoothly to the right
+  for (let i = c + 1; i < n; i++) {
+    xs[i] = (xs[i - 1] ?? 0) + ((feet[i - 1] ?? 0) + (feet[i] ?? 0)) / 2 + gapAfter(i - 1);
   }
-  let total = 0;
-  for (let i = 0; i < n; i++) total += (feet[i] ?? 0) + (i < n - 1 ? gapAfter(i) : 0);
-  let cursor = (lay.width - total) / 2;
-  for (let i = 0; i < n; i++) {
-    xs[i] = cursor + (feet[i] ?? 0) / 2;
-    cursor += (feet[i] ?? 0) + gapAfter(i);
+  // Distribute previous frames smoothly to the left
+  for (let i = c - 1; i >= 0; i--) {
+    xs[i] = (xs[i + 1] ?? 0) - ((feet[i + 1] ?? 0) + (feet[i] ?? 0)) / 2 - gapAfter(i);
   }
   return xs;
 }
@@ -332,62 +341,30 @@ function railRestTilt(i) {
 
 function resolveRailContacts(s, lay, list, margin) {
   const n = list.length;
-  for (let pass = 0; pass < 3; pass++) {
+  if (n <= 1) return;
+
+  // Pairwise separation: strictly prevent adjacent frames from overlapping or colliding
+  for (let pass = 0; pass < 2; pass++) {
     for (let i = 0; i < n - 1; i++) {
       const a = list[i];
       const b = list[i + 1];
       if (!a || !b) continue;
       const reachA = railReach(s, lay, a, i);
       const reachB = railReach(s, lay, b, i + 1);
-      const overlap = (s.x[i] ?? 0) + reachA[1] - ((s.x[i + 1] ?? 0) + reachB[0]) + margin;
-      if (overlap <= 0) continue;
-      if (i === s.drag) s.x[i + 1] = (s.x[i + 1] ?? 0) + overlap;
-      else if (i + 1 === s.drag) s.x[i] = (s.x[i] ?? 0) - overlap;
-      else {
-        s.x[i] = (s.x[i] ?? 0) - overlap / 2;
-        s.x[i + 1] = (s.x[i + 1] ?? 0) + overlap / 2;
+      const minDistance = reachA[1] - reachB[0] + margin;
+      const currentDist = (s.x[i + 1] ?? 0) - (s.x[i] ?? 0);
+      const overlap = minDistance - currentDist;
+      if (overlap > 0) {
+        s.x[i] = (s.x[i] ?? 0) - overlap * 0.5;
+        s.x[i + 1] = (s.x[i + 1] ?? 0) + overlap * 0.5;
+        const va = s.vx[i] ?? 0;
+        const vb = s.vx[i + 1] ?? 0;
+        if (va > vb) {
+          const shared = (va + vb) * 0.5;
+          s.vx[i] = shared;
+          s.vx[i + 1] = shared;
+        }
       }
-      const va = s.vx[i] ?? 0;
-      const vb = s.vx[i + 1] ?? 0;
-      if (va > vb) {
-        const shared = (va + vb) / 2;
-        if (i !== s.drag) s.vx[i] = shared;
-        if (i + 1 !== s.drag) s.vx[i + 1] = shared;
-      }
-    }
-  }
-  if (!lay.carousel && n > 0) {
-    const lo = 6;
-    const hi = lay.width - 6;
-    const first = list[0];
-    const last = list[n - 1];
-    if (first) {
-      const l0 = railReach(s, lay, first, 0)[0];
-      if ((s.x[0] ?? 0) + l0 < lo) {
-        s.x[0] = lo - l0;
-        s.vx[0] = Math.abs(s.vx[0] ?? 0) * 0.3;
-      }
-    }
-    for (let i = 0; i < n - 1; i++) {
-      const a = list[i];
-      const b = list[i + 1];
-      if (!a || !b) continue;
-      const min = (s.x[i] ?? 0) + railReach(s, lay, a, i)[1] - railReach(s, lay, b, i + 1)[0] + margin;
-      if ((s.x[i + 1] ?? 0) < min) s.x[i + 1] = min;
-    }
-    if (last) {
-      const rn = railReach(s, lay, last, n - 1)[1];
-      if ((s.x[n - 1] ?? 0) + rn > hi) {
-        s.x[n - 1] = hi - rn;
-        s.vx[n - 1] = -Math.abs(s.vx[n - 1] ?? 0) * 0.3;
-      }
-    }
-    for (let i = n - 2; i >= 0; i--) {
-      const a = list[i];
-      const b = list[i + 1];
-      if (!a || !b) continue;
-      const max = (s.x[i + 1] ?? 0) + railReach(s, lay, b, i + 1)[0] - railReach(s, lay, a, i)[1] - margin;
-      if ((s.x[i] ?? 0) > max) s.x[i] = max;
     }
   }
 }
@@ -408,6 +385,8 @@ function paintRailFrame(i) {
   const hang = el.hangs[i];
   if (hang) {
     hang.style.transform = left;
+    const distanceToActive = Math.abs(i - (railState.active ?? 0));
+    hang.style.zIndex = lit > 0.4 ? "30" : String(Math.max(1, 20 - distanceToActive));
     hang.setAttribute("data-active", lit > 0.4 ? "true" : "false");
     const dot = hang.querySelector(".label-status-dot");
     if (dot) dot.style.display = lit > 0.4 ? "inline-block" : "none";
@@ -456,21 +435,19 @@ function stepRailSimulation(now) {
   const sub = Math.max(3, Math.ceil(dt / 0.0115));
   const h = dt / sub;
   const margin = RAIL_CONSTANTS.MARGIN * lay.unit;
-  const restoring = now > s.free;
 
   for (let k = 0; k < sub; k++) {
     for (let i = 0; i < n; i++) {
       const shape = list[i];
       if (!shape) continue;
       const len = railPendulum(lay, shape, i);
-      if (i !== s.drag) {
-        const before = s.vx[i] ?? 0;
-        const stiff = restoring ? 130 : 0;
-        const damp = restoring ? 2 * Math.sqrt(130) * 0.86 : 3.2;
-        const ax = -stiff * ((s.x[i] ?? 0) - (s.tx[i] ?? 0)) - damp * before;
-        s.vx[i] = before + ax * h;
-        s.x[i] = (s.x[i] ?? 0) + (s.vx[i] ?? 0) * h;
-      }
+      const before = s.vx[i] ?? 0;
+      const stiff = 140;
+      const damp = 2 * Math.sqrt(140) * 0.88;
+      const ax = -stiff * ((s.x[i] ?? 0) - (s.tx[i] ?? 0)) - damp * before;
+      s.vx[i] = before + ax * h;
+      s.x[i] = (s.x[i] ?? 0) + (s.vx[i] ?? 0) * h;
+
       const ae = -150 * ((s.e[i] ?? 0) - (s.te[i] ?? 0)) - 2 * Math.sqrt(150) * 0.78 * (s.ve[i] ?? 0);
       s.ve[i] = (s.ve[i] ?? 0) + ae * h;
       s.e[i] = (s.e[i] ?? 0) + (s.ve[i] ?? 0) * h;
@@ -496,19 +473,17 @@ function stepRailSimulation(now) {
     s.hx[i] = x;
     s.hv[i] = hv;
     if (shape) {
-      s.vsw[i] = (s.vsw[i] ?? 0) + Math.max(-40, Math.min(40, (hv - was) * (RAIL_CONSTANTS.DEG / railPendulum(lay, shape, i)) * (i === s.drag ? RAIL_CONSTANTS.DRAG_COUPLING : RAIL_CONSTANTS.SWING_COUPLING)));
+      s.vsw[i] = (s.vsw[i] ?? 0) + Math.max(-40, Math.min(40, (hv - was) * (RAIL_CONSTANTS.DEG / railPendulum(lay, shape, i)) * RAIL_CONSTANTS.SWING_COUPLING));
     }
   }
 
-  if (s.drag >= 0) s.vx[s.drag] = s.hv[s.drag] ?? 0;
-
-  let busy = s.drag >= 0 || now < s.free;
+  let busy = false;
   for (let i = 0; i < n; i++) {
     paintRailFrame(i);
     const rest = railRestTilt(i) * (1 - Math.max(0, Math.min(1, s.e[i] ?? 0)));
     if (
       Math.abs(s.vx[i] ?? 0) > 0.4 ||
-      (restoring && Math.abs((s.x[i] ?? 0) - (s.tx[i] ?? 0)) > 0.25) ||
+      Math.abs((s.x[i] ?? 0) - (s.tx[i] ?? 0)) > 0.25 ||
       Math.abs((s.e[i] ?? 0) - (s.te[i] ?? 0)) > 0.002 ||
       Math.abs(s.ve[i] ?? 0) > 0.01 ||
       Math.abs((s.ty[i] ?? 0) - (s.tty[i] ?? 0)) > 0.02 ||
@@ -526,7 +501,7 @@ function stepRailSimulation(now) {
     s.raf = 0;
     s.last = 0;
     for (let i = 0; i < n; i++) {
-      if (restoring) s.x[i] = s.tx[i] ?? 0;
+      s.x[i] = s.tx[i] ?? 0;
       s.hx[i] = s.x[i] ?? 0;
       s.hv[i] = 0;
       s.vx[i] = 0;
@@ -556,35 +531,34 @@ function impulseRail(i, amount) {
 }
 
 function chooseRailPrint(index) {
-  if (index === railState.active) return;
+  if (index === null) return;
+  const n = railState.shapes.length;
+  if (n === 0) return;
+  const nextIdx = Math.max(0, Math.min(n - 1, index));
   const old = railState.active;
-  railState.active = index;
+  railState.active = nextIdx;
+  railState.carouselIndex = nextIdx;
 
   const { sim: s, layout: lay, shapes: list, items } = railState;
-  const n = list.length;
-  if (!lay || n === 0) return;
+  if (!lay) return;
 
-  const xs = computeRailTargets(lay, list, index, railState.carouselIndex);
+  const xs = computeRailTargets(lay, list, nextIdx, nextIdx);
   for (let i = 0; i < n; i++) {
-    s.tx[i] = (xs[i] ?? 0) + (lay.carousel ? railState.pointer.swipe : 0);
-    s.te[i] = i === index ? 1 : 0;
-    if (i !== index) s.tty[i] = 0;
+    s.tx[i] = xs[i] ?? 0;
+    s.te[i] = i === nextIdx ? 1 : 0;
+    if (i !== nextIdx) s.tty[i] = 0;
   }
 
-  if (index !== null) {
-    railState.carouselIndex = index;
-    impulseRail(index - 1, RAIL_CONSTANTS.NEIGHBOUR_KICK);
-    impulseRail(index + 1, -RAIL_CONSTANTS.NEIGHBOUR_KICK);
-  }
-  if (old !== null) {
-    impulseRail(old - 1, -RAIL_CONSTANTS.NEIGHBOUR_KICK * 0.5);
-    impulseRail(old + 1, RAIL_CONSTANTS.NEIGHBOUR_KICK * 0.5);
+  impulseRail(nextIdx - 1, RAIL_CONSTANTS.NEIGHBOUR_KICK);
+  impulseRail(nextIdx + 1, -RAIL_CONSTANTS.NEIGHBOUR_KICK);
+  if (old !== null && old !== nextIdx) {
+    impulseRail(old, -RAIL_CONSTANTS.NEIGHBOUR_KICK * 0.5);
   }
 
   kickRailSimulation();
 
   // Update Caption & Buttons
-  const currentItem = index !== null ? items[index] : null;
+  const currentItem = items[nextIdx];
   const capTitle = document.getElementById("rail-caption-title");
   const capByline = document.getElementById("rail-caption-byline");
   const openBtn = document.getElementById("rail-open-detail-btn");
@@ -599,20 +573,35 @@ function chooseRailPrint(index) {
       openBtn.textContent = `Angkat & Balik Sisi Belakang (${currentItem.id})`;
       openBtn.onclick = () => openWorkModal(currentItem.id);
     }
-  } else {
-    if (capTitle) capTitle.textContent = "Pilih atau sorot bingkai untuk menyalakan lampu pameran";
-    if (capByline) capByline.textContent = "Sukunaru Studio • Sentuh & geser rel untuk mengayunkan karya";
-    if (openBtn) {
-      openBtn.textContent = "Pilih Karya untuk Dilihat";
-      openBtn.onclick = null;
-    }
   }
 
   // Update Pagination Dots
   const dots = document.querySelectorAll(".rail-dot-btn");
   dots.forEach((dot, dotIdx) => {
-    dot.classList.toggle("is-active", dotIdx === index);
+    dot.classList.toggle("is-active", dotIdx === nextIdx);
   });
+
+  // Update Prev / Next Buttons
+  const prevBtn = document.getElementById("rail-prev-btn");
+  const nextBtn = document.getElementById("rail-next-btn");
+  if (prevBtn) prevBtn.disabled = nextIdx <= 0;
+  if (nextBtn) nextBtn.disabled = nextIdx >= n - 1;
+}
+
+function prevRailPrint() {
+  const current = railState.active ?? railState.carouselIndex ?? 0;
+  if (current > 0) {
+    railState.playing = false;
+    chooseRailPrint(current - 1);
+  }
+}
+
+function nextRailPrint() {
+  const current = railState.active ?? railState.carouselIndex ?? 0;
+  if (current < railState.shapes.length - 1) {
+    railState.playing = false;
+    chooseRailPrint(current + 1);
+  }
 }
 
 function aimRail(index, clientX) {
@@ -865,64 +854,37 @@ function initPictureRailGallery(filterKey = "all") {
     el.washes = items.map((_, i) => stage.querySelector(`[data-wash="${i}"]`));
   }
 
-  // Pointer event interaction (dragging along rail, hovering to tilt, clicking to lift)
-  stage.onpointermove = (event) => {
-    const p = railState.pointer;
-    const s = railState.sim;
-    const lay = railState.layout;
-    if (!lay) return;
+  // Wire Prev / Next Navigation buttons
+  const prevBtn = document.getElementById("rail-prev-btn");
+  const nextBtn = document.getElementById("rail-next-btn");
+  if (prevBtn) {
+    prevBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      prevRailPrint();
+    };
+  }
+  if (nextBtn) {
+    nextBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      nextRailPrint();
+    };
+  }
 
-    if (p.id === event.pointerId) {
-      const dx = event.clientX - p.x;
-      const now = performance.now();
-      if (!p.moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(event.clientY - p.y)) {
-        p.moved = true;
-        railState.playing = false;
-        if (stage.setPointerCapture) stage.setPointerCapture(event.pointerId);
-        if (!lay.carousel && p.index >= 0) {
-          s.drag = p.index;
-          s.grab = event.clientX - stage.getBoundingClientRect().left - (s.x[p.index] ?? 0);
-        }
-      }
-      if (p.moved) {
-        const v = (event.clientX - p.lastX) / Math.max(1, now - p.lastT);
-        p.v = p.v * 0.6 + v * 0.4;
-        p.lastX = event.clientX;
-        p.lastT = now;
-        if (s.drag >= 0) {
-          s.x[s.drag] = event.clientX - stage.getBoundingClientRect().left - s.grab;
-          s.free = now + 900;
-          kickRailSimulation();
-        } else if (lay.carousel) {
-          p.swipe = dx;
-          const xs = computeRailTargets(lay, railState.shapes, railState.active, railState.carouselIndex);
-          for (let i = 0; i < railState.shapes.length; i++) s.tx[i] = (xs[i] ?? 0) + dx;
-          kickRailSimulation();
-        }
-      }
-      return;
-    }
-
-    if (event.pointerType !== "mouse" || lay.carousel) return;
-    const hit = nearestRailPrint(event.clientX, event.clientY);
-    const nowIdx = railState.active;
-    if (nowIdx !== null && hit !== nowIdx) {
-      const shape = railState.shapes[nowIdx];
-      const box = stage.getBoundingClientRect();
-      const local = event.clientX - box.left;
-      const keep = shape ? Math.abs(local - (s.x[nowIdx] ?? 0)) < (shape.w * lay.unit * RAIL_CONSTANTS.LIFT_GROW) / 2 + 10 : false;
-      if (keep && event.clientY - box.top < lay.stageH) {
-        aimRail(nowIdx, event.clientX);
-        return;
-      }
-    }
-    if (hit !== null) {
-      railState.playing = false;
-      chooseRailPrint(hit);
-      aimRail(hit, event.clientX);
+  // Keyboard navigation on stage
+  stage.tabIndex = 0;
+  stage.onkeydown = (e) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      prevRailPrint();
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      nextRailPrint();
     }
   };
 
+  // Pointer event interaction (smooth sideways swipe, drag & tap to center/open)
   stage.onpointerdown = (event) => {
     if (event.button !== 0) return;
     const hit = nearestRailPrint(event.clientX, event.clientY);
@@ -941,10 +903,49 @@ function initPictureRailGallery(filterKey = "all") {
     };
   };
 
+  stage.onpointermove = (event) => {
+    const p = railState.pointer;
+    const s = railState.sim;
+    const lay = railState.layout;
+    if (!lay) return;
+
+    if (p.id === event.pointerId) {
+      const dx = event.clientX - p.x;
+      const now = performance.now();
+      if (!p.moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(event.clientY - p.y)) {
+        p.moved = true;
+        railState.playing = false;
+        if (stage.setPointerCapture) stage.setPointerCapture(event.pointerId);
+      }
+      if (p.moved) {
+        const v = (event.clientX - p.lastX) / Math.max(1, now - p.lastT);
+        p.v = p.v * 0.6 + v * 0.4;
+        p.lastX = event.clientX;
+        p.lastT = now;
+        p.swipe = dx;
+
+        const currentCenter = railState.active ?? railState.carouselIndex ?? 0;
+        const xs = computeRailTargets(lay, railState.shapes, currentCenter, currentCenter);
+        for (let i = 0; i < railState.shapes.length; i++) {
+          s.tx[i] = (xs[i] ?? 0) + dx;
+        }
+        kickRailSimulation();
+      }
+      return;
+    }
+
+    // Subtle 3D tilt when hovering active frame with mouse
+    if (event.pointerType !== "mouse") return;
+    const hit = nearestRailPrint(event.clientX, event.clientY);
+    if (hit !== null && hit === railState.active) {
+      aimRail(hit, event.clientX);
+    }
+  };
+
   stage.onpointerup = (event) => finishRailPointer(event, false);
   stage.onpointercancel = (event) => finishRailPointer(event, true);
   stage.onpointerleave = (event) => {
-    if (event.pointerType !== "mouse" || railState.pointer.id >= 0 || railState.layout?.carousel) return;
+    if (event.pointerType !== "mouse" || railState.pointer.id >= 0) return;
     for (let i = 0; i < railState.shapes.length; i++) railState.sim.tty[i] = 0;
     kickRailSimulation();
   };
@@ -959,35 +960,34 @@ function initPictureRailGallery(filterKey = "all") {
     }
     railState.pointer = { ...p, id: -1 };
 
-    if (s.drag >= 0) {
-      const idle = performance.now() - p.lastT;
-      s.vx[s.drag] = idle < 140 ? p.v * 1000 * (1 - idle / 140) : 0;
-      s.drag = -1;
-      s.free = performance.now() + 700;
-      kickRailSimulation();
-      return;
-    }
-
-    if (p.moved && lay?.carousel) {
+    if (p.moved) {
       const dx = event.clientX - p.x;
-      const from = railState.active ?? railState.carouselIndex;
-      const step = Math.abs(dx) > 40 || Math.abs(p.v) > 0.45 ? (dx < 0 ? 1 : -1) : 0;
-      railState.pointer.swipe = 0;
+      const from = railState.active ?? railState.carouselIndex ?? 0;
+      let step = 0;
+      if (Math.abs(p.v) > 0.28) {
+        step = p.v < 0 ? 1 : -1;
+      } else if (Math.abs(dx) > 38) {
+        step = dx < 0 ? 1 : -1;
+      }
+      p.swipe = 0;
       const next = Math.max(0, Math.min(railState.shapes.length - 1, from + step));
       railState.carouselIndex = next;
-      const xs = computeRailTargets(lay, railState.shapes, next, next);
-      for (let i = 0; i < railState.shapes.length; i++) s.tx[i] = xs[i] ?? 0;
-      kickRailSimulation();
       chooseRailPrint(next);
       return;
     }
 
     if (cancelled || p.moved || p.index < 0) return;
     railState.playing = false;
-    const hitWork = railState.items[p.index];
-    if (hitWork) {
-      chooseRailPrint(p.index);
-      openWorkModal(hitWork.id);
+    const hitIndex = p.index;
+    if (hitIndex !== railState.active) {
+      // Clicked a neighboring frame on the side -> slide to center that frame!
+      chooseRailPrint(hitIndex);
+    } else {
+      // Clicked the currently centered active frame -> open 3D inspection modal!
+      const hitWork = railState.items[hitIndex];
+      if (hitWork) {
+        openWorkModal(hitWork.id);
+      }
     }
   }
 
