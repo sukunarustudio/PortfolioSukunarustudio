@@ -333,6 +333,7 @@ function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
       const geom = getCardGeometry(diff, config);
       const isActive = diff === 0;
 
+      card._geom = geom;
       card.classList.toggle("is-active", isActive);
       card.style.zIndex = String(geom.zIndex);
       card.style.pointerEvents = geom.opacity > 0.05 ? "auto" : "none";
@@ -376,8 +377,48 @@ function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
     goToIndex(fanCarouselState.activeIndex - 1);
   }
 
-  // Card click / keyboard activation
+  // Card click / hover / keyboard activation
   cardEls.forEach((card, idx) => {
+    card.addEventListener("mouseenter", () => {
+      if (idx !== fanCarouselState.activeIndex) return;
+      const geom = card._geom;
+      if (!geom) return;
+      if (typeof window.gsap !== "undefined") {
+        window.gsap.to(card, {
+          xPercent: -50,
+          yPercent: -50,
+          x: geom.x,
+          y: geom.y - 10,
+          scale: geom.scale * 1.035,
+          duration: 0.3,
+          ease: "power2.out",
+          overwrite: "auto"
+        });
+      } else {
+        card.style.transform = `translate3d(calc(-50% + ${geom.x}px), calc(-50% + ${geom.y - 10}px), 0) rotate(${geom.rot}deg) scale(${geom.scale * 1.035})`;
+      }
+    });
+
+    card.addEventListener("mouseleave", () => {
+      if (idx !== fanCarouselState.activeIndex) return;
+      const geom = card._geom;
+      if (!geom) return;
+      if (typeof window.gsap !== "undefined") {
+        window.gsap.to(card, {
+          xPercent: -50,
+          yPercent: -50,
+          x: geom.x,
+          y: geom.y,
+          scale: geom.scale,
+          duration: 0.3,
+          ease: "power2.out",
+          overwrite: "auto"
+        });
+      } else {
+        card.style.transform = `translate3d(calc(-50% + ${geom.x}px), calc(-50% + ${geom.y}px), 0) rotate(${geom.rot}deg) scale(${geom.scale})`;
+      }
+    });
+
     card.addEventListener("click", () => {
       if (fanCarouselState.isDragging) return;
       if (idx === fanCarouselState.activeIndex) {

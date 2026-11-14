@@ -446,19 +446,6 @@ export const FanPosterCarousel: React.FC<FanPosterCarouselProps> = ({
                 aria-hidden="true"
               />
 
-              {/* Center Active Hover: Glassmorphism Floating Caption Pill */}
-              {isCenter && (
-                <div
-                  className="absolute bottom-3 inset-x-3 p-2.5 rounded-xl bg-black/75 backdrop-blur-md border border-white/15 text-left opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 shadow-lg pointer-events-none"
-                  aria-hidden="true"
-                >
-                  <p className="text-xs font-bold text-white truncate font-sans">{poster.title}</p>
-                  <p className="text-[10px] text-zinc-300 font-mono tracking-wide mt-0.5 truncate">
-                    {poster.category} • {poster.year}
-                  </p>
-                </div>
-              )}
-
               {/* Side Card Overlay Tint for Visual Hierarchy */}
               {!isCenter && (
                 <div
@@ -471,17 +458,23 @@ export const FanPosterCarousel: React.FC<FanPosterCarouselProps> = ({
         })}
       </div>
 
-      {/* Bottom Control Bar: Circular Prev (<), Next (>) & Pagination Dots */}
-      <div className="mt-6 flex flex-col items-center justify-center gap-4">
-        {/* Active Title Banner */}
-        <div className="text-center px-4 max-w-xl">
-          <h3 className="text-base sm:text-lg font-bold text-zinc-100 font-sans tracking-tight truncate">
-            {posters[activeIndex]?.title}
-          </h3>
-          <p className="text-xs text-[#FF8E00] font-mono tracking-wider mt-0.5">
-            {posters[activeIndex]?.category} &bull; {posters[activeIndex]?.year} &bull; {posters[activeIndex]?.dimensions || "A4 ARCHIVAL PRINT"}
-          </p>
-        </div>
+      {/* Bottom Control Bar: Lihat Detail Button, Prev/Next & Dots */}
+      <div className="mt-5 flex flex-col items-center justify-center gap-4">
+        {/* Single Action Button: Lihat Detail */}
+        <button
+          type="button"
+          onClick={() => setSelectedPoster(posters[activeIndex])}
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#FF8E00] hover:bg-[#ffa024] text-black font-bold text-sm shadow-lg shadow-[#FF8E00]/25 transition-all hover:-translate-y-0.5 active:scale-95 cursor-pointer"
+          aria-label="Lihat detail poster aktif"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 3h6v6" />
+            <path d="M9 21H3v-6" />
+            <path d="M21 3l-7 7" />
+            <path d="M3 21l7-7" />
+          </svg>
+          <span>Lihat Detail</span>
+        </button>
 
         {/* Circular Controls & Dots */}
         <div className="flex items-center justify-center gap-4 sm:gap-6 mt-1">
