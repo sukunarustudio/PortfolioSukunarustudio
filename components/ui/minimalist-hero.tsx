@@ -95,7 +95,7 @@ export const MinimalistHero = ({
             <br />
             {overlayText.line2}
             <br />
-            {overlayText.line3}
+            <em className="font-serif italic font-normal text-amber-500">{overlayText.line3}</em>
           </h1>
         </motion.div>
       </div>

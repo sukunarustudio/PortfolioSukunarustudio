@@ -665,6 +665,21 @@ dialog {
   display: block;
 }
 
+/* Editorial Serif Accents per DESIGN.md (Instrument Serif) */
+.hero-massive-title em,
+.hero-massive-title .title-accent,
+.section-title em,
+.hub-title em,
+.hub-subtitle em,
+.hero-title em {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.1em;
+  letter-spacing: -0.015em;
+  color: var(--accent-text-on-surface);
+}
+
 /* Hero Footer Bar: Social Links on Left, Location on Right */
 .hero-footer-bar {
   display: flex;
