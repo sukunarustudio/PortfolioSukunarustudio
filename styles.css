@@ -236,7 +236,17 @@ dialog {
   align-items: center;
   justify-content: space-between;
   min-height: 4.5rem;
-  gap: 1rem;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  padding-inline: clamp(1rem, 2.5vw, 2.5rem);
+}
+
+.site-header .container {
+  width: 100%;
+  max-width: 100%;
+  padding-inline: clamp(1rem, 2.5vw, 2.5rem);
+  margin-inline: 0;
 }
 
 .brand-mark {
@@ -329,6 +339,7 @@ dialog {
 .primary-nav {
   display: flex;
   align-items: center;
+  margin-inline: auto;
 }
 
 .nav-list {
