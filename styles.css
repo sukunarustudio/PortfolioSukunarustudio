@@ -613,7 +613,7 @@ dialog {
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #FFA826 0%, var(--accent-brand) 70%, #D46900 100%);
   box-shadow: 0 24px 64px -10px rgba(255, 142, 0, 0.48);
-  top: 48%;
+  top: 38%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
@@ -664,10 +664,10 @@ dialog {
 
 .hero-massive-title {
   font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: clamp(4.8rem, 8.5vw, 9rem);
+  font-size: clamp(3.2rem, 5.5vw, 6rem);
   font-weight: 800;
-  line-height: 0.82;
-  letter-spacing: -0.05em;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
   color: var(--text-primary);
   margin: 0;
   text-transform: lowercase;
@@ -1716,6 +1716,7 @@ dialog {
   .hero-circle-backdrop {
     width: clamp(300px, 54vw, 400px);
     height: clamp(300px, 54vw, 400px);
+    top: 40%;
   }
 
   .hero-portrait-img {
@@ -1732,7 +1733,7 @@ dialog {
   }
 
   .hero-massive-title {
-    font-size: clamp(3.5rem, 12vw, 5.5rem);
+    font-size: clamp(2.6rem, 8vw, 4.2rem);
   }
 
   .hero-stage-left {
@@ -1927,6 +1928,7 @@ dialog {
   .hero-circle-backdrop {
     width: 250px;
     height: 250px;
+    top: 40%;
   }
 
   .hero-portrait-img {
@@ -1936,7 +1938,7 @@ dialog {
   }
 
   .hero-massive-title {
-    font-size: clamp(3rem, 15vw, 4.4rem);
+    font-size: clamp(2.4rem, 11vw, 3.4rem);
   }
 
   .hero-clean-text {
