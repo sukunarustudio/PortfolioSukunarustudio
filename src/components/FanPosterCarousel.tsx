@@ -347,7 +347,11 @@ export const FanPosterCarousel: React.FC<FanPosterCarouselProps> = ({
   // Card click interaction
   const handleCardClick = (index: number) => {
     if (index === activeIndex) {
-      // Center card clicked -> open lightbox
+      // Don't open detail when clicking image on mobile browser
+      if (typeof window !== "undefined" && (window.innerWidth <= 768 || window.matchMedia("(max-width: 768px)").matches)) {
+        return;
+      }
+      // Center card clicked on desktop -> open lightbox
       const activePoster = posters[activeIndex];
       setSelectedPoster(activePoster);
       if (onPosterClick) onPosterClick(activePoster);
@@ -459,15 +463,15 @@ export const FanPosterCarousel: React.FC<FanPosterCarouselProps> = ({
       </div>
 
       {/* Bottom Control Bar: Lihat Detail Button, Prev/Next & Dots */}
-      <div className="mt-5 flex flex-col items-center justify-center gap-4">
+      <div className="mt-4 sm:mt-5 flex flex-col items-center justify-center gap-3 sm:gap-4">
         {/* Single Action Button: Lihat Detail */}
         <button
           type="button"
           onClick={() => setSelectedPoster(posters[activeIndex])}
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#FF8E00] hover:bg-[#ffa024] text-black font-bold text-sm shadow-lg shadow-[#FF8E00]/25 transition-all hover:-translate-y-0.5 active:scale-95 cursor-pointer"
+          className="inline-flex items-center gap-1.5 sm:gap-2 px-4 py-1.5 sm:px-6 sm:py-2.5 rounded-full bg-[#FF8E00] hover:bg-[#ffa024] text-black font-bold text-xs sm:text-sm shadow-md shadow-[#FF8E00]/25 transition-all hover:-translate-y-0.5 active:scale-95 cursor-pointer"
           aria-label="Lihat detail poster aktif"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" className="sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 3h6v6" />
             <path d="M9 21H3v-6" />
             <path d="M21 3l-7 7" />
@@ -477,21 +481,21 @@ export const FanPosterCarousel: React.FC<FanPosterCarouselProps> = ({
         </button>
 
         {/* Circular Controls & Dots */}
-        <div className="flex items-center justify-center gap-4 sm:gap-6 mt-1">
+        <div className="flex items-center justify-center gap-3 sm:gap-6 mt-0.5 sm:mt-1">
           {/* Previous Button */}
           <button
             type="button"
             onClick={handlePrev}
             aria-label="Karya Sebelumnya"
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center bg-zinc-900 border border-zinc-700/80 text-zinc-200 hover:text-white hover:border-[#FF8E00] hover:bg-zinc-800 transition-all duration-200 active:scale-95 shadow-md"
+            className="w-8 h-8 sm:w-11 sm:h-11 rounded-full flex items-center justify-center bg-zinc-900 border border-zinc-700/80 text-zinc-200 hover:text-white hover:border-[#FF8E00] hover:bg-zinc-800 transition-all duration-200 active:scale-95 shadow-md"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="14" height="14" className="sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
 
           {/* Interactive Pagination Dots */}
-          <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-zinc-900/80 border border-zinc-800 backdrop-blur-sm">
+          <div className="flex items-center gap-1 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-zinc-900/80 border border-zinc-800 backdrop-blur-sm">
             {posters.map((poster, index) => {
               const isActive = index === activeIndex;
               return (
@@ -502,8 +506,8 @@ export const FanPosterCarousel: React.FC<FanPosterCarouselProps> = ({
                   aria-label={`Buka slide ${index + 1}: ${poster.title}`}
                   className={`transition-all duration-300 rounded-full ${
                     isActive
-                      ? "w-6 sm:w-7 h-2 bg-[#FF8E00] shadow-sm shadow-[#FF8E00]/50"
-                      : "w-2 h-2 bg-[#d4d4d8] hover:bg-zinc-300 opacity-60 hover:opacity-100"
+                      ? "w-4 sm:w-7 h-1.5 sm:h-2 bg-[#FF8E00] shadow-sm shadow-[#FF8E00]/50"
+                      : "w-1.5 sm:w-2 h-1.5 sm:h-2 bg-[#d4d4d8] hover:bg-zinc-300 opacity-60 hover:opacity-100"
                   }`}
                 />
               );
@@ -515,9 +519,9 @@ export const FanPosterCarousel: React.FC<FanPosterCarouselProps> = ({
             type="button"
             onClick={handleNext}
             aria-label="Karya Selanjutnya"
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center bg-zinc-900 border border-zinc-700/80 text-zinc-200 hover:text-white hover:border-[#FF8E00] hover:bg-zinc-800 transition-all duration-200 active:scale-95 shadow-md"
+            className="w-8 h-8 sm:w-11 sm:h-11 rounded-full flex items-center justify-center bg-zinc-900 border border-zinc-700/80 text-zinc-200 hover:text-white hover:border-[#FF8E00] hover:bg-zinc-800 transition-all duration-200 active:scale-95 shadow-md"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="14" height="14" className="sm:w-[18px] sm:h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>

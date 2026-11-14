@@ -433,6 +433,11 @@ function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
     card.addEventListener("click", () => {
       if (fanCarouselState.isDragging) return;
       if (idx === fanCarouselState.activeIndex) {
+        // Jangan buka detail saat klik gambar di browser HP (hanya buka lewat tombol Lihat Detail)
+        const isMobile = window.innerWidth <= 768 || (window.matchMedia && window.matchMedia("(max-width: 768px)").matches);
+        if (isMobile) {
+          return;
+        }
         const item = items[idx];
         if (item) {
           if (typeof openWorkModal === "function") {
@@ -450,8 +455,18 @@ function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         if (idx === fanCarouselState.activeIndex) {
+          const isMobile = window.innerWidth <= 768 || (window.matchMedia && window.matchMedia("(max-width: 768px)").matches);
+          if (isMobile) {
+            return;
+          }
           const item = items[idx];
-          if (item) openWorkModal(item.id);
+          if (item) {
+            if (typeof openWorkModal === "function") {
+              openWorkModal(item.id);
+            } else if (typeof window.openWorkModal === "function") {
+              window.openWorkModal(item.id);
+            }
+          }
         } else {
           goToIndex(idx);
         }

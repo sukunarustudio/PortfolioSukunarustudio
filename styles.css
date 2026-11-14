@@ -1455,9 +1455,47 @@ dialog {
 }
 
 @media (max-width: 640px) {
+  .fan-active-info-wrap {
+    margin-top: 1rem;
+  }
+
   .fan-active-modal-btn {
-    width: auto;
-    padding-inline: 1.5rem;
+    padding: 0.45rem 1.15rem;
+    font-size: 0.78rem;
+    gap: 0.38rem;
+  }
+
+  .fan-active-modal-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .fan-controls-bar {
+    gap: 0.65rem;
+    margin-top: 0.75rem;
+  }
+
+  .fan-nav-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .fan-nav-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .fan-dots-container {
+    gap: 0.3rem;
+  }
+
+  .fan-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .fan-dot.is-active {
+    width: 16px;
   }
 }
 
