@@ -345,6 +345,56 @@ function initDialogsAndTriggers() {
   const closeProductBtn = document.getElementById("close-product-dialog");
   const closeProductSecondary = document.getElementById("dialog-product-close-secondary");
 
+  const legalDialog = document.getElementById("legal-dialog");
+  const closeLegalBtn = document.getElementById("close-legal-dialog");
+  const closeLegalSecondary = document.getElementById("close-legal-secondary");
+
+  const LEGAL_CONTENTS = {
+    terms: {
+      code: "LEGAL // 01",
+      category: "LEGAL & LISENSI KARYA",
+      title: "Ketentuan Lisensi & Hak Cipta",
+      content: `
+        <h4>1. Komisi Desain Kustom (Poster &amp; Feeds)</h4>
+        <p>Klien yang memesan layanan desain (poster cetak, feed media sosial, key visual) memperoleh <strong>Hak Guna Komersial Penuh (Full Commercial Usage Rights)</strong> atas hasil akhir desain yang disepakati untuk keperluan promosi, cetak merchandise, pameran, maupun kampanye digital tanpa batas waktu.</p>
+        <p>Sukunaru Studio tetap memegang hak moral kepengarangan dan hak untuk menampilkan karya tersebut dalam portofolio studio, arsip cetak fisik, dan publikasi media resmi studio.</p>
+        <h4>2. Software Kreator (Vectonaru &amp; Filter Studio)</h4>
+        <p>Lisensi perangkat lunak Vectonaru dan Sukunaru Filter Studio diberikan per pembeli/lisensi resmi. Pengguna berhak mempergunakan aset visual atau vektor yang dihasilkan oleh aplikasi untuk keperluan personal maupun komersial tanpa royalti tambahan.</p>
+        <p>Dilarang keras menyalin kode program, mendekompilasi, mendistribusikan ulang (re-distribute), atau menjual kembali installer aplikasi tanpa izin tertulis resmi dari Sukunaru Studio.</p>
+      `
+    },
+    privacy: {
+      code: "PRIVACY // 02",
+      category: "KEBIJAKAN PRIVASI",
+      title: "Kebijakan Privasi & Nol Pelacak",
+      content: `
+        <h4>1. Prinsip Zero-Tracking &amp; Tanpa Cookie Pihak Ketiga</h4>
+        <p>Website Sukunaru Studio dibangun dengan prinsip integritas privasi tinggi. Kami <strong>tidak menggunakan cookie pelacak pihak ketiga</strong>, skrip telemetri intrusif, maupun pixel iklan pengumpul data pengguna.</p>
+        <h4>2. Komunikasi Langsung via WhatsApp Resmi</h4>
+        <p>Seluruh interaksi, pengiriman brief proyek, dan konsultasi dilakukan secara transparan dan terenkripsi langsung melalui nomor resmi WhatsApp Sukunaru Studio (+62 895 1920 3345).</p>
+        <h4>3. Keamanan Data &amp; Kerahasiaan Klien</h4>
+        <p>Materi, file referensi gambar, maupun identitas yang Anda kirimkan untuk pengerjaan proyek dijaga kerahasiaannya dan tidak akan pernah dibagikan atau diperjualbelikan kepada pihak ketiga manapun.</p>
+      `
+    },
+    credits: {
+      code: "SPEC // 03",
+      category: "KREDIT & TEKNOLOGI",
+      title: "Kredit Tipografi & Spesifikasi Rekayasa",
+      content: `
+        <h4>1. Identitas &amp; Desain Grafis Studio</h4>
+        <p>Konseptualisasi, sistem visual editorial, arsitektur tata letak, dan grafis poster orisinal dirancang secara independen oleh <strong>Sukunaru Studio</strong> dengan disiplin Swiss Print Graphic &amp; Precision Creative Engineering.</p>
+        <h4>2. Lisensi Tipografi Resmi</h4>
+        <ul>
+          <li><strong>Plus Jakarta Sans</strong> &mdash; Didesain oleh Gumpita Rahayu / Tokotype (SIL Open Font License). Digunakan sebagai tipografi body, navigasi, dan antarmuka.</li>
+          <li><strong>Instrument Serif</strong> &mdash; Didesain oleh Instrument Studio (SIL Open Font License). Digunakan sebagai aksen editorial dan headline judul studio.</li>
+          <li><strong>JetBrains Mono</strong> &mdash; Didesain oleh JetBrains Team (SIL Open Font License). Digunakan untuk spesifikasi cetak teknis, dimensi DPI, dan registrasi artboard.</li>
+        </ul>
+        <h4>3. Standar Rekayasa Web Murni</h4>
+        <p>Dikembangkan dengan HTML5 Semantik, CSS Modern Grid/Flexbox dengan variabel warna berstandar WCAG 2.1 AA/AAA, serta Vanilla JavaScript murni tanpa runtime framework berat untuk performa kilat dan keandalan maksimal.</p>
+      `
+    }
+  };
+
   let activeWorkTopic = "";
 
   function openWorkModal(workId) {
@@ -396,6 +446,25 @@ function initDialogsAndTriggers() {
       );
       document.getElementById("dialog-product-wa-link").href = `https://wa.me/${STUDIO_WA_NUMBER}?text=${waMsg}`;
       productDialog.showModal();
+      return;
+    }
+
+    const legalTriggerBtn = event.target.closest("[data-legal-trigger]");
+    if (legalTriggerBtn && legalDialog) {
+      event.preventDefault();
+      const type = legalTriggerBtn.getAttribute("data-legal-trigger");
+      const info = LEGAL_CONTENTS[type] || LEGAL_CONTENTS.terms;
+      const codeEl = document.getElementById("dialog-legal-code");
+      const catEl = document.getElementById("dialog-legal-category");
+      const titleEl = document.getElementById("dialog-legal-title");
+      const contentEl = document.getElementById("dialog-legal-content");
+
+      if (codeEl) codeEl.textContent = info.code;
+      if (catEl) catEl.textContent = info.category;
+      if (titleEl) titleEl.textContent = info.title;
+      if (contentEl) contentEl.innerHTML = info.content;
+
+      legalDialog.showModal();
     }
   });
 
@@ -425,6 +494,12 @@ function initDialogsAndTriggers() {
   [closeProductBtn, closeProductSecondary].forEach((btn) => {
     if (btn && productDialog) {
       btn.addEventListener("click", () => productDialog.close());
+    }
+  });
+
+  [closeLegalBtn, closeLegalSecondary].forEach((btn) => {
+    if (btn && legalDialog) {
+      btn.addEventListener("click", () => legalDialog.close());
     }
   });
 }
@@ -789,7 +864,9 @@ function initInteractiveBackgroundAndCursor() {
 }
 
 function initScrollToTop() {
-  const brandLinks = document.querySelectorAll(".brand-mark, .footer-brand-link");
+  const brandLinks = document.querySelectorAll(
+    ".brand-mark, .footer-brand-link, #footer-back-to-top, .back-to-top-button"
+  );
 
   brandLinks.forEach((link) => {
     link.addEventListener("click", (e) => {
@@ -926,9 +1003,17 @@ function initScrollReveal() {
   observeElements(initialItems);
 }
 
+function initCopyrightYear() {
+  const currentYearEl = document.getElementById("current-year");
+  if (currentYearEl) {
+    currentYearEl.textContent = new Date().getFullYear();
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
   initScrollToTop();
+  initCopyrightYear();
   initMobileMenu();
   initProductStateControls();
   initPortfolioControls();
