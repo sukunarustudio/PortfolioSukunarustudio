@@ -692,51 +692,30 @@ dialog {
 /* Hero Signature Styling (Alwi Abdul Aziz) */
 .hero-signature-wrap {
   display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  gap: 0.15rem;
-  margin-top: clamp(0.65rem, 1.8vh, 1.35rem);
-  padding-left: 0.2rem;
+  margin-top: clamp(1.4rem, 3.8vh, 2.85rem);
+  padding-left: 0.25rem;
 }
 
 .signature-handwriting {
   font-family: "Alex Brush", "Caveat", cursive;
-  font-size: clamp(2rem, 3.4vw, 2.85rem);
+  font-size: clamp(1.2rem, 1.8vw, 1.6rem);
   font-weight: 400;
-  line-height: 1.05;
+  line-height: 1.1;
   color: var(--accent-text-on-surface);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   transform: rotate(-3deg);
   display: inline-block;
   transform-origin: left center;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s ease;
   user-select: none;
+  opacity: 0.92;
 }
 
 .signature-handwriting:hover {
-  transform: rotate(-1deg) scale(1.05);
+  transform: rotate(-1deg) scale(1.08);
   color: var(--accent-brand);
-}
-
-.signature-subtext {
-  font-family: "JetBrains Mono", monospace;
-  font-size: clamp(0.62rem, 0.85vw, 0.72rem);
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  opacity: 0.82;
-}
-
-.signature-subtext::before {
-  content: "";
-  display: inline-block;
-  width: 14px;
-  height: 1px;
-  background-color: var(--border-structural);
+  opacity: 1;
 }
 
 /* Editorial Serif Accents per DESIGN.md (Instrument Serif) */
@@ -2895,20 +2874,17 @@ dialog {
   }
 
   .hero-signature-wrap {
+    justify-content: center;
     align-items: center;
     text-align: center;
-    margin-top: 0.5rem;
+    margin-top: 1.1rem;
     padding-left: 0;
   }
 
   .signature-handwriting {
     transform: rotate(-2deg);
     transform-origin: center center;
-    font-size: clamp(1.75rem, 5.2vw, 2.3rem);
-  }
-
-  .signature-subtext::before {
-    display: none;
+    font-size: clamp(1.15rem, 3.6vw, 1.45rem);
   }
 
   .hero-stage-left {
