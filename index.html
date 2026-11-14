@@ -187,7 +187,7 @@
 
         <!-- Tombol Aksi: Lihat Detail Poster -->
         <div class="fan-active-info-wrap container">
-          <button type="button" class="btn btn-accent fan-active-modal-btn" id="fan-active-modal-btn" aria-label="Lihat detail poster">
+          <button type="button" class="btn btn-accent fan-active-modal-btn" id="fan-active-modal-btn" data-work-id="SKN-01" aria-label="Lihat detail poster">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
             <span>Lihat Detail</span>
           </button>
@@ -487,39 +487,38 @@
       <div class="hub-grid">
         <div class="wa-brief-box scroll-reveal-item" id="brief-wa">
           <div class="box-tag-row">
-            <span class="spec-chip">RESPON CEPAT</span>
-            <span class="spec-chip">WHATSAPP RESMI</span>
+            <span class="spec-chip">WHATSAPP</span>
           </div>
-          <h2 id="contact-heading" class="hub-title">Konsultasi Proyek &amp; <em>Pemesanan</em></h2>
+          <h2 id="contact-heading" class="hub-title">Konsultasi &amp; <em>Pemesanan</em></h2>
           <p class="hub-desc">
-            Kirim ringkasan kebutuhan Anda lewat formulir berikut, atau langsung chat kami di WhatsApp (+62 895-1920-3345).
+            Kirim ringkasan brief proyek Anda atau chat langsung via WhatsApp.
           </p>
 
           <form id="wa-brief-form" class="brief-form" novalidate>
             <div class="form-row">
-              <label for="client-name" class="form-label">Nama Anda / Brand *</label>
-              <input type="text" id="client-name" name="clientName" class="form-input" placeholder="Nama Anda atau nama brand..." required autocomplete="name">
+              <label for="client-name" class="form-label">Nama / Brand *</label>
+              <input type="text" id="client-name" name="clientName" class="form-input" placeholder="Nama Anda atau nama brand" required autocomplete="name">
               <p class="field-error" id="error-client-name" hidden></p>
             </div>
 
             <div class="form-row">
-              <label for="inquiry-topic" class="form-label">Kebutuhan Utama *</label>
+              <label for="inquiry-topic" class="form-label">Layanan / Produk *</label>
               <select id="inquiry-topic" name="inquiryTopic" class="form-select" required>
-                <option value="">Pilih topik diskusi...</option>
-                <option value="Paket Jasa: Sukunaru Feed Starter Pack">Jasa Desain: Sukunaru Feed Starter Pack</option>
-                <option value="Paket Jasa: Monthly Content & Carousel Production">Jasa Desain: Monthly Content &amp; Carousel Production</option>
-                <option value="Paket Jasa: Key Visual & Event Poster Print">Jasa Desain: Key Visual &amp; Event Poster Print</option>
-                <option value="Paket Jasa: Full Print & Promo Visual Suite">Jasa Desain: Full Print &amp; Promo Visual Suite</option>
-                <option value="Tanya Produk Digital: Vectonaru">Produk Digital: Vectonaru (Microstock &amp; Vector Tool)</option>
-                <option value="Tanya Produk Digital: Sukunaru Filter Studio">Produk Digital: Sukunaru Filter Studio</option>
-                <option value="Custom Project / Kolaborasi Lainnya">Custom Project / Kolaborasi Lainnya</option>
+                <option value="">Pilih layanan atau produk...</option>
+                <option value="Paket Jasa: Sukunaru Feed Starter Pack">Jasa Desain: Feed Starter Pack</option>
+                <option value="Paket Jasa: Monthly Content & Carousel Production">Jasa Desain: Monthly Content &amp; Carousel</option>
+                <option value="Paket Jasa: Key Visual & Event Poster Print">Jasa Desain: Key Visual &amp; Poster Print</option>
+                <option value="Paket Jasa: Full Print & Promo Visual Suite">Jasa Desain: Full Print &amp; Promo Suite</option>
+                <option value="Tanya Produk Digital: Vectonaru">Produk Digital: Vectonaru</option>
+                <option value="Tanya Produk Digital: Sukunaru Filter Studio">Produk Digital: Filter Studio</option>
+                <option value="Custom Project / Kolaborasi Lainnya">Custom Project / Kolaborasi</option>
               </select>
               <p class="field-error" id="error-inquiry-topic" hidden></p>
             </div>
 
             <div class="form-row">
-              <label for="project-details" class="form-label">Detail Singkat / Pertanyaan *</label>
-              <textarea id="project-details" name="projectDetails" rows="3" class="form-textarea" placeholder="Ceritakan kebutuhan desain, target waktu, atau pertanyaan seputar software..." required></textarea>
+              <label for="project-details" class="form-label">Detail Kebutuhan *</label>
+              <textarea id="project-details" name="projectDetails" rows="3" class="form-textarea" placeholder="Jelaskan kebutuhan desain, timeline, atau pertanyaan Anda..." required></textarea>
               <p class="field-error" id="error-project-details" hidden></p>
             </div>
 
@@ -527,10 +526,10 @@
 
             <div class="form-actions">
               <button type="submit" class="btn btn-accent btn-large">
-                Kirim Brief ke WhatsApp
+                Kirim ke WhatsApp
               </button>
               <a href="https://wa.me/6289519203345?text=Halo%20Sukunaru%20Studio,%20saya%20ingin%20konsultasi%20mengenai%20jasa%20desain%20/%20produk%20digital." target="_blank" rel="noopener noreferrer" class="btn btn-outline">
-                Chat WhatsApp Langsung
+                Chat Langsung
               </a>
             </div>
           </form>
@@ -538,12 +537,11 @@
 
         <div class="social-directory-box scroll-reveal-item" aria-labelledby="social-dir-heading">
           <div class="box-tag-row">
-            <span class="spec-chip">KANAL RESMI</span>
             <span class="spec-chip">MEDIA SOSIAL</span>
           </div>
-          <h3 id="social-dir-heading" class="hub-subtitle">Saluran Resmi <em>Sukunaru Studio</em></h3>
+          <h3 id="social-dir-heading" class="hub-subtitle">Ikuti <em>Sukunaru Studio</em></h3>
           <p class="hub-desc">
-            Ikuti kanal resmi kami untuk melihat karya terbaru, video proses kerja, dan update software.
+            Update karya poster, video proses kreatif, dan software.
           </p>
 
           <ul class="social-directory-list">
@@ -552,29 +550,26 @@
                 <div class="social-info">
                   <span class="social-platform">INSTAGRAM</span>
                   <strong class="social-handle">@sukunarustudio</strong>
-                  <span class="social-purpose">Karya poster harian, rekap feed klien, dan pengumuman rilis.</span>
                 </div>
-                <span class="social-action-label">Buka Profil</span>
+                <span class="social-action-label">Buka Instagram &rarr;</span>
               </a>
             </li>
             <li class="scroll-reveal-item">
               <a href="https://tiktok.com/@sukunarustudio" target="_blank" rel="noopener noreferrer" class="social-row">
                 <div class="social-info">
-                  <span class="social-platform">TIKTOK &amp; REELS</span>
+                  <span class="social-platform">TIKTOK</span>
                   <strong class="social-handle">@sukunarustudio</strong>
-                  <span class="social-purpose">Video proses desain poster dan demo penggunaan software.</span>
                 </div>
-                <span class="social-action-label">Tonton Video</span>
+                <span class="social-action-label">Buka TikTok &rarr;</span>
               </a>
             </li>
             <li class="scroll-reveal-item">
               <a href="https://youtube.com/@sukunarustudio" target="_blank" rel="noopener noreferrer" class="social-row">
                 <div class="social-info">
-                  <span class="social-platform">YOUTUBE CHANNEL</span>
+                  <span class="social-platform">YOUTUBE</span>
                   <strong class="social-handle">@sukunarustudio</strong>
-                  <span class="social-purpose">Tutorial lengkap penggunaan Vectonaru dan Sukunaru Filter Studio.</span>
                 </div>
-                <span class="social-action-label">Buka YouTube</span>
+                <span class="social-action-label">Buka YouTube &rarr;</span>
               </a>
             </li>
             <li class="scroll-reveal-item">
@@ -582,9 +577,8 @@
                 <div class="social-info">
                   <span class="social-platform">THREADS</span>
                   <strong class="social-handle">@sukunarustudio</strong>
-                  <span class="social-purpose">Catatan kerja studio, update fitur aplikasi, dan diskusi desain.</span>
                 </div>
-                <span class="social-action-label">Ikuti di Threads</span>
+                <span class="social-action-label">Buka Threads &rarr;</span>
               </a>
             </li>
           </ul>
