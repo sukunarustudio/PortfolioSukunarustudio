@@ -195,6 +195,8 @@ const PORTFOLIO_WORKS = [
   }
 ];
 
+let openWorkModal = null;
+
 /* ==========================================================================
    7-Card Fan Arc Poster Carousel (A4 Aspect Ratio: 1 / 1.414)
    ========================================================================== */
@@ -315,7 +317,16 @@ function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
     if (titleEl && activeItem) titleEl.textContent = activeItem.title;
     if (categoryEl && activeItem) categoryEl.textContent = activeItem.categoryLabel || (activeItem.specs ? activeItem.specs.join(" • ") : "A4 POSTER PRINT");
     if (modalBtn && activeItem) {
-      modalBtn.onclick = () => openWorkModal(activeItem.id);
+      modalBtn.setAttribute("data-work-id", activeItem.id);
+      modalBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof openWorkModal === "function") {
+          openWorkModal(activeItem.id);
+        } else if (typeof window.openWorkModal === "function") {
+          window.openWorkModal(activeItem.id);
+        }
+      };
     }
 
     if (dotsContainer) {
@@ -423,7 +434,13 @@ function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
       if (fanCarouselState.isDragging) return;
       if (idx === fanCarouselState.activeIndex) {
         const item = items[idx];
-        if (item) openWorkModal(item.id);
+        if (item) {
+          if (typeof openWorkModal === "function") {
+            openWorkModal(item.id);
+          } else if (typeof window.openWorkModal === "function") {
+            window.openWorkModal(item.id);
+          }
+        }
       } else {
         goToIndex(idx);
       }
@@ -945,7 +962,8 @@ function initDialogsAndTriggers() {
 
   let activeWorkTopic = "";
 
-  function openWorkModal(workId) {
+  openWorkModal = function(workId) {
+    window.openWorkModal = openWorkModal;
     if (!workDialog) return;
     const found = PORTFOLIO_WORKS.find((item) => item.id === workId);
     if (!found) return;
@@ -1623,8 +1641,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initCopyrightYear();
   initMobileMenu();
   initProductStateControls();
-  initPortfolioControls();
   initDialogsAndTriggers();
+  initPortfolioControls();
   initBriefForm();
   initInteractiveBackgroundAndCursor();
   initScrollReveal();
