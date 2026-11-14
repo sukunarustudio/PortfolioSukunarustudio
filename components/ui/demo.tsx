@@ -6,7 +6,7 @@ const MinimalistHeroDemo = () => {
   const socialLinks = [
     { icon: Instagram, href: 'https://instagram.com/sukunarustudio', label: 'Instagram' },
     { icon: Send, href: 'https://wa.me/6289519203345', label: 'WhatsApp' },
-    { icon: Twitter, href: 'https://x.com/sukunarustudio', label: 'X (Twitter)' },
+    { icon: Twitter, href: 'https://threads.net/@sukunarustudio', label: 'Threads' },
     { icon: Youtube, href: 'https://youtube.com/@sukunarustudio', label: 'YouTube' },
   ];
 

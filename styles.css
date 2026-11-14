@@ -1353,12 +1353,25 @@ dialog {
 .form-select,
 .form-textarea {
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   padding: 0.65rem 0.9rem;
   background-color: var(--bg-primary);
   border: 1.5px solid var(--border-structural);
   color: var(--text-primary);
   border-radius: 2px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF8E00' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 14px 14px;
+  padding-right: 2.4rem;
 }
 
 .form-textarea {
@@ -1707,7 +1720,8 @@ dialog {
   }
 
   .flagship-duet {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
   }
 
   .work-piece.span-4,
@@ -1742,11 +1756,11 @@ dialog {
     background-color: var(--bg-primary);
     border-bottom: 2px solid var(--accent-brand);
     box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
-    padding: 1.15rem 1.25rem 1.5rem;
+    padding: 1.15rem 1.25rem max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
     max-height: calc(100dvh - 4.5rem);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px);
     z-index: 99;
   }
 
@@ -1769,21 +1783,24 @@ dialog {
   .nav-list {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.4rem;
+    gap: 0.5rem;
   }
 
   .nav-link {
     width: 100%;
-    min-height: 48px;
-    padding: 0.65rem 0.85rem;
+    min-height: 52px;
+    padding: 0.75rem 1rem;
     border: 1px solid var(--border-subtle);
     background-color: var(--bg-elevated);
+    border-radius: var(--radius-sm, 2px);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 0.95rem;
+    font-size: 0.98rem;
     font-weight: 600;
     white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   }
 
   .nav-link:active {
@@ -1793,10 +1810,17 @@ dialog {
   }
 
   .nav-link-arrow {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     font-family: "JetBrains Mono", monospace;
-    color: var(--text-secondary);
-    font-size: 0.88rem;
+    color: var(--accent-brand);
+    font-size: 1.1rem;
+    transition: transform 0.2s ease, color 0.15s ease;
+  }
+
+  .nav-link:active .nav-link-arrow {
+    color: var(--accent-contrast-ink);
+    transform: translateX(4px);
   }
 
   .nav-mobile-cta {
@@ -1808,10 +1832,15 @@ dialog {
 
   .nav-mobile-cta .btn {
     width: 100%;
-    min-height: 48px;
+    min-height: 50px;
     font-weight: 700;
     justify-content: center;
     white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-mobile-cta .btn:active {
+    transform: scale(0.98);
   }
 }
 
@@ -1958,106 +1987,139 @@ dialog {
 
   /* Digital Products Section (#produk) */
   .section-header-bar {
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
     margin-bottom: 1.5rem;
   }
 
-  .product-mode-control {
-    width: 100%;
-    display: flex;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    gap: 0.45rem;
-    padding-bottom: 0.25rem;
-  }
-
-  .product-mode-control::-webkit-scrollbar {
-    display: none;
-  }
-
-  .control-caption {
-    display: block;
-    width: 100%;
-    margin-bottom: 0.25rem;
-    font-size: 0.76rem;
-  }
-
-  .state-pill {
-    flex-shrink: 0;
-    white-space: nowrap;
-    min-height: 44px;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.76rem;
-  }
-
   .flagship-duet {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .flagship-item {
+    border-radius: var(--radius-base);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .flagship-visual {
-    padding: 0.85rem;
+    padding: 0.65rem 0.5rem;
   }
 
   .spec-frame-bar {
-    font-size: 0.68rem;
-    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.62rem;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.35rem;
   }
 
   .product-schematic {
-    max-height: 200px;
     width: 100%;
+    height: auto;
+    aspect-ratio: 560 / 280;
+    max-height: 140px;
   }
 
   .flagship-body {
-    padding: 1.15rem;
+    padding: 0.75rem 0.65rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
   }
 
   .flagship-meta-row {
-    margin-bottom: 0.6rem;
-  }
-
-  .product-category {
-    font-size: 0.72rem;
-  }
-
-  .product-price {
-    font-size: 0.88rem;
-    padding: 0.2rem 0.55rem;
-  }
-
-  .flagship-name {
-    font-size: 1.35rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
     margin-bottom: 0.45rem;
   }
 
+  .product-category {
+    font-size: 0.64rem;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 600;
+    color: var(--accent-text-on-surface);
+    letter-spacing: 0.04em;
+  }
+
+  .product-price {
+    font-size: 0.82rem;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border: 1px solid var(--border-structural);
+    background-color: var(--bg-elevated);
+    border-radius: 2px;
+  }
+
+  .flagship-name {
+    font-size: clamp(1.05rem, 3.8vw, 1.3rem);
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
+  }
+
   .flagship-summary {
-    font-size: 0.88rem;
-    line-height: 1.55;
-    margin-bottom: 1rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    margin-bottom: 0.65rem;
+    color: var(--text-secondary);
   }
 
   .feature-spec-list {
-    gap: 0.45rem;
-    margin-bottom: 1.25rem;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.85rem;
   }
 
   .feature-spec-list li {
-    font-size: 0.86rem;
-    line-height: 1.45;
-    padding-left: 1.05rem;
+    font-size: 0.74rem;
+    line-height: 1.35;
+    padding-left: 0.85rem;
+    position: relative;
+  }
+
+  .feature-spec-list li::before {
+    content: "+";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--accent-brand);
+    font-weight: 700;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.74rem;
   }
 
   .flagship-actions {
+    display: flex;
     flex-direction: column;
-    gap: 0.55rem;
+    gap: 0.35rem;
+    margin-top: auto;
   }
 
   .flagship-actions .btn {
     width: 100%;
-    min-height: 48px;
+    min-height: 42px;
+    padding: 0.45rem 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 700;
     justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .flagship-actions .btn:active {
+    transform: scale(0.97);
   }
 
   /* Portfolio Section (#karya) */
@@ -2072,8 +2134,9 @@ dialog {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    gap: 0.45rem;
-    padding-bottom: 0.35rem;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem 0.5rem 0.15rem;
+    scroll-snap-type: x proximity;
   }
 
   .portfolio-controls::-webkit-scrollbar {
@@ -2082,16 +2145,25 @@ dialog {
 
   .filter-tab {
     flex-shrink: 0;
+    scroll-snap-align: start;
     white-space: nowrap;
     min-height: 44px;
-    padding: 0.45rem 0.8rem;
-    font-size: 0.75rem;
+    padding: 0.5rem 0.95rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: var(--radius-full);
     text-align: center;
+    -webkit-tap-highlight-color: transparent;
   }
 
+  .filter-tab:active {
+    transform: scale(0.96);
+  }
+
+  /* Tablet & Phablet (541px to 720px) 2-column Grid */
   .poster-wall {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.65rem;
+    gap: 0.85rem;
   }
 
   .work-piece.span-4,
@@ -2102,44 +2174,64 @@ dialog {
   }
 
   .work-info {
-    padding: 0.65rem;
-    gap: 0.35rem;
+    padding: 0.75rem;
+    gap: 0.4rem;
   }
 
   .work-meta-line {
-    font-size: 0.64rem;
+    font-size: 0.68rem;
     flex-wrap: wrap;
-    gap: 0.2rem;
+    gap: 0.35rem;
   }
 
   .work-meta-line span:last-child {
-    display: none;
+    display: inline-block;
   }
 
   .work-title {
-    font-size: 0.88rem;
-    line-height: 1.25;
+    font-size: 0.92rem;
+    line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
-  .work-summary,
+  .work-summary {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+  }
+
   .work-spec-tag {
-    display: none;
+    display: block;
+    font-size: 0.72rem;
+    color: var(--accent-text-on-surface);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .work-footer {
-    padding-top: 0.4rem;
-    border-top: none;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-subtle);
   }
 
   .work-footer .btn {
     width: 100%;
     min-height: 44px;
-    padding: 0.4rem 0.5rem;
-    font-size: 0.76rem;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .work-footer .btn:active {
+    transform: scale(0.98);
   }
 
   /* Services Ledger Section (#jasa) */
@@ -2147,69 +2239,142 @@ dialog {
     margin-bottom: 1.5rem;
   }
 
+  .service-ledger {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    border-top: none;
+    align-items: stretch;
+  }
+
   .ledger-row {
-    grid-template-columns: 1fr;
-    gap: 0.85rem;
-    padding-block: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0.85rem 0.75rem;
+    gap: 0.65rem;
+    background-color: var(--bg-elevated);
+    border: 1.5px solid var(--border-structural);
+    border-radius: var(--radius-base, 4px);
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
   }
 
   .ledger-index-col {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
     padding-bottom: 0.4rem;
     border-bottom: 1px dashed var(--border-subtle);
   }
 
   .ledger-code {
-    font-size: 0.82rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--accent-text-on-surface);
   }
 
   .ledger-type {
-    font-size: 0.72rem;
+    font-size: 0.64rem;
+    letter-spacing: 0.03em;
+    color: var(--text-secondary);
+  }
+
+  .ledger-main-col {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
   }
 
   .ledger-title {
-    font-size: 1.22rem;
-    margin-bottom: 0.4rem;
+    font-size: clamp(0.98rem, 3.2vw, 1.15rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.35rem;
   }
 
   .ledger-desc {
-    font-size: 0.88rem;
-    line-height: 1.5;
-    margin-bottom: 0.75rem;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+    margin-bottom: 0.55rem;
   }
 
   .ledger-deliverables {
-    grid-template-columns: 1fr;
-    gap: 0.4rem;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
     margin-bottom: 0.5rem;
+    padding-left: 0;
   }
 
   .ledger-deliverables li {
-    font-size: 0.85rem;
-    line-height: 1.4;
-    padding-left: 1rem;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    padding-left: 0.8rem;
+    position: relative;
+    color: var(--text-primary);
+  }
+
+  .ledger-deliverables li::before {
+    content: "+";
+    position: absolute;
+    left: 0;
+    color: var(--accent-text-on-surface);
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    font-size: 0.75rem;
   }
 
   .ledger-action-col {
-    padding: 1rem;
-    gap: 0.85rem;
-    background-color: var(--bg-elevated);
-    border: 1.5px solid var(--border-structural);
-    margin-top: 0.25rem;
+    margin-top: auto;
+    padding: 0.65rem 0.6rem;
+    gap: 0.55rem;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-structural);
+    border-radius: var(--radius-sm, 2px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .price-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .price-caption {
+    font-size: 0.64rem;
+    color: var(--text-secondary);
+    line-height: 1.2;
   }
 
   .price-value {
-    font-size: 1.28rem;
+    font-size: 1.08rem;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
+
+  .price-note {
+    font-size: 0.62rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
   }
 
   .ledger-action-col .btn {
     width: 100%;
-    min-height: 48px;
+    min-height: 40px;
+    padding: 0.45rem 0.45rem;
+    font-size: 0.74rem;
     font-weight: 700;
     justify-content: center;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.25;
   }
 
   /* Contact Hub & WA Brief Form Section (#sosmed) */
@@ -2435,6 +2600,124 @@ dialog {
   }
 }
 
+/* Phone Reflow (<= 540px) */
+@media (max-width: 540px) {
+  .flagship-duet {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .poster-wall {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .work-piece {
+    border-radius: var(--radius-base);
+  }
+
+  .work-canvas {
+    aspect-ratio: 4 / 5;
+    max-height: 420px;
+    background-color: var(--surface-primary);
+  }
+
+  .work-poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  .work-info {
+    padding: 1rem 1.1rem 1.15rem;
+    gap: 0.55rem;
+  }
+
+  .work-meta-line {
+    font-size: 0.72rem;
+    gap: 0.5rem;
+  }
+
+  .work-meta-line span:last-child {
+    display: inline-block;
+  }
+
+  .work-title {
+    font-size: 1.08rem;
+    line-height: 1.35;
+    -webkit-line-clamp: 2;
+  }
+
+  .work-summary {
+    display: block;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+
+  .work-spec-tag {
+    display: inline-block;
+    font-size: 0.76rem;
+    color: var(--accent-text-on-surface);
+  }
+
+  .work-footer {
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .work-footer .btn {
+    width: 100%;
+    min-height: 48px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    justify-content: center;
+  }
+
+  /* Services Ledger 2-Column on Phone (<= 540px) */
+  .service-ledger {
+    gap: 0.6rem;
+  }
+
+  .ledger-row {
+    padding: 0.75rem 0.65rem;
+    gap: 0.55rem;
+  }
+
+  .ledger-title {
+    font-size: 0.95rem;
+    line-height: 1.25;
+  }
+
+  .ledger-desc {
+    font-size: 0.74rem;
+    line-height: 1.4;
+    margin-bottom: 0.45rem;
+  }
+
+  .ledger-deliverables li {
+    font-size: 0.7rem;
+    line-height: 1.32;
+    padding-left: 0.75rem;
+  }
+
+  .ledger-action-col {
+    padding: 0.55rem 0.5rem;
+    gap: 0.45rem;
+  }
+
+  .price-value {
+    font-size: 1.02rem;
+  }
+
+  .ledger-action-col .btn {
+    min-height: 38px;
+    font-size: 0.72rem;
+    padding: 0.4rem 0.35rem;
+  }
+}
+
 /* Very Narrow Phones (< 440px) */
 @media (max-width: 440px) {
   .hero-section {
@@ -2460,6 +2743,41 @@ dialog {
     font-size: clamp(1.85rem, 10vw, 2.3rem);
   }
 
+  .flagship-duet {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .flagship-visual {
+    padding: 0.45rem 0.35rem;
+  }
+
+  .flagship-body {
+    padding: 0.65rem 0.45rem 0.75rem;
+  }
+
+  .flagship-name {
+    font-size: 0.98rem;
+  }
+
+  .flagship-summary {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    margin-bottom: 0.5rem;
+  }
+
+  .feature-spec-list li {
+    font-size: 0.68rem;
+    line-height: 1.3;
+    padding-left: 0.75rem;
+  }
+
+  .flagship-actions .btn {
+    min-height: 38px;
+    padding: 0.35rem 0.25rem;
+    font-size: 0.72rem;
+  }
+
   .social-row {
     flex-direction: column;
     align-items: flex-start;
@@ -2471,16 +2789,72 @@ dialog {
     text-align: center;
   }
 
-  .poster-wall {
-    gap: 0.5rem;
+  /* Services Ledger 2-Column on Very Narrow Phones (< 440px) */
+  .service-ledger {
+    gap: 0.45rem;
   }
 
-  .work-info {
-    padding: 0.55rem;
+  .ledger-row {
+    padding: 0.65rem 0.48rem;
+    gap: 0.45rem;
   }
 
-  .work-title {
-    font-size: 0.84rem;
+  .ledger-code {
+    font-size: 0.7rem;
+  }
+
+  .ledger-type {
+    font-size: 0.6rem;
+  }
+
+  .ledger-title {
+    font-size: 0.88rem;
+    line-height: 1.2;
+    margin-bottom: 0.3rem;
+  }
+
+  .ledger-desc {
+    font-size: 0.7rem;
+    line-height: 1.35;
+    margin-bottom: 0.4rem;
+  }
+
+  .ledger-deliverables {
+    gap: 0.25rem;
+  }
+
+  .ledger-deliverables li {
+    font-size: 0.66rem;
+    line-height: 1.28;
+    padding-left: 0.7rem;
+  }
+
+  .ledger-deliverables li::before {
+    font-size: 0.7rem;
+  }
+
+  .ledger-action-col {
+    padding: 0.5rem 0.42rem;
+    gap: 0.4rem;
+  }
+
+  .price-caption {
+    font-size: 0.6rem;
+  }
+
+  .price-value {
+    font-size: 0.94rem;
+  }
+
+  .price-note {
+    font-size: 0.58rem;
+    line-height: 1.2;
+  }
+
+  .ledger-action-col .btn {
+    min-height: 36px;
+    font-size: 0.68rem;
+    padding: 0.35rem 0.25rem;
   }
 }
 

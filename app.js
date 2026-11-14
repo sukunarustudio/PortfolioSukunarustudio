@@ -254,6 +254,8 @@ function initProductStateControls() {
   const loadingBox = document.getElementById("products-state-loading");
   const errorBox = document.getElementById("products-state-error");
 
+  if (!stateButtons.length || !content || !loadingBox || !errorBox) return;
+
   stateButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const targetState = btn.getAttribute("data-product-state");
