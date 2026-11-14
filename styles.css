@@ -2035,10 +2035,10 @@ dialog {
   text-decoration: none;
 }
 
-/* 2. Navigation 4-Column Grid */
+/* 2. Navigation 3-Column Grid */
 .footer-nav-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(1.5rem, 3vw, 2.5rem);
 }
 
