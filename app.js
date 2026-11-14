@@ -1174,6 +1174,7 @@ function initPortfolioControls() {
   const viewGridBtn = document.getElementById("view-grid-btn");
   const railWrap = document.getElementById("picture-rail-wrap");
   const gridWrap = document.getElementById("portfolio-grid");
+  const gridContainer = document.getElementById("portfolio-grid-container");
   let currentFilter = "all";
 
   function setViewMode(mode) {
@@ -1188,9 +1189,14 @@ function initPortfolioControls() {
     }
     if (railWrap) railWrap.hidden = !isRail;
     if (gridWrap) gridWrap.hidden = isRail;
+    if (gridContainer) gridContainer.hidden = isRail;
     if (isRail) {
       initPictureRailGallery(currentFilter);
     }
+  }
+
+  if (gridContainer) {
+    gridContainer.hidden = true;
   }
 
   if (viewRailBtn) {

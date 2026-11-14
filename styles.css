@@ -1042,7 +1042,12 @@ dialog {
   align-items: flex-end;
   justify-content: space-between;
   gap: 1.5rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.portfolio-view-and-filters[hidden],
+#portfolio-grid-container[hidden] {
+  display: none !important;
 }
 
 .portfolio-controls {

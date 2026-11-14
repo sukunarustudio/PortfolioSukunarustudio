@@ -300,7 +300,7 @@
           <p class="section-subtitle">Dinding pameran interaktif fisik: geser di sepanjang rel untuk menyalakan lampu pameran, geser dan ayunkan bingkai, atau klik karya untuk membalik sisi belakang label.</p>
         </div>
 
-        <div class="portfolio-view-and-filters">
+        <div class="portfolio-view-and-filters" hidden>
           <div class="portfolio-view-switch" role="group" aria-label="Pilihan Tampilan Portofolio">
             <button type="button" class="view-btn is-active" data-view="rail" id="view-rail-btn" aria-pressed="true">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="5" x2="21" y2="5"></line><line x1="8" y1="5" x2="8" y2="12"></line><line x1="16" y1="5" x2="16" y2="12"></line><rect x="5" y1="12" width="6" height="7" rx="1"></rect><rect x="13" y1="12" width="6" height="7" rx="1"></rect></svg>
@@ -353,7 +353,7 @@
         </div>
       </div>
 
-      <div class="container">
+      <div class="container" id="portfolio-grid-container" hidden>
         <div id="portfolio-state-loading" class="ui-state-box" hidden aria-live="polite">
           <div class="state-spinner" aria-hidden="true"></div>
           <p class="state-title">Memuat galeri karya...</p>
