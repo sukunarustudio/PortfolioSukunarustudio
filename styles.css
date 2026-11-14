@@ -589,25 +589,26 @@ dialog {
   color: var(--accent-brand);
 }
 
-/* Center Column: Sukunaru Orange Halo Backdrop + Grounded Creator Portrait */
+/* Center Column: Sukunaru Orange Halo Backdrop + Grounded Creator Portrait (Enlarged Scale) */
 .hero-stage-center {
   display: flex;
   justify-content: center;
   align-items: flex-end;
   justify-self: center;
   position: relative;
-  height: clamp(440px, 62vh, 580px);
-  width: clamp(340px, 34vw, 480px);
+  height: clamp(520px, 72vh, 700px);
+  width: clamp(380px, 36vw, 540px);
+  overflow: visible;
 }
 
 .hero-circle-backdrop {
   position: absolute;
-  width: clamp(320px, 30vw, 440px);
-  height: clamp(320px, 30vw, 440px);
+  width: clamp(360px, 34vw, 480px);
+  height: clamp(360px, 34vw, 480px);
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #FFA826 0%, var(--accent-brand) 70%, #D46900 100%);
-  box-shadow: 0 20px 60px -10px rgba(255, 142, 0, 0.45);
-  top: 45%;
+  box-shadow: 0 24px 64px -10px rgba(255, 142, 0, 0.48);
+  top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
@@ -616,30 +617,31 @@ dialog {
 
 [data-theme="light"] .hero-circle-backdrop {
   background: radial-gradient(circle at 35% 30%, #FFB03A 0%, var(--accent-brand) 70%, #E07000 100%);
-  box-shadow: 0 16px 48px -10px rgba(255, 142, 0, 0.35);
+  box-shadow: 0 20px 52px -10px rgba(255, 142, 0, 0.38);
 }
 
 .hero-portrait-img {
   position: relative;
   z-index: 2;
-  height: clamp(420px, 58vh, 560px);
+  height: clamp(500px, 70vh, 680px);
   width: auto;
-  max-width: 100%;
+  max-width: none;
   object-fit: contain;
   object-position: bottom center;
-  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.65));
+  filter: drop-shadow(0 24px 44px rgba(0, 0, 0, 0.75));
   user-select: none;
   pointer-events: none;
   transform-origin: bottom center;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(1.2);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
 }
 
 [data-theme="light"] .hero-portrait-img {
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.28));
 }
 
 .hero-stage-center:hover .hero-portrait-img {
-  transform: scale(1.02);
+  transform: scale(1.23) translateY(-4px);
 }
 
 /* Right Column: 3-line Bold Typography */
@@ -1688,17 +1690,19 @@ dialog {
 
   .hero-stage-center {
     order: 1;
-    height: clamp(360px, 48vh, 460px);
+    height: clamp(400px, 52vh, 520px);
     width: 100%;
   }
 
   .hero-circle-backdrop {
-    width: clamp(280px, 52vw, 360px);
-    height: clamp(280px, 52vw, 360px);
+    width: clamp(300px, 54vw, 400px);
+    height: clamp(300px, 54vw, 400px);
   }
 
   .hero-portrait-img {
-    height: clamp(340px, 46vh, 440px);
+    height: clamp(380px, 50vh, 480px);
+    transform: scale(1.16);
+    transform-origin: bottom center;
   }
 
   .hero-stage-right {
@@ -1889,16 +1893,19 @@ dialog {
   }
 
   .hero-stage-center {
-    height: 300px;
+    height: 340px;
+    width: 100%;
   }
 
   .hero-circle-backdrop {
-    width: 230px;
-    height: 230px;
+    width: 250px;
+    height: 250px;
   }
 
   .hero-portrait-img {
-    height: 280px;
+    height: 320px;
+    transform: scale(1.15);
+    transform-origin: bottom center;
   }
 
   .hero-massive-title {
