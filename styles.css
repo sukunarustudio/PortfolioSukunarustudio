@@ -1641,6 +1641,7 @@ dialog {
   .hero-section {
     min-height: auto;
     padding-block: 2rem 1.5rem;
+    overflow: visible;
   }
 
   .minimalist-hero-stage {
@@ -1855,8 +1856,9 @@ dialog {
   /* Minimalist Hero Mobile */
   .hero-section {
     min-height: auto;
-    padding-top: 0.75rem;
-    padding-bottom: 1rem;
+    padding-top: clamp(2rem, 5vh, 2.75rem);
+    padding-bottom: 1.25rem;
+    overflow: visible;
   }
 
   .minimalist-hero-stage {
@@ -1865,21 +1867,22 @@ dialog {
   }
 
   .hero-stage-center {
-    height: 280px;
+    height: 270px;
     width: 100%;
     margin-bottom: 0;
     align-items: flex-end;
+    overflow: visible;
   }
 
   .hero-circle-backdrop {
-    width: 210px;
-    height: 210px;
-    top: 40%;
+    width: 200px;
+    height: 200px;
+    top: 42%;
   }
 
   .hero-portrait-img {
-    height: 280px;
-    transform: scale(1.12);
+    height: 250px;
+    transform: none;
     transform-origin: bottom center;
   }
 
@@ -2434,18 +2437,23 @@ dialog {
 
 /* Very Narrow Phones (< 440px) */
 @media (max-width: 440px) {
+  .hero-section {
+    padding-top: 1.75rem;
+  }
+
   .hero-stage-center {
     height: 240px;
   }
 
   .hero-circle-backdrop {
-    width: 180px;
-    height: 180px;
+    width: 175px;
+    height: 175px;
+    top: 42%;
   }
 
   .hero-portrait-img {
-    height: 240px;
-    transform: scale(1.1);
+    height: 220px;
+    transform: none;
   }
 
   .hero-massive-title {
