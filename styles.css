@@ -3131,10 +3131,24 @@ dialog {
     margin: 0;
   }
 
+  /* Sembunyikan teks 'less is more' pada tampilan mobile phone */
   .hero-massive-title {
-    font-size: clamp(2.1rem, 9.5vw, 3rem);
-    line-height: 0.9;
-    margin: 0;
+    display: none;
+  }
+
+  .hero-signature-wrap {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 0.35rem;
+    margin-bottom: 0.65rem;
+    padding-left: 0;
+  }
+
+  .signature-handwriting {
+    font-size: clamp(1.2rem, 4.2vw, 1.55rem);
+    transform: rotate(-2deg);
+    transform-origin: center center;
   }
 
   .hero-stage-left {
@@ -4047,10 +4061,6 @@ dialog {
   .hero-portrait-img {
     height: 220px;
     transform: none;
-  }
-
-  .hero-massive-title {
-    font-size: clamp(1.85rem, 10vw, 2.3rem);
   }
 
   .flagship-duet {
