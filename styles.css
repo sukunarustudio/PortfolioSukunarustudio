@@ -526,25 +526,27 @@ dialog {
   font-size: 0.98rem;
 }
 
-/* Minimalist Hero Section (Inspired by mnmlst.) */
+/* Minimalist Hero Section (DESIGN.md Architecture + Editorial Composition) */
 .hero-section {
   min-height: calc(100vh - 72px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding-block: clamp(1.5rem, 3.5vh, 2.5rem);
+  padding-top: clamp(1rem, 2.5vh, 2rem);
+  padding-bottom: clamp(1rem, 2vh, 1.5rem);
   border-bottom: 1px solid var(--border-structural);
   position: relative;
+  overflow: hidden;
 }
 
 .minimalist-hero-stage {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(240px, 1fr);
   align-items: center;
   justify-content: center;
-  gap: clamp(2rem, 4.5vw, 4.5rem);
+  gap: clamp(1.5rem, 3.5vw, 4rem);
   width: 100%;
-  max-width: 1140px;
+  max-width: 1200px;
   margin-inline: auto;
   flex-grow: 1;
 }
@@ -565,6 +567,7 @@ dialog {
 }
 
 .hero-clean-text {
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: clamp(0.92rem, 1.05vw, 1.02rem);
   line-height: 1.65;
   color: var(--text-secondary);
@@ -572,6 +575,7 @@ dialog {
 }
 
 .hero-clean-link {
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
@@ -582,27 +586,28 @@ dialog {
 }
 
 .hero-clean-link:hover {
-  color: var(--accent-text-on-surface);
+  color: var(--accent-brand);
 }
 
-/* Center Column: Golden Circle Backdrop + Large Editorial Portrait */
+/* Center Column: Sukunaru Orange Halo Backdrop + Grounded Creator Portrait */
 .hero-stage-center {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
   justify-self: center;
   position: relative;
-  height: clamp(400px, 52vh, 540px);
+  height: clamp(440px, 62vh, 580px);
+  width: clamp(340px, 34vw, 480px);
 }
 
 .hero-circle-backdrop {
   position: absolute;
-  width: clamp(320px, 32vw, 450px);
-  height: clamp(320px, 32vw, 450px);
+  width: clamp(320px, 30vw, 440px);
+  height: clamp(320px, 30vw, 440px);
   border-radius: 50%;
-  background-color: #F5B700;
-  box-shadow: 0 16px 48px -8px rgba(245, 183, 0, 0.42);
-  top: 50%;
+  background: radial-gradient(circle at 35% 30%, #FFA826 0%, var(--accent-brand) 70%, #D46900 100%);
+  box-shadow: 0 20px 60px -10px rgba(255, 142, 0, 0.45);
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
@@ -610,18 +615,19 @@ dialog {
 }
 
 [data-theme="light"] .hero-circle-backdrop {
-  background-color: #EAB308;
-  box-shadow: 0 16px 44px -8px rgba(234, 179, 8, 0.35);
+  background: radial-gradient(circle at 35% 30%, #FFB03A 0%, var(--accent-brand) 70%, #E07000 100%);
+  box-shadow: 0 16px 48px -10px rgba(255, 142, 0, 0.35);
 }
 
 .hero-portrait-img {
   position: relative;
   z-index: 2;
-  height: clamp(380px, 48vh, 510px);
+  height: clamp(420px, 58vh, 560px);
   width: auto;
-  max-width: 95%;
+  max-width: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.5));
+  object-position: bottom center;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.65));
   user-select: none;
   pointer-events: none;
   transform-origin: bottom center;
@@ -629,11 +635,11 @@ dialog {
 }
 
 [data-theme="light"] .hero-portrait-img {
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.24));
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.25));
 }
 
 .hero-stage-center:hover .hero-portrait-img {
-  transform: scale(1.025);
+  transform: scale(1.02);
 }
 
 /* Right Column: 3-line Bold Typography */
@@ -645,10 +651,10 @@ dialog {
 }
 
 .hero-massive-title {
-  font-family: "Plus Jakarta Sans", -apple-system, sans-serif;
-  font-size: clamp(4.2rem, 7.5vw, 8.2rem);
-  font-weight: 900;
-  line-height: 0.85;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: clamp(4.8rem, 8.5vw, 9rem);
+  font-weight: 800;
+  line-height: 0.82;
   letter-spacing: -0.05em;
   color: var(--text-primary);
   margin: 0;
@@ -665,6 +671,37 @@ dialog {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-top: 1rem;
+  z-index: 3;
+}
+
+.hero-social-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.hero-social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.hero-social-links a:hover {
+  color: var(--accent-brand);
+  transform: translateY(-2px);
+}
+
+.hero-location-text {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.84rem;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
   padding-top: 1.5rem;
   z-index: 3;
 }
@@ -1636,16 +1673,17 @@ dialog {
 
   .hero-stage-center {
     order: 1;
-    height: clamp(340px, 45vh, 440px);
+    height: clamp(360px, 48vh, 460px);
+    width: 100%;
   }
 
   .hero-circle-backdrop {
-    width: clamp(260px, 52vw, 340px);
-    height: clamp(260px, 52vw, 340px);
+    width: clamp(280px, 52vw, 360px);
+    height: clamp(280px, 52vw, 360px);
   }
 
   .hero-portrait-img {
-    height: clamp(320px, 44vh, 420px);
+    height: clamp(340px, 46vh, 440px);
   }
 
   .hero-stage-right {
