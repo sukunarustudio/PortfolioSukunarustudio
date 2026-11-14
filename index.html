@@ -292,37 +292,77 @@
       </div>
     </section>
 
-    <section class="portfolio-section container" id="karya" aria-labelledby="portfolio-heading">
-      <div class="portfolio-top-bar scroll-reveal-item">
+    <section class="portfolio-section" id="karya" aria-labelledby="portfolio-heading">
+      <div class="container portfolio-top-bar scroll-reveal-item">
         <div>
-          <h2 id="portfolio-heading" class="section-title">Arsip Karya <em>Sukunaru Studio</em></h2>
-          <p class="section-subtitle">12 karya poster cetak A3/A2 dan visual media sosial yang dikerjakan di studio. Klik karya untuk melihat detail dan spesifikasi cetak.</p>
+          <span class="portfolio-eyebrow">PRINT SHOP &bull; SUKUNARU STUDIO EDITIONS</span>
+          <h2 id="portfolio-heading" class="section-title">Dinding Rel Pameran <em>Sukunaru Studio</em></h2>
+          <p class="section-subtitle">Dinding pameran interaktif fisik: geser di sepanjang rel untuk menyalakan lampu pameran, geser dan ayunkan bingkai, atau klik karya untuk membalik sisi belakang label.</p>
         </div>
 
-        <div class="portfolio-controls" role="tablist" aria-label="Filter Kategori Karya">
-          <button type="button" role="tab" aria-selected="true" class="filter-tab is-active" data-filter="all">Semua Karya (12)</button>
-          <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="poster">Poster Cetak (6)</button>
-          <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="socmed">Media Sosial (6)</button>
-          <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="upcoming">Rilis Mendatang (0)</button>
-        </div>
-      </div>
+        <div class="portfolio-view-and-filters">
+          <div class="portfolio-view-switch" role="group" aria-label="Pilihan Tampilan Portofolio">
+            <button type="button" class="view-btn is-active" data-view="rail" id="view-rail-btn" aria-pressed="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="5" x2="21" y2="5"></line><line x1="8" y1="5" x2="8" y2="12"></line><line x1="16" y1="5" x2="16" y2="12"></line><rect x="5" y1="12" width="6" height="7" rx="1"></rect><rect x="13" y1="12" width="6" height="7" rx="1"></rect></svg>
+              <span>Rel Pameran 3D</span>
+            </button>
+            <button type="button" class="view-btn" data-view="grid" id="view-grid-btn" aria-pressed="false">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>Grid Katalog</span>
+            </button>
+          </div>
 
-      <div id="portfolio-state-loading" class="ui-state-box" hidden aria-live="polite">
-        <div class="state-spinner" aria-hidden="true"></div>
-        <p class="state-title">Memuat galeri karya...</p>
-        <p class="state-desc">Menyiapkan daftar poster dan visual media sosial.</p>
-      </div>
-
-      <div id="portfolio-state-empty" class="ui-state-box" hidden aria-live="polite">
-        <p class="state-title">Belum ada karya di tab ini.</p>
-        <p class="state-desc">Karya untuk kategori ini masih dalam proses kurasi. Pilih Semua Karya untuk melihat portofolio aktif, atau hubungi kami lewat WhatsApp untuk diskusi proyek baru.</p>
-        <div class="state-actions">
-          <button type="button" class="btn btn-accent" data-reset-filter>Tampilkan Semua Karya</button>
-          <button type="button" class="btn btn-outline" data-open-brief="Konsultasi Proyek Desain Baru">Diskusi Proyek di WA</button>
+          <div class="portfolio-controls" role="tablist" aria-label="Filter Kategori Karya">
+            <button type="button" role="tab" aria-selected="true" class="filter-tab is-active" data-filter="all">Semua Karya (12)</button>
+            <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="poster">Poster Cetak (6)</button>
+            <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="socmed">Media Sosial (6)</button>
+          </div>
         </div>
       </div>
 
-      <div class="poster-wall" id="portfolio-grid" aria-live="polite"></div>
+      <!-- PICTURE RAIL COMPONENT -->
+      <div id="picture-rail-wrap" class="picture-rail-stage-wrap scroll-reveal-item" data-slot="picture-rail-gallery">
+        <div class="picture-rail-wall-gradient" aria-hidden="true"></div>
+        <div id="picture-rail-stage" class="picture-rail-stage" role="group" aria-label="Rel Pameran Karya">
+          <!-- Rail, shadow, hooks, wires, frames injected and simulated via app.js -->
+        </div>
+
+        <!-- Carousel Pagination Dots (active on mobile / narrow widths) -->
+        <div id="picture-rail-dots" class="picture-rail-dots" role="group" aria-label="Navigasi Bingkai"></div>
+
+        <!-- Dynamic Lit Frame Caption Bar -->
+        <div class="picture-rail-caption-bar container">
+          <div id="picture-rail-caption" class="picture-rail-caption-inner" aria-live="polite">
+            <p id="rail-caption-title" class="rail-caption-title">Pilih atau sorot bingkai untuk menyalakan lampu pameran</p>
+            <p id="rail-caption-byline" class="rail-caption-byline">Sukunaru Studio &bull; Sentuh &amp; geser rel untuk mengayunkan karya</p>
+          </div>
+          <div class="picture-rail-actions">
+            <button type="button" class="btn btn-accent" id="rail-open-detail-btn">
+              Angkat &amp; Balik Sisi Belakang
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div id="portfolio-state-loading" class="ui-state-box" hidden aria-live="polite">
+          <div class="state-spinner" aria-hidden="true"></div>
+          <p class="state-title">Memuat galeri karya...</p>
+          <p class="state-desc">Menyiapkan daftar poster dan visual media sosial.</p>
+        </div>
+
+        <div id="portfolio-state-empty" class="ui-state-box" hidden aria-live="polite">
+          <p class="state-title">Belum ada karya di tab ini.</p>
+          <p class="state-desc">Pilih Semua Karya untuk melihat portofolio aktif, atau hubungi kami lewat WhatsApp untuk diskusi proyek baru.</p>
+          <div class="state-actions">
+            <button type="button" class="btn btn-accent" data-reset-filter>Tampilkan Semua Karya</button>
+            <button type="button" class="btn btn-outline" data-open-brief="Konsultasi Proyek Desain Baru">Diskusi Proyek di WA</button>
+          </div>
+        </div>
+
+        <!-- Alternative Grid View -->
+        <div class="poster-wall" id="portfolio-grid" aria-live="polite" hidden></div>
+      </div>
     </section>
 
     <section class="services-section" id="jasa" aria-labelledby="services-heading">
@@ -718,18 +758,85 @@
     </div>
   </footer>
 
-  <dialog class="studio-dialog" id="work-dialog" aria-labelledby="dialog-work-title">
+  <dialog class="studio-dialog dialog-picture-flip" id="work-dialog" aria-labelledby="dialog-work-title">
     <div class="dialog-inner">
       <div class="dialog-top-bar">
         <span class="dialog-code" id="dialog-work-code">WRK / 01</span>
+        <div class="dialog-face-tabs" role="group" aria-label="Pilih Sisi Bingkai">
+          <button type="button" class="dialog-face-btn is-active" id="flip-front-btn" aria-pressed="true">
+            Sisi Depan
+          </button>
+          <button type="button" class="dialog-face-btn" id="flip-back-btn" aria-pressed="false">
+            Sisi Belakang &amp; Label
+          </button>
+        </div>
         <button type="button" class="dialog-close-btn" id="close-work-dialog" aria-label="Tutup detail karya">
           Tutup [ESC]
         </button>
       </div>
+
       <div class="dialog-content dialog-work-layout">
-        <div class="dialog-work-image-wrap">
-          <img src="" alt="" id="dialog-work-image" class="dialog-work-image" loading="lazy">
+        <!-- 3D Flippable Frame View -->
+        <div class="dialog-flip-stage-wrap" id="dialog-flip-area" title="Tarik mendatar untuk membalik sisi bingkai">
+          <div class="dialog-flip-card" id="dialog-spin-stage">
+            <!-- Front Face -->
+            <div class="dialog-face dialog-face-front" id="dialog-face-front">
+              <div class="dialog-frame-box" id="dialog-frame-box">
+                <!-- Overhead Brass Fixture -->
+                <div class="dialog-fixture" aria-hidden="true">
+                  <span class="fixture-stem left"></span>
+                  <span class="fixture-stem right"></span>
+                  <span class="fixture-hood"></span>
+                </div>
+                <!-- Frame Moulding Container -->
+                <div class="dialog-frame-moulding" id="dialog-frame-moulding">
+                  <div class="dialog-frame-mat" id="dialog-frame-mat">
+                    <img src="" alt="" id="dialog-work-image" class="dialog-work-image" loading="lazy">
+                    <span class="dialog-glass-glare" aria-hidden="true"></span>
+                  </div>
+                </div>
+                <div class="dialog-frame-lamp-glow" aria-hidden="true"></div>
+              </div>
+            </div>
+
+            <!-- Back Face (rotated 180deg) -->
+            <div class="dialog-face dialog-face-back" id="dialog-face-back" aria-hidden="true">
+              <div class="dialog-back-board" id="dialog-back-board">
+                <div class="dialog-back-tape" aria-hidden="true"></div>
+                <!-- Hanging D-rings & Sagging Wire -->
+                <svg class="dialog-back-wire-svg" viewBox="0 0 320 400" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M 40 100 Q 160 160 280 100" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"></path>
+                  <path d="M 40 100 Q 160 160 280 100" fill="none" stroke="#ccc" stroke-width="1.8" stroke-dasharray="3 3"></path>
+                  <!-- Left D-Ring -->
+                  <circle cx="40" cy="100" r="5" fill="#888"></circle>
+                  <circle cx="40" cy="100" r="2.5" fill="#333"></circle>
+                  <!-- Right D-Ring -->
+                  <circle cx="280" cy="100" r="5" fill="#888"></circle>
+                  <circle cx="280" cy="100" r="2.5" fill="#333"></circle>
+                </svg>
+                <!-- Official Studio Gallery Label -->
+                <div class="dialog-gallery-label">
+                  <div class="label-header">
+                    <span class="label-stamp">GALLERY LABEL // SUKUNARU STUDIO</span>
+                    <span class="label-edition" id="dialog-label-edition">EDITION 01/01</span>
+                  </div>
+                  <h3 class="label-title" id="dialog-label-title">Judul Karya</h3>
+                  <p class="label-artist">Sukunaru Studio &bull; Indonesia (GMT+7)</p>
+                  <div class="label-divider"></div>
+                  <ul class="label-details-list" id="dialog-label-details"></ul>
+                  <!-- Official Signature -->
+                  <div class="label-signature-row">
+                    <span class="label-sig-text">Verified Studio Archive</span>
+                    <svg class="label-signature-svg" viewBox="0 0 120 26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M3,18 C10,4 14,4 13,14 C12,22 18,20 22,12 C25,6 27,8 26,15 C30,10 34,9 35,15 C37,21 43,6 48,9 C52,12 47,20 54,17 C60,14 63,7 66,12 C69,18 74,14 79,11 C84,8 88,16 94,13 C100,10 106,11 116,8"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
         <div class="dialog-work-meta">
           <span class="dialog-category" id="dialog-work-category">POSTER PRINT</span>
           <h2 class="dialog-title" id="dialog-work-title">Judul Karya</h2>
