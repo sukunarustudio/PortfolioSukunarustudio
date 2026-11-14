@@ -182,20 +182,20 @@ function resolveContacts(s: Sim, lay: Layout, list: Shape[], margin: number) {
       const a = list[i];
       const b = list[i + 1];
       if (!a || !b) continue;
-      const reachA = reach(s, lay, a, i);
-      const reachB = reach(s, lay, b, i + 1);
-      const minDistance = reachA[1] - reachB[0] + margin;
-      const currentDist = (s.x[i + 1] ?? 0) - (s.x[i] ?? 0);
+      const xi = Number.isFinite(s.x[i]) ? s.x[i]! : (s.tx[i] ?? 0);
+      const xi1 = Number.isFinite(s.x[i + 1]) ? s.x[i + 1]! : (s.tx[i + 1] ?? 0);
+      const minDistance = ((a.w + b.w) * lay.unit) * 0.5 + 14;
+      const currentDist = xi1 - xi;
       const overlap = minDistance - currentDist;
       if (overlap > 0) {
-        s.x[i] = (s.x[i] ?? 0) - overlap * 0.5;
-        s.x[i + 1] = (s.x[i + 1] ?? 0) + overlap * 0.5;
-        const va = s.vx[i] ?? 0;
-        const vb = s.vx[i + 1] ?? 0;
-        if (va > vb) {
-          const shared = (va + vb) * 0.5;
-          s.vx[i] = shared;
-          s.vx[i + 1] = shared;
+        s.x[i] = xi - overlap * 0.5;
+        s.x[i + 1] = xi1 + overlap * 0.5;
+        const va = Number.isFinite(s.vx[i]) ? s.vx[i]! : 0;
+        const vb = Number.isFinite(s.vx[i + 1]) ? s.vx[i + 1]! : 0;
+        const vRel = va - vb;
+        if (vRel > 0) {
+          s.vx[i] = va - vRel * 0.5;
+          s.vx[i + 1] = vb + vRel * 0.5;
         }
       }
     }
@@ -334,7 +334,13 @@ export function PictureRailGallery({
   const step = React.useCallback((now: number) => {
     const s = sim.current;
     const { layout: lay, shapes: list, count: n } = live.current;
-    const dt = s.last ? Math.min(0.1, (now - s.last) / 1000) : 1 / 60;
+    let dt = 1 / 60;
+    if (s.last && Number.isFinite(s.last)) {
+      const elapsed = (now - s.last) / 1000;
+      if (elapsed > 0.001 && elapsed < 0.2) {
+        dt = Math.min(0.05, elapsed);
+      }
+    }
     s.last = now;
     const sub = Math.max(3, Math.ceil(dt / 0.0115));
     const h = dt / sub;

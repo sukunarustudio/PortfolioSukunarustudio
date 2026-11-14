@@ -339,30 +339,38 @@ function railRestTilt(i) {
   return (((i * 37 + 11) % 7) - 3) * 0.5;
 }
 
-function resolveRailContacts(s, lay, list, margin) {
+function resolveRailContacts(s, lay, list) {
   const n = list.length;
   if (n <= 1) return;
 
-  // Pairwise separation: strictly prevent adjacent frames from overlapping or colliding
+  // Strict physical non-penetration along the rail rod.
+  // Frames have physical width and cannot pass through or overlap adjacent frames.
   for (let pass = 0; pass < 2; pass++) {
     for (let i = 0; i < n - 1; i++) {
       const a = list[i];
       const b = list[i + 1];
       if (!a || !b) continue;
-      const reachA = railReach(s, lay, a, i);
-      const reachB = railReach(s, lay, b, i + 1);
-      const minDistance = reachA[1] - reachB[0] + margin;
-      const currentDist = (s.x[i + 1] ?? 0) - (s.x[i] ?? 0);
+
+      const xi = Number.isFinite(s.x[i]) ? s.x[i] : (s.tx[i] ?? 0);
+      const xi1 = Number.isFinite(s.x[i + 1]) ? s.x[i + 1] : (s.tx[i + 1] ?? 0);
+
+      // Safe separation distance based on frame dimensions plus air gap (14px)
+      const minDistance = ((a.w + b.w) * lay.unit) * 0.5 + 14;
+      const currentDist = xi1 - xi;
       const overlap = minDistance - currentDist;
+
       if (overlap > 0) {
-        s.x[i] = (s.x[i] ?? 0) - overlap * 0.5;
-        s.x[i + 1] = (s.x[i + 1] ?? 0) + overlap * 0.5;
-        const va = s.vx[i] ?? 0;
-        const vb = s.vx[i + 1] ?? 0;
-        if (va > vb) {
-          const shared = (va + vb) * 0.5;
-          s.vx[i] = shared;
-          s.vx[i + 1] = shared;
+        // Separate equally without pumping kinetic energy
+        s.x[i] = xi - overlap * 0.5;
+        s.x[i + 1] = xi1 + overlap * 0.5;
+
+        // Inelastic velocity contact: damp converging velocities only
+        const va = Number.isFinite(s.vx[i]) ? s.vx[i] : 0;
+        const vb = Number.isFinite(s.vx[i + 1]) ? s.vx[i + 1] : 0;
+        const vRel = va - vb; // Positive when approaching each other
+        if (vRel > 0) {
+          s.vx[i] = va - vRel * 0.5;
+          s.vx[i + 1] = vb + vRel * 0.5;
         }
       }
     }
@@ -375,11 +383,28 @@ function paintRailFrame(i) {
   if (!shape || !lay) return;
 
   const w = shape.w * lay.unit;
-  const x = s.x[i] ?? 0;
-  const theta = s.sw[i] ?? 0;
-  const e = Math.max(0, Math.min(1.2, s.e[i] ?? 0));
+  let x = s.x[i];
+  if (!Number.isFinite(x)) {
+    x = s.tx[i] ?? (lay.width / 2);
+    s.x[i] = x;
+    s.vx[i] = 0;
+  }
+  let theta = s.sw[i];
+  if (!Number.isFinite(theta)) {
+    theta = railRestTilt(i);
+    s.sw[i] = theta;
+    s.vsw[i] = 0;
+  }
+  let e = s.e[i];
+  if (!Number.isFinite(e)) {
+    e = s.te[i] ?? 0;
+    s.e[i] = e;
+    s.ve[i] = 0;
+  }
+
+  e = Math.max(0, Math.min(1.2, e));
   const lit = Math.max(0, Math.min(1, e));
-  const ty = (s.ty[i] ?? 0) * lit;
+  const ty = (Number.isFinite(s.ty[i]) ? s.ty[i] : 0) * lit;
   const left = `translate3d(${(x - w / 2).toFixed(2)}px, 0, 0)`;
 
   const hang = el.hangs[i];
@@ -430,50 +455,82 @@ function stepRailSimulation(now) {
   const n = list.length;
   if (!lay || n === 0) return;
 
-  const dt = s.last ? Math.min(0.1, (now - s.last) / 1000) : 1 / 60;
+  // Robust time delta: strictly clamp to [0.002s .. 0.05s] to eliminate 0/0 NaN and frame explosion
+  let dt = 1 / 60;
+  if (s.last && Number.isFinite(s.last)) {
+    const elapsed = (now - s.last) / 1000;
+    if (elapsed > 0.001 && elapsed < 0.2) {
+      dt = Math.min(0.05, elapsed);
+    }
+  }
   s.last = now;
+
   const sub = Math.max(3, Math.ceil(dt / 0.0115));
   const h = dt / sub;
-  const margin = RAIL_CONSTANTS.MARGIN * lay.unit;
 
   for (let k = 0; k < sub; k++) {
     for (let i = 0; i < n; i++) {
       const shape = list[i];
       if (!shape) continue;
-      const len = railPendulum(lay, shape, i);
-      const before = s.vx[i] ?? 0;
+      const len = Math.max(30, railPendulum(lay, shape, i));
+
+      // X translation spring
+      const tx = Number.isFinite(s.tx[i]) ? s.tx[i] : (lay.width / 2);
+      const currX = Number.isFinite(s.x[i]) ? s.x[i] : tx;
+      const beforeVx = Number.isFinite(s.vx[i]) ? s.vx[i] : 0;
       const stiff = 140;
       const damp = 2 * Math.sqrt(140) * 0.88;
-      const ax = -stiff * ((s.x[i] ?? 0) - (s.tx[i] ?? 0)) - damp * before;
-      s.vx[i] = before + ax * h;
-      s.x[i] = (s.x[i] ?? 0) + (s.vx[i] ?? 0) * h;
+      const ax = -stiff * (currX - tx) - damp * beforeVx;
+      let newVx = beforeVx + ax * h;
+      newVx = Math.max(-2500, Math.min(2500, newVx));
+      s.vx[i] = newVx;
+      s.x[i] = currX + newVx * h;
 
-      const ae = -150 * ((s.e[i] ?? 0) - (s.te[i] ?? 0)) - 2 * Math.sqrt(150) * 0.78 * (s.ve[i] ?? 0);
-      s.ve[i] = (s.ve[i] ?? 0) + ae * h;
-      s.e[i] = (s.e[i] ?? 0) + (s.ve[i] ?? 0) * h;
+      // Lift spring
+      const te = Number.isFinite(s.te[i]) ? s.te[i] : 0;
+      const currE = Number.isFinite(s.e[i]) ? s.e[i] : te;
+      const currVe = Number.isFinite(s.ve[i]) ? s.ve[i] : 0;
+      const ae = -150 * (currE - te) - 2 * Math.sqrt(150) * 0.78 * currVe;
+      s.ve[i] = currVe + ae * h;
+      s.e[i] = currE + s.ve[i] * h;
 
-      const at = -110 * ((s.ty[i] ?? 0) - (s.tty[i] ?? 0)) - 2 * Math.sqrt(110) * 0.72 * (s.vty[i] ?? 0);
-      s.vty[i] = (s.vty[i] ?? 0) + at * h;
-      s.ty[i] = (s.ty[i] ?? 0) + (s.vty[i] ?? 0) * h;
+      // 3D tilt spring
+      const tty = Number.isFinite(s.tty[i]) ? s.tty[i] : 0;
+      const currTy = Number.isFinite(s.ty[i]) ? s.ty[i] : tty;
+      const currVty = Number.isFinite(s.vty[i]) ? s.vty[i] : 0;
+      const at = -110 * (currTy - tty) - 2 * Math.sqrt(110) * 0.72 * currVty;
+      s.vty[i] = currVty + at * h;
+      s.ty[i] = currTy + s.vty[i] * h;
 
+      // Swing angle spring
       const rest = railRestTilt(i) * (1 - Math.max(0, Math.min(1, s.e[i] ?? 0)));
-      const as = -(RAIL_CONSTANTS.SWING_G / len) * ((s.sw[i] ?? 0) - rest) - RAIL_CONSTANTS.SWING_DAMP * (s.vsw[i] ?? 0);
-      s.vsw[i] = (s.vsw[i] ?? 0) + as * h;
-      s.sw[i] = Math.max(-RAIL_CONSTANTS.SWING_MAX, Math.min(RAIL_CONSTANTS.SWING_MAX, (s.sw[i] ?? 0) + (s.vsw[i] ?? 0) * h));
+      const currSw = Number.isFinite(s.sw[i]) ? s.sw[i] : rest;
+      const currVsw = Number.isFinite(s.vsw[i]) ? s.vsw[i] : 0;
+      const as = -(RAIL_CONSTANTS.SWING_G / len) * (currSw - rest) - RAIL_CONSTANTS.SWING_DAMP * currVsw;
+      let newVsw = currVsw + as * h;
+      newVsw = Math.max(-180, Math.min(180, newVsw));
+      s.vsw[i] = newVsw;
+      s.sw[i] = Math.max(-RAIL_CONSTANTS.SWING_MAX, Math.min(RAIL_CONSTANTS.SWING_MAX, currSw + newVsw * h));
     }
-    resolveRailContacts(s, lay, list, margin);
+    resolveRailContacts(s, lay, list);
   }
 
   const follow = 1 - Math.exp(-dt / 0.035);
   for (let i = 0; i < n; i++) {
     const shape = list[i];
-    const x = s.x[i] ?? 0;
-    const was = s.hv[i] ?? 0;
-    const hv = was + ((x - (s.hx[i] ?? x)) / dt - was) * follow;
+    const x = Number.isFinite(s.x[i]) ? s.x[i] : (s.tx[i] ?? 0);
+    const lastHx = Number.isFinite(s.hx[i]) ? s.hx[i] : x;
+    const was = Number.isFinite(s.hv[i]) ? s.hv[i] : 0;
+    const rawV = dt > 0 ? (x - lastHx) / dt : 0;
+    const clampedV = Math.max(-1500, Math.min(1500, Number.isFinite(rawV) ? rawV : 0));
+    const hv = was + (clampedV - was) * follow;
     s.hx[i] = x;
     s.hv[i] = hv;
     if (shape) {
-      s.vsw[i] = (s.vsw[i] ?? 0) + Math.max(-40, Math.min(40, (hv - was) * (RAIL_CONSTANTS.DEG / railPendulum(lay, shape, i)) * RAIL_CONSTANTS.SWING_COUPLING));
+      const pen = railPendulum(lay, shape, i);
+      const deltaV = (hv - was) * (RAIL_CONSTANTS.DEG / Math.max(30, pen)) * RAIL_CONSTANTS.SWING_COUPLING;
+      const kick = Math.max(-25, Math.min(25, Number.isFinite(deltaV) ? deltaV : 0));
+      s.vsw[i] = Math.max(-120, Math.min(120, (s.vsw[i] ?? 0) + kick));
     }
   }
 
