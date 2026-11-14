@@ -9,8 +9,8 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=2.2">
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=2.3">
 </head>
 <body>
   <canvas id="halftone-canvas" class="halftone-canvas" aria-hidden="true"></canvas>
@@ -119,6 +119,10 @@
             <span class="title-line">is</span>
             <span class="title-line title-accent"><em>more.</em></span>
           </h1>
+          <div class="hero-signature-wrap" aria-label="Tanda tangan Alwi Abdul Aziz">
+            <span class="signature-handwriting">Alwi Abdul Aziz</span>
+            <span class="signature-subtext">ALWI ABDUL AZIZ</span>
+          </div>
         </div>
       </div>
 
@@ -141,6 +145,88 @@
         <div class="hero-location-text">
           Indonesia &bull; GMT+7
         </div>
+      </div>
+    </section>
+
+    <section class="portfolio-section" id="karya" aria-labelledby="portfolio-heading">
+      <div class="container portfolio-top-bar scroll-reveal-item">
+        <div>
+          <span class="portfolio-eyebrow">PRINT SHOP &bull; SUKUNARU STUDIO EDITIONS</span>
+          <h2 id="portfolio-heading" class="section-title">Dinding Rel Pameran <em>Sukunaru Studio</em></h2>
+          <p class="section-subtitle">Dinding pameran interaktif fisik: geser di sepanjang rel untuk menyalakan lampu pameran, geser dan ayunkan bingkai, atau klik karya untuk membalik sisi belakang label.</p>
+        </div>
+
+        <div class="portfolio-view-and-filters" hidden>
+          <div class="portfolio-view-switch" role="group" aria-label="Pilihan Tampilan Portofolio">
+            <button type="button" class="view-btn is-active" data-view="rail" id="view-rail-btn" aria-pressed="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="5" x2="21" y2="5"></line><line x1="8" y1="5" x2="8" y2="12"></line><line x1="16" y1="5" x2="16" y2="12"></line><rect x="5" y1="12" width="6" height="7" rx="1"></rect><rect x="13" y1="12" width="6" height="7" rx="1"></rect></svg>
+              <span>Rel Pameran 3D</span>
+            </button>
+            <button type="button" class="view-btn" data-view="grid" id="view-grid-btn" aria-pressed="false">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>Grid Katalog</span>
+            </button>
+          </div>
+
+          <div class="portfolio-controls" role="tablist" aria-label="Filter Kategori Karya">
+            <button type="button" role="tab" aria-selected="true" class="filter-tab is-active" data-filter="all">Semua Karya (12)</button>
+            <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="poster">Poster Cetak (6)</button>
+            <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="socmed">Media Sosial (6)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PICTURE RAIL COMPONENT -->
+      <div id="picture-rail-wrap" class="picture-rail-stage-wrap scroll-reveal-item" data-slot="picture-rail-gallery">
+        <div class="picture-rail-wall-gradient" aria-hidden="true"></div>
+
+        <!-- Sideways Navigation Controls -->
+        <button type="button" class="rail-nav-btn rail-nav-prev" id="rail-prev-btn" aria-label="Geser ke karya sebelumnya" title="Karya Sebelumnya">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button type="button" class="rail-nav-btn rail-nav-next" id="rail-next-btn" aria-label="Geser ke karya selanjutnya" title="Karya Selanjutnya">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+
+        <div id="picture-rail-stage" class="picture-rail-stage" role="group" aria-label="Rel Pameran Karya">
+          <!-- Rail, shadow, hooks, wires, frames injected and simulated via app.js -->
+        </div>
+
+        <!-- Carousel Pagination Dots (active on mobile / narrow widths) -->
+        <div id="picture-rail-dots" class="picture-rail-dots" role="group" aria-label="Navigasi Bingkai"></div>
+
+        <!-- Dynamic Lit Frame Caption Bar -->
+        <div class="picture-rail-caption-bar container">
+          <div id="picture-rail-caption" class="picture-rail-caption-inner" aria-live="polite">
+            <p id="rail-caption-title" class="rail-caption-title">Pilih atau sorot bingkai untuk menyalakan lampu pameran</p>
+            <p id="rail-caption-byline" class="rail-caption-byline">Sukunaru Studio &bull; Sentuh &amp; geser rel untuk mengayunkan karya</p>
+          </div>
+          <div class="picture-rail-actions">
+            <button type="button" class="btn btn-accent" id="rail-open-detail-btn">
+              Angkat &amp; Balik Sisi Belakang
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="container" id="portfolio-grid-container" hidden>
+        <div id="portfolio-state-loading" class="ui-state-box" hidden aria-live="polite">
+          <div class="state-spinner" aria-hidden="true"></div>
+          <p class="state-title">Memuat galeri karya...</p>
+          <p class="state-desc">Menyiapkan daftar poster dan visual media sosial.</p>
+        </div>
+
+        <div id="portfolio-state-empty" class="ui-state-box" hidden aria-live="polite">
+          <p class="state-title">Belum ada karya di tab ini.</p>
+          <p class="state-desc">Pilih Semua Karya untuk melihat portofolio aktif, atau hubungi kami lewat WhatsApp untuk diskusi proyek baru.</p>
+          <div class="state-actions">
+            <button type="button" class="btn btn-accent" data-reset-filter>Tampilkan Semua Karya</button>
+            <button type="button" class="btn btn-outline" data-open-brief="Konsultasi Proyek Desain Baru">Diskusi Proyek di WA</button>
+          </div>
+        </div>
+
+        <!-- Alternative Grid View -->
+        <div class="poster-wall" id="portfolio-grid" aria-live="polite" hidden></div>
       </div>
     </section>
 
@@ -265,88 +351,6 @@
             </div>
           </article>
         </div>
-      </div>
-    </section>
-
-    <section class="portfolio-section" id="karya" aria-labelledby="portfolio-heading">
-      <div class="container portfolio-top-bar scroll-reveal-item">
-        <div>
-          <span class="portfolio-eyebrow">PRINT SHOP &bull; SUKUNARU STUDIO EDITIONS</span>
-          <h2 id="portfolio-heading" class="section-title">Dinding Rel Pameran <em>Sukunaru Studio</em></h2>
-          <p class="section-subtitle">Dinding pameran interaktif fisik: geser di sepanjang rel untuk menyalakan lampu pameran, geser dan ayunkan bingkai, atau klik karya untuk membalik sisi belakang label.</p>
-        </div>
-
-        <div class="portfolio-view-and-filters" hidden>
-          <div class="portfolio-view-switch" role="group" aria-label="Pilihan Tampilan Portofolio">
-            <button type="button" class="view-btn is-active" data-view="rail" id="view-rail-btn" aria-pressed="true">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="5" x2="21" y2="5"></line><line x1="8" y1="5" x2="8" y2="12"></line><line x1="16" y1="5" x2="16" y2="12"></line><rect x="5" y1="12" width="6" height="7" rx="1"></rect><rect x="13" y1="12" width="6" height="7" rx="1"></rect></svg>
-              <span>Rel Pameran 3D</span>
-            </button>
-            <button type="button" class="view-btn" data-view="grid" id="view-grid-btn" aria-pressed="false">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-              <span>Grid Katalog</span>
-            </button>
-          </div>
-
-          <div class="portfolio-controls" role="tablist" aria-label="Filter Kategori Karya">
-            <button type="button" role="tab" aria-selected="true" class="filter-tab is-active" data-filter="all">Semua Karya (12)</button>
-            <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="poster">Poster Cetak (6)</button>
-            <button type="button" role="tab" aria-selected="false" class="filter-tab" data-filter="socmed">Media Sosial (6)</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- PICTURE RAIL COMPONENT -->
-      <div id="picture-rail-wrap" class="picture-rail-stage-wrap scroll-reveal-item" data-slot="picture-rail-gallery">
-        <div class="picture-rail-wall-gradient" aria-hidden="true"></div>
-
-        <!-- Sideways Navigation Controls -->
-        <button type="button" class="rail-nav-btn rail-nav-prev" id="rail-prev-btn" aria-label="Geser ke karya sebelumnya" title="Karya Sebelumnya">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        </button>
-        <button type="button" class="rail-nav-btn rail-nav-next" id="rail-next-btn" aria-label="Geser ke karya selanjutnya" title="Karya Selanjutnya">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        </button>
-
-        <div id="picture-rail-stage" class="picture-rail-stage" role="group" aria-label="Rel Pameran Karya">
-          <!-- Rail, shadow, hooks, wires, frames injected and simulated via app.js -->
-        </div>
-
-        <!-- Carousel Pagination Dots (active on mobile / narrow widths) -->
-        <div id="picture-rail-dots" class="picture-rail-dots" role="group" aria-label="Navigasi Bingkai"></div>
-
-        <!-- Dynamic Lit Frame Caption Bar -->
-        <div class="picture-rail-caption-bar container">
-          <div id="picture-rail-caption" class="picture-rail-caption-inner" aria-live="polite">
-            <p id="rail-caption-title" class="rail-caption-title">Pilih atau sorot bingkai untuk menyalakan lampu pameran</p>
-            <p id="rail-caption-byline" class="rail-caption-byline">Sukunaru Studio &bull; Sentuh &amp; geser rel untuk mengayunkan karya</p>
-          </div>
-          <div class="picture-rail-actions">
-            <button type="button" class="btn btn-accent" id="rail-open-detail-btn">
-              Angkat &amp; Balik Sisi Belakang
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="container" id="portfolio-grid-container" hidden>
-        <div id="portfolio-state-loading" class="ui-state-box" hidden aria-live="polite">
-          <div class="state-spinner" aria-hidden="true"></div>
-          <p class="state-title">Memuat galeri karya...</p>
-          <p class="state-desc">Menyiapkan daftar poster dan visual media sosial.</p>
-        </div>
-
-        <div id="portfolio-state-empty" class="ui-state-box" hidden aria-live="polite">
-          <p class="state-title">Belum ada karya di tab ini.</p>
-          <p class="state-desc">Pilih Semua Karya untuk melihat portofolio aktif, atau hubungi kami lewat WhatsApp untuk diskusi proyek baru.</p>
-          <div class="state-actions">
-            <button type="button" class="btn btn-accent" data-reset-filter>Tampilkan Semua Karya</button>
-            <button type="button" class="btn btn-outline" data-open-brief="Konsultasi Proyek Desain Baru">Diskusi Proyek di WA</button>
-          </div>
-        </div>
-
-        <!-- Alternative Grid View -->
-        <div class="poster-wall" id="portfolio-grid" aria-live="polite" hidden></div>
       </div>
     </section>
 
@@ -898,6 +902,6 @@
     </div>
   </dialog>
 
-  <script src="app.js?v=2.2"></script>
+  <script src="app.js?v=2.3"></script>
 </body>
 </html>
