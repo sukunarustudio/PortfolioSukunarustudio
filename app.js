@@ -983,10 +983,14 @@ function initDialogsAndTriggers() {
     const found = PORTFOLIO_WORKS.find((item) => item.id === workId);
     if (!found) return;
 
-    document.getElementById("dialog-work-code").textContent = found.id;
-    document.getElementById("dialog-work-category").textContent = found.categoryLabel;
-    document.getElementById("dialog-work-title").textContent = found.title;
-    document.getElementById("dialog-work-desc").textContent = found.summary;
+    const codeEl = document.getElementById("dialog-work-code");
+    if (codeEl) codeEl.textContent = found.id;
+    const catEl = document.getElementById("dialog-work-category");
+    if (catEl) catEl.textContent = found.categoryLabel;
+    const titleEl = document.getElementById("dialog-work-title");
+    if (titleEl) titleEl.textContent = found.title;
+    const descEl = document.getElementById("dialog-work-desc");
+    if (descEl) descEl.textContent = found.summary;
     const imgEl = document.getElementById("dialog-work-image");
     if (imgEl) {
       imgEl.src = found.image;
@@ -1015,11 +1019,16 @@ function initDialogsAndTriggers() {
       labelDetails.innerHTML = detailsList.map((d) => `<li>${d}</li>`).join("");
     }
 
-    setCardFlipped(false);
+    if (typeof setCardFlipped === "function") {
+      setCardFlipped(false);
+    }
 
-    document.getElementById("dialog-work-specs").innerHTML = found.specs
-      .map((s) => `<span class="spec-chip">${s}</span>`)
-      .join("");
+    const specsEl = document.getElementById("dialog-work-specs");
+    if (specsEl) {
+      specsEl.innerHTML = (found.specs || [])
+        .map((s) => `<span class="spec-chip">${s}</span>`)
+        .join("");
+    }
     activeWorkTopic =
       found.category === "poster"
         ? "Paket Jasa: Key Visual & Event Poster Print"
