@@ -149,7 +149,7 @@ function renderPortfolio(filterKey) {
   grid.innerHTML = items
     .map(
       (work) => `
-      <article class="work-piece ${work.spanClass}">
+      <article class="work-piece ${work.spanClass} scroll-reveal-item">
         <div class="work-canvas" data-work-id="${work.id}" role="button" tabindex="0" aria-label="Perbesar karya ${work.title}">
           <img src="${work.image}" alt="${work.title}" class="work-poster-img" loading="lazy" width="540" height="720">
         </div>
@@ -171,6 +171,10 @@ function renderPortfolio(filterKey) {
     `
     )
     .join("");
+
+  if (typeof window.registerScrollRevealItems === "function") {
+    window.registerScrollRevealItems(grid.querySelectorAll(".scroll-reveal-item"));
+  }
 }
 
 function initThemeToggle() {
@@ -816,6 +820,110 @@ function initScrollToTop() {
   });
 }
 
+function initScrollReveal() {
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReduced || !("IntersectionObserver" in window)) {
+    return;
+  }
+
+  document.documentElement.classList.add("scroll-reveal-init");
+
+  let revealQueue = [];
+  let queueTimer = null;
+
+  function processQueue() {
+    if (revealQueue.length === 0) return;
+
+    // Sort queue by document order to guarantee top-to-bottom / left-to-right stagger
+    revealQueue.sort((a, b) => {
+      return (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1;
+    });
+
+    const currentBatch = [...revealQueue];
+    revealQueue = [];
+    queueTimer = null;
+
+    currentBatch.forEach((el, index) => {
+      const delaySeconds = index * 0.12;
+      revealElement(el, delaySeconds);
+    });
+  }
+
+  function revealElement(el, delaySeconds) {
+    el.style.setProperty("--reveal-delay", `${delaySeconds.toFixed(2)}s`);
+
+    requestAnimationFrame(() => {
+      el.classList.add("is-revealing");
+    });
+
+    let settled = false;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      el.classList.remove("scroll-reveal-item", "is-revealing");
+      el.classList.add("reveal-settled");
+      el.style.removeProperty("--reveal-delay");
+      el.style.willChange = "";
+    };
+
+    el.addEventListener(
+      "transitionend",
+      (e) => {
+        if (e.target === el && (e.propertyName === "opacity" || e.propertyName === "transform")) {
+          settle();
+        }
+      },
+      { once: true }
+    );
+
+    // Safety fallback timer: 0.6s animation duration + delay + 100ms buffer
+    setTimeout(settle, (delaySeconds + 0.6) * 1000 + 100);
+  }
+
+  const observer = new IntersectionObserver(
+    (entries, obs) => {
+      let hasNew = false;
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          obs.unobserve(entry.target);
+          revealQueue.push(entry.target);
+          hasNew = true;
+        }
+      });
+
+      if (hasNew) {
+        if (queueTimer) clearTimeout(queueTimer);
+        queueTimer = setTimeout(processQueue, 35);
+      }
+    },
+    {
+      root: null,
+      rootMargin: "0px 0px -40px 0px",
+      threshold: 0.08
+    }
+  );
+
+  function observeElements(elements) {
+    if (!elements) return;
+    elements.forEach((el) => {
+      if (
+        el &&
+        el.nodeType === 1 &&
+        !el.classList.contains("reveal-settled") &&
+        !el.classList.contains("is-revealing")
+      ) {
+        observer.observe(el);
+      }
+    });
+  }
+
+  window.registerScrollRevealItems = observeElements;
+
+  // Initial observation of all items marked with .scroll-reveal-item
+  const initialItems = document.querySelectorAll(".scroll-reveal-item");
+  observeElements(initialItems);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
   initScrollToTop();
@@ -825,4 +933,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initDialogsAndTriggers();
   initBriefForm();
   initInteractiveBackgroundAndCursor();
+  initScrollReveal();
 });
