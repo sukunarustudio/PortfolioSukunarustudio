@@ -1652,6 +1652,7 @@ dialog {
   display: block;
   user-select: none;
   pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 .rail-glass-glare {

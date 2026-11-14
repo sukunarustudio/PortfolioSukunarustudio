@@ -301,21 +301,35 @@ function computeRailLayout(shapes, drops, width) {
 function computeRailTargets(lay, shapes, front, centreIndex) {
   const n = shapes.length;
   if (n === 0) return [];
-  const feet = shapes.map((s, i) => s.w * lay.unit * (i === front ? RAIL_CONSTANTS.LIFT_GROW : 1));
-  const gapAfter = (a) => lay.unit * (RAIL_CONSTANTS.GAP + (front !== null && (a === front || a + 1 === front) ? RAIL_CONSTANTS.BREATH : 0));
-  const xs = feet.map(() => 0);
+
+  const safeFront = (front !== null && Number.isFinite(front))
+    ? Math.max(0, Math.min(n - 1, Math.round(front)))
+    : null;
+
+  let c = 0;
+  if (Number.isFinite(centreIndex)) {
+    c = Math.max(0, Math.min(n - 1, Math.round(centreIndex)));
+  } else if (safeFront !== null) {
+    c = safeFront;
+  }
+
+  const unit = (lay && Number.isFinite(lay.unit) && lay.unit > 20) ? lay.unit : 120;
+  const width = (lay && Number.isFinite(lay.width) && lay.width > 100) ? lay.width : 980;
+
+  const feet = shapes.map((s, i) => (s.w || 1) * unit * (i === safeFront ? RAIL_CONSTANTS.LIFT_GROW : 1));
+  const gapAfter = (a) => unit * (RAIL_CONSTANTS.GAP + (safeFront !== null && (a === safeFront || a + 1 === safeFront) ? RAIL_CONSTANTS.BREATH : 0));
+  const xs = new Array(n).fill(0);
 
   // Center active frame at stage horizontal center
-  const c = Math.max(0, Math.min(n - 1, front !== null ? front : (centreIndex ?? 0)));
-  xs[c] = lay.width / 2;
+  xs[c] = width / 2;
 
   // Distribute subsequent frames smoothly to the right
   for (let i = c + 1; i < n; i++) {
-    xs[i] = (xs[i - 1] ?? 0) + ((feet[i - 1] ?? 0) + (feet[i] ?? 0)) / 2 + gapAfter(i - 1);
+    xs[i] = xs[i - 1] + (feet[i - 1] + feet[i]) / 2 + gapAfter(i - 1);
   }
   // Distribute previous frames smoothly to the left
   for (let i = c - 1; i >= 0; i--) {
-    xs[i] = (xs[i + 1] ?? 0) - ((feet[i + 1] ?? 0) + (feet[i] ?? 0)) / 2 - gapAfter(i);
+    xs[i] = xs[i + 1] - (feet[i + 1] + feet[i]) / 2 - gapAfter(i);
   }
   return xs;
 }
@@ -588,11 +602,11 @@ function impulseRail(i, amount) {
 }
 
 function chooseRailPrint(index) {
-  if (index === null) return;
+  if (index === null || !Number.isFinite(index)) return;
   const n = railState.shapes.length;
   if (n === 0) return;
-  const nextIdx = Math.max(0, Math.min(n - 1, index));
-  const old = railState.active;
+  const nextIdx = Math.max(0, Math.min(n - 1, Math.round(index)));
+  const old = Number.isFinite(railState.active) ? railState.active : null;
   railState.active = nextIdx;
   railState.carouselIndex = nextIdx;
 
@@ -646,7 +660,7 @@ function chooseRailPrint(index) {
 }
 
 function prevRailPrint() {
-  const current = railState.active ?? railState.carouselIndex ?? 0;
+  const current = Number.isFinite(railState.active) ? railState.active : (Number.isFinite(railState.carouselIndex) ? railState.carouselIndex : 0);
   if (current > 0) {
     railState.playing = false;
     chooseRailPrint(current - 1);
@@ -654,7 +668,7 @@ function prevRailPrint() {
 }
 
 function nextRailPrint() {
-  const current = railState.active ?? railState.carouselIndex ?? 0;
+  const current = Number.isFinite(railState.active) ? railState.active : (Number.isFinite(railState.carouselIndex) ? railState.carouselIndex : 0);
   if (current < railState.shapes.length - 1) {
     railState.playing = false;
     chooseRailPrint(current + 1);
@@ -703,7 +717,7 @@ function nearestRailPrint(clientX, clientY) {
   return best;
 }
 
-function initPictureRailGallery(filterKey = "all") {
+function initPictureRailGallery(filterKey = "all", initialIndex = 0) {
   const stage = document.getElementById("picture-rail-stage");
   const dotsContainer = document.getElementById("picture-rail-dots");
   if (!stage) return;
@@ -722,7 +736,7 @@ function initPictureRailGallery(filterKey = "all") {
   railState.elements.dots = dotsContainer;
 
   function resizeAndMount(initial = false) {
-    const width = stage.clientWidth || 980;
+    const width = Math.max(320, stage.clientWidth || window.innerWidth || 980);
     railState.width = width;
     const lay = computeRailLayout(railState.shapes, railState.drops, width);
     railState.layout = lay;
@@ -748,7 +762,8 @@ function initPictureRailGallery(filterKey = "all") {
     s.free = 0;
     s.last = 0;
 
-    const xs = computeRailTargets(lay, railState.shapes, null, 0);
+    const activeIdx = Number.isFinite(initialIndex) ? Math.max(0, Math.min(count - 1, Math.round(initialIndex))) : 0;
+    const xs = computeRailTargets(lay, railState.shapes, activeIdx, activeIdx);
     for (let i = 0; i < count; i++) {
       s.x[i] = xs[i] ?? 0;
       s.tx[i] = xs[i] ?? 0;
@@ -761,7 +776,7 @@ function initPictureRailGallery(filterKey = "all") {
 
     if (dotsContainer) {
       dotsContainer.innerHTML = filtered.map((item, i) => `
-        <button type="button" class="rail-dot-btn ${i === 0 ? "is-active" : ""}" aria-label="${item.title}" data-rail-dot="${i}"></button>
+        <button type="button" class="rail-dot-btn ${i === activeIdx ? "is-active" : ""}" aria-label="${item.title}" data-rail-dot="${i}"></button>
       `).join("");
 
       dotsContainer.querySelectorAll("[data-rail-dot]").forEach((btn) => {
@@ -773,7 +788,7 @@ function initPictureRailGallery(filterKey = "all") {
       });
     }
 
-    chooseRailPrint(0);
+    chooseRailPrint(activeIdx);
 
     if (initial && !railState.brushed) {
       railState.brushed = true;
@@ -875,7 +890,7 @@ function initPictureRailGallery(filterKey = "all") {
 
                     <span class="rail-mat-board" style="inset: ${m}px;">
                       <span class="rail-artwork-box" style="left: ${mat}px; right: ${mat}px; top: ${mat}px; bottom: ${mat + matB}px;">
-                        <img src="${item.image}" alt="${item.title}" class="rail-poster-img" loading="lazy">
+                        <img src="${item.image}" alt="${item.title}" class="rail-poster-img" loading="lazy" draggable="false">
                       </span>
                       <span data-glare="${i}" class="rail-glass-glare"></span>
                     </span>
@@ -909,6 +924,11 @@ function initPictureRailGallery(filterKey = "all") {
     el.dims = items.map((_, i) => stage.querySelector(`[data-dim="${i}"]`));
     el.shadows = items.map((_, i) => stage.querySelector(`[data-shadow="${i}"]`));
     el.washes = items.map((_, i) => stage.querySelector(`[data-wash="${i}"]`));
+
+    // Paint all frames immediately to their calculated initial positions
+    for (let i = 0; i < items.length; i++) {
+      paintRailFrame(i);
+    }
   }
 
   // Wire Prev / Next Navigation buttons
@@ -967,24 +987,31 @@ function initPictureRailGallery(filterKey = "all") {
     if (!lay) return;
 
     if (p.id === event.pointerId) {
-      const dx = event.clientX - p.x;
+      const clientX = Number.isFinite(event.clientX) ? event.clientX : p.lastX;
+      const clientY = Number.isFinite(event.clientY) ? event.clientY : p.y;
+      const dx = clientX - p.x;
       const now = performance.now();
-      if (!p.moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(event.clientY - p.y)) {
+      if (!p.moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(clientY - p.y)) {
         p.moved = true;
         railState.playing = false;
-        if (stage.setPointerCapture) stage.setPointerCapture(event.pointerId);
+        if (stage.setPointerCapture && typeof stage.setPointerCapture === "function") {
+          try {
+            stage.setPointerCapture(event.pointerId);
+          } catch (_) {}
+        }
       }
       if (p.moved) {
-        const v = (event.clientX - p.lastX) / Math.max(1, now - p.lastT);
-        p.v = p.v * 0.6 + v * 0.4;
-        p.lastX = event.clientX;
+        const dt = Math.max(1, now - p.lastT);
+        const v = (clientX - p.lastX) / dt;
+        p.v = Number.isFinite(v) ? (p.v * 0.6 + v * 0.4) : p.v;
+        p.lastX = clientX;
         p.lastT = now;
         p.swipe = dx;
 
-        const currentCenter = railState.active ?? railState.carouselIndex ?? 0;
+        const currentCenter = Number.isFinite(railState.active) ? railState.active : (Number.isFinite(railState.carouselIndex) ? railState.carouselIndex : 0);
         const xs = computeRailTargets(lay, railState.shapes, currentCenter, currentCenter);
         for (let i = 0; i < railState.shapes.length; i++) {
-          s.tx[i] = (xs[i] ?? 0) + dx;
+          s.tx[i] = (xs[i] ?? 0) + (Number.isFinite(dx) ? dx : 0);
         }
         kickRailSimulation();
       }
@@ -1012,28 +1039,37 @@ function initPictureRailGallery(filterKey = "all") {
     if (p.id !== event.pointerId) return;
     const s = railState.sim;
     const lay = railState.layout;
-    if (stage.hasPointerCapture && stage.hasPointerCapture(event.pointerId)) {
-      stage.releasePointerCapture(event.pointerId);
-    }
-    railState.pointer = { ...p, id: -1 };
 
-    if (p.moved) {
-      const dx = event.clientX - p.x;
-      const from = railState.active ?? railState.carouselIndex ?? 0;
+    if (stage.hasPointerCapture && typeof stage.releasePointerCapture === "function") {
+      try {
+        if (stage.hasPointerCapture(event.pointerId)) {
+          stage.releasePointerCapture(event.pointerId);
+        }
+      } catch (_) {}
+    }
+
+    const wasMoved = p.moved;
+    const clientX = (event && Number.isFinite(event.clientX) && event.clientX !== 0) ? event.clientX : p.lastX;
+    const dx = clientX - p.x;
+    const v = Number.isFinite(p.v) ? p.v : 0;
+    const from = Number.isFinite(railState.active) ? railState.active : (Number.isFinite(railState.carouselIndex) ? railState.carouselIndex : 0);
+
+    railState.pointer = { ...p, id: -1, swipe: 0, moved: false };
+
+    if (wasMoved) {
       let step = 0;
-      if (Math.abs(p.v) > 0.28) {
-        step = p.v < 0 ? 1 : -1;
-      } else if (Math.abs(dx) > 38) {
+      if (Math.abs(v) > 0.28) {
+        step = v < 0 ? 1 : -1;
+      } else if (Number.isFinite(dx) && Math.abs(dx) > 38) {
         step = dx < 0 ? 1 : -1;
       }
-      p.swipe = 0;
       const next = Math.max(0, Math.min(railState.shapes.length - 1, from + step));
       railState.carouselIndex = next;
       chooseRailPrint(next);
       return;
     }
 
-    if (cancelled || p.moved || p.index < 0) return;
+    if (cancelled || p.index < 0) return;
     railState.playing = false;
     const hitIndex = p.index;
     if (hitIndex !== railState.active) {
@@ -1290,7 +1326,8 @@ function initPortfolioControls() {
     if (resizeTimer) clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       if (railWrap && !railWrap.hidden) {
-        initPictureRailGallery(currentFilter);
+        const preserveIdx = Number.isFinite(railState.active) ? railState.active : (Number.isFinite(railState.carouselIndex) ? railState.carouselIndex : 0);
+        initPictureRailGallery(currentFilter, preserveIdx);
       }
     }, 150);
   });

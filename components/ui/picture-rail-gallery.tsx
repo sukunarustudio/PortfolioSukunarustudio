@@ -277,20 +277,29 @@ export function PictureRailGallery({
 
   const targetsFor = React.useCallback((lay: Layout, front: number | null, centreIndex: number) => {
     const n = shapes.length;
-    const feet = shapes.map((s, i) => s.w * lay.unit * (i === front ? LIFT_GROW : 1));
-    const gapAfter = (a: number) => lay.unit * (GAP + (front !== null && (a === front || a + 1 === front) ? BREATH : 0));
-    const xs = feet.map(() => 0);
-    if (lay.carousel) {
-      const c = clamp(front ?? centreIndex, 0, Math.max(0, n - 1));
-      xs[c] = lay.width / 2;
-      for (let i = c + 1; i < n; i++) xs[i] = (xs[i - 1] ?? 0) + ((feet[i - 1] ?? 0) + (feet[i] ?? 0)) / 2 + gapAfter(i - 1);
-      for (let i = c - 1; i >= 0; i--) xs[i] = (xs[i + 1] ?? 0) - ((feet[i + 1] ?? 0) + (feet[i] ?? 0)) / 2 - gapAfter(i);
-      return xs;
+    if (n === 0) return [];
+
+    const safeFront = (front !== null && Number.isFinite(front))
+      ? Math.max(0, Math.min(n - 1, Math.round(front)))
+      : null;
+
+    let c = 0;
+    if (Number.isFinite(centreIndex)) {
+      c = Math.max(0, Math.min(n - 1, Math.round(centreIndex)));
+    } else if (safeFront !== null) {
+      c = safeFront;
     }
-    let total = 0;
-    for (let i = 0; i < n; i++) total += (feet[i] ?? 0) + (i < n - 1 ? gapAfter(i) : 0);
-    let cursor = (lay.width - total) / 2;
-    for (let i = 0; i < n; i++) { xs[i] = cursor + (feet[i] ?? 0) / 2; cursor += (feet[i] ?? 0) + gapAfter(i); }
+
+    const unit = (lay && Number.isFinite(lay.unit) && lay.unit > 20) ? lay.unit : 120;
+    const width = (lay && Number.isFinite(lay.width) && lay.width > 100) ? lay.width : 980;
+
+    const feet = shapes.map((s, i) => (s.w || 1) * unit * (i === safeFront ? LIFT_GROW : 1));
+    const gapAfter = (a: number) => unit * (GAP + (safeFront !== null && (a === safeFront || a + 1 === safeFront) ? BREATH : 0));
+    const xs = feet.map(() => 0);
+
+    xs[c] = width / 2;
+    for (let i = c + 1; i < n; i++) xs[i] = (xs[i - 1] ?? 0) + ((feet[i - 1] ?? 0) + (feet[i] ?? 0)) / 2 + gapAfter(i - 1);
+    for (let i = c - 1; i >= 0; i--) xs[i] = (xs[i + 1] ?? 0) - ((feet[i + 1] ?? 0) + (feet[i] ?? 0)) / 2 - gapAfter(i);
     return xs;
   }, [shapes]);
 
@@ -621,7 +630,11 @@ export function PictureRailGallery({
     if (p.id !== event.pointerId) return;
     const s = sim.current;
     const stage = stageRef.current;
-    if (stage?.hasPointerCapture(event.pointerId)) stage.releasePointerCapture(event.pointerId);
+    if (stage?.hasPointerCapture(event.pointerId)) {
+      try {
+        stage.releasePointerCapture(event.pointerId);
+      } catch (_) {}
+    }
     pointer.current = { ...p, id: -1 };
     if (s.drag >= 0) {
       const idle = stamp(event) - p.lastT;
