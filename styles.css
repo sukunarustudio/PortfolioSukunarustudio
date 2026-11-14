@@ -587,12 +587,19 @@ dialog {
   margin-bottom: 1.25rem;
 }
 
-.hero-stage-left .hero-clean-text:last-child {
-  margin-bottom: 0;
+.hero-clean-link {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 1.5px;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
-.hero-clean-link {
-  display: none !important;
+.hero-clean-link:hover {
+  color: var(--accent-brand);
 }
 
 /* Center Column: Sukunaru Orange Halo Backdrop + Grounded Creator Portrait (Flush to Bottom) */
@@ -3156,8 +3163,8 @@ dialog {
     margin-bottom: 0.45rem;
   }
 
-  .hero-stage-left .hero-clean-text:last-child {
-    margin-bottom: 0;
+  .hero-clean-link {
+    font-size: 0.92rem;
   }
 
   .hero-footer-bar {
