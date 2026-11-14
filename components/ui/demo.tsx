@@ -1,33 +1,25 @@
 import React from 'react';
-import { Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Instagram, Send, Twitter, Youtube } from 'lucide-react';
 import { MinimalistHero } from '@/components/ui/minimalist-hero';
 
 const MinimalistHeroDemo = () => {
-  const navLinks = [
-    { label: 'HOME', href: '#top' },
-    { label: 'PRODUK', href: '#produk' },
-    { label: 'KARYA', href: '#karya' },
-    { label: 'KONTAK', href: '#sosmed' },
-  ];
-
   const socialLinks = [
-    { icon: Instagram, href: 'https://instagram.com/sukunarustudio' },
-    { icon: Twitter, href: 'https://twitter.com/sukunarustudio' },
-    { icon: Facebook, href: 'https://facebook.com/sukunarustudio' },
-    { icon: Linkedin, href: 'https://linkedin.com/company/sukunarustudio' },
+    { icon: Instagram, href: 'https://instagram.com/sukunarustudio', label: 'Instagram' },
+    { icon: Send, href: 'https://wa.me/6289519203345', label: 'WhatsApp' },
+    { icon: Twitter, href: 'https://x.com/sukunarustudio', label: 'X (Twitter)' },
+    { icon: Youtube, href: 'https://youtube.com/@sukunarustudio', label: 'YouTube' },
   ];
 
   return (
     <MinimalistHero
-      logoText="SUKUNARU."
-      navLinks={navLinks}
-      mainText="Sukunaru Studio mengerjakan poster cetak berkarakter editorial, identitas visual media sosial, serta software utilitas kreator."
+      mainText="Sukunaru Studio merancang poster cetak berkarakter editorial, visual media sosial, dan software kreator."
       readMoreLink="#karya"
       imageSrc="/assets/creator-portrait.png"
-      imageAlt="Portrait Sukunaru Studio Creator"
+      imageAlt="Portrait Kreator Sukunaru Studio"
       overlayText={{
-        part1: 'visual',
-        part2: 'craft.',
+        line1: 'less',
+        line2: 'is',
+        line3: 'more.',
       }}
       socialLinks={socialLinks}
       locationText="Indonesia • GMT+7"
