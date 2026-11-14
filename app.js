@@ -196,910 +196,281 @@ const PORTFOLIO_WORKS = [
 ];
 
 /* ==========================================================================
-   Picture Rail Gallery Physics Engine & Component
+   7-Card Fan Arc Poster Carousel (A4 Aspect Ratio: 1 / 1.414)
    ========================================================================== */
-const RAIL_CONSTANTS = {
-  PERSPECTIVE: 1200,
-  GAP: 0.3,
-  BREATH: 0.1,
-  MARGIN: 0.05,
-  EDGE: 36,
-  RAIL_MIN_UNIT: 90,
-  RAIL_MAX_UNIT: 150,
-  CAROUSEL_MAX_UNIT: 128,
-  LIFT_SCALE: 0.06,
-  SUPERSAMPLE: 2,
-  LIFT_GROW: 1.12,
-  LIFT_Z: 26,
-  TILT_X: -6,
-  TILT_Y: 4,
-  SWING_MAX: 14,
-  SWING_DAMP: 2.2,
-  SWING_G: 3900,
-  SWING_COUPLING: 0.08,
-  DRAG_COUPLING: 0.16,
-  NEIGHBOUR_KICK: 12,
-  DEG: 180 / Math.PI
-};
-
-let railState = {
-  items: [],
-  shapes: [],
-  drops: [],
-  layout: null,
-  width: 0,
-  active: null,
-  carouselIndex: 0,
-  focusIndex: 0,
-  sim: {
-    x: [], vx: [], tx: [],
-    sw: [], vsw: [],
-    e: [], ve: [], te: [],
-    ty: [], vty: [], tty: [],
-    hx: [], hv: [],
-    drag: -1, grab: 0, free: 0, last: 0, raf: 0
+const FAN_CAROUSEL_CONFIG = {
+  desktop: {
+    cardWidth: 260,
+    offsets: {
+      0: { scale: 1, rot: 0, x: 0, y: 0, zIndex: 10, opacity: 1 },
+      1: { scale: 0.92, rot: 6, x: 140, y: 22, zIndex: 8, opacity: 1 },
+      "-1": { scale: 0.92, rot: -6, x: -140, y: 22, zIndex: 8, opacity: 1 },
+      2: { scale: 0.85, rot: 12, x: 260, y: 55, zIndex: 6, opacity: 1 },
+      "-2": { scale: 0.85, rot: -12, x: -260, y: 55, zIndex: 6, opacity: 1 },
+      3: { scale: 0.78, rot: 18, x: 360, y: 98, zIndex: 4, opacity: 0.85 },
+      "-3": { scale: 0.78, rot: -18, x: -360, y: 98, zIndex: 4, opacity: 0.85 }
+    }
   },
-  playing: true,
-  beatTimer: null,
-  brushed: false,
-  pointer: { id: -1, index: -1, x: 0, y: 0, moved: false, kind: "", swipe: 0, lastX: 0, lastT: 0, v: 0 },
-  elements: {
-    stage: null,
-    dots: null,
-    captionTitle: null,
-    captionByline: null,
-    openDetailBtn: null,
-    hangs: [],
-    backs: [],
-    swings: [],
-    slots: [],
-    tilts: [],
-    lights: [],
-    glares: [],
-    dims: [],
-    shadows: [],
-    washes: []
+  tablet: {
+    cardWidth: 220,
+    offsets: {
+      0: { scale: 1, rot: 0, x: 0, y: 0, zIndex: 10, opacity: 1 },
+      1: { scale: 0.92, rot: 6, x: 105, y: 20, zIndex: 8, opacity: 1 },
+      "-1": { scale: 0.92, rot: -6, x: -105, y: 20, zIndex: 8, opacity: 1 },
+      2: { scale: 0.85, rot: 12, x: 195, y: 50, zIndex: 6, opacity: 1 },
+      "-2": { scale: 0.85, rot: -12, x: -195, y: 50, zIndex: 6, opacity: 1 },
+      3: { scale: 0.78, rot: 18, x: 270, y: 88, zIndex: 4, opacity: 0.75 },
+      "-3": { scale: 0.78, rot: -18, x: -270, y: 88, zIndex: 4, opacity: 0.75 }
+    }
+  },
+  mobile: {
+    cardWidth: 175,
+    offsets: {
+      0: { scale: 1, rot: 0, x: 0, y: 0, zIndex: 10, opacity: 1 },
+      1: { scale: 0.92, rot: 5.5, x: 68, y: 16, zIndex: 8, opacity: 1 },
+      "-1": { scale: 0.92, rot: -5.5, x: -68, y: 16, zIndex: 8, opacity: 1 },
+      2: { scale: 0.84, rot: 11, x: 130, y: 40, zIndex: 6, opacity: 0.9 },
+      "-2": { scale: 0.84, rot: -11, x: -130, y: 40, zIndex: 6, opacity: 0.9 },
+      3: { scale: 0.76, rot: 16, x: 185, y: 72, zIndex: 4, opacity: 0 },
+      "-3": { scale: 0.76, rot: -16, x: -185, y: 72, zIndex: 4, opacity: 0 }
+    }
   }
 };
 
-function shapeOfWork(item) {
-  const aspect = Math.max(0.4, Math.min(2.5, item.aspect ?? 0.8));
-  const frame = item.frame ?? "black";
-  const mold = frame === "oak" ? 0.068 : frame === "white" ? 0.058 : 0.046;
-  const mat = item.mat ? 0.11 : 0;
-  const matB = item.mat ? 0.022 : 0;
-  const iw = Math.sqrt(aspect);
-  return { frame, mold, mat, matB, w: iw + 2 * (mold + mat), h: 1 / iw + 2 * (mold + mat) + matB };
-}
+let fanCarouselState = {
+  activeIndex: 0,
+  items: [],
+  cards: [],
+  dots: [],
+  isDragging: false
+};
 
-function computeRailLayout(shapes, drops, width) {
-  const n = shapes.length;
-  // Always active sliding gallery so frames maintain generous size and never fold
-  const carousel = true;
-  const unit = Math.round(
-    width < 640
-      ? Math.max(110, width * 0.28)
-      : Math.max(130, Math.min(165, width * 0.135))
-  );
-  const railTop = 6;
-  const railT = Math.round(Math.max(9, Math.min(16, unit * 0.11)));
-  const pivotY = railTop + railT + Math.round(unit * 0.045) + 2;
-  const maxH = shapes.reduce((m, s) => Math.max(m, s.h), 0) * unit;
-  const centre = pivotY + unit * 0.22 + maxH / 2;
-  const tops = shapes.map((s, i) =>
-    Math.round(
-      Math.max(
-        pivotY + unit * 0.08,
-        centre - (s.h * unit) / 2 + Math.max(-0.15, Math.min(0.6, drops[i] ?? 0)) * unit
-      )
-    )
-  );
-  const bottom = shapes.reduce((m, s, i) => Math.max(m, (tops[i] ?? 0) + s.h * unit), pivotY);
-  return { width, unit, carousel, railTop, railT, pivotY, tops, stageH: Math.round(bottom + 42) };
-}
+function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
+  const wrap = document.getElementById("fan-carousel-wrap");
+  const stage = document.getElementById("fan-carousel-stage");
+  const dotsContainer = document.getElementById("fan-dots-container");
+  const prevBtn = document.getElementById("fan-prev-btn");
+  const nextBtn = document.getElementById("fan-next-btn");
+  const titleEl = document.getElementById("fan-active-title");
+  const categoryEl = document.getElementById("fan-active-category");
+  const modalBtn = document.getElementById("fan-active-modal-btn");
 
-function computeRailTargets(lay, shapes, front, centreIndex) {
-  const n = shapes.length;
-  if (n === 0) return [];
-
-  const safeFront = (front !== null && Number.isFinite(front))
-    ? Math.max(0, Math.min(n - 1, Math.round(front)))
-    : null;
-
-  let c = 0;
-  if (Number.isFinite(centreIndex)) {
-    c = Math.max(0, Math.min(n - 1, Math.round(centreIndex)));
-  } else if (safeFront !== null) {
-    c = safeFront;
-  }
-
-  const unit = (lay && Number.isFinite(lay.unit) && lay.unit > 20) ? lay.unit : 120;
-  const width = (lay && Number.isFinite(lay.width) && lay.width > 100) ? lay.width : 980;
-
-  const feet = shapes.map((s, i) => (s.w || 1) * unit * (i === safeFront ? RAIL_CONSTANTS.LIFT_GROW : 1));
-  const gapAfter = (a) => unit * (RAIL_CONSTANTS.GAP + (safeFront !== null && (a === safeFront || a + 1 === safeFront) ? RAIL_CONSTANTS.BREATH : 0));
-  const xs = new Array(n).fill(0);
-
-  // Center active frame at stage horizontal center
-  xs[c] = width / 2;
-
-  // Distribute subsequent frames smoothly to the right
-  for (let i = c + 1; i < n; i++) {
-    xs[i] = xs[i - 1] + (feet[i - 1] + feet[i]) / 2 + gapAfter(i - 1);
-  }
-  // Distribute previous frames smoothly to the left
-  for (let i = c - 1; i >= 0; i--) {
-    xs[i] = xs[i + 1] - (feet[i + 1] + feet[i]) / 2 - gapAfter(i);
-  }
-  return xs;
-}
-
-function railPendulum(lay, shape, i) {
-  return Math.max(30, (lay.tops[i] ?? 0) - lay.pivotY + (shape.h * lay.unit) / 2);
-}
-
-function railReach(s, lay, shape, i) {
-  const e = Math.max(0, Math.min(1, s.e[i] ?? 0));
-  const half = (shape.w * lay.unit * (1 + (RAIL_CONSTANTS.LIFT_GROW - 1) * e)) / 2;
-  const top = (lay.tops[i] ?? 0) - lay.pivotY;
-  const bottom = top + shape.h * lay.unit;
-  const r = (s.sw[i] ?? 0) / RAIL_CONSTANTS.DEG;
-  const c = Math.cos(r);
-  const sn = Math.sin(r);
-  return [Math.min(-half * c - top * sn, -half * c - bottom * sn), Math.max(half * c - top * sn, half * c - bottom * sn)];
-}
-
-function railRestTilt(i) {
-  return (((i * 37 + 11) % 7) - 3) * 0.5;
-}
-
-function resolveRailContacts(s, lay, list) {
-  const n = list.length;
-  if (n <= 1) return;
-
-  // Strict physical non-penetration along the rail rod.
-  // Frames have physical width and cannot pass through or overlap adjacent frames.
-  for (let pass = 0; pass < 2; pass++) {
-    for (let i = 0; i < n - 1; i++) {
-      const a = list[i];
-      const b = list[i + 1];
-      if (!a || !b) continue;
-
-      const xi = Number.isFinite(s.x[i]) ? s.x[i] : (s.tx[i] ?? 0);
-      const xi1 = Number.isFinite(s.x[i + 1]) ? s.x[i + 1] : (s.tx[i + 1] ?? 0);
-
-      // Safe separation distance based on frame dimensions plus air gap (14px)
-      const minDistance = ((a.w + b.w) * lay.unit) * 0.5 + 14;
-      const currentDist = xi1 - xi;
-      const overlap = minDistance - currentDist;
-
-      if (overlap > 0) {
-        // Separate equally without pumping kinetic energy
-        s.x[i] = xi - overlap * 0.5;
-        s.x[i + 1] = xi1 + overlap * 0.5;
-
-        // Inelastic velocity contact: damp converging velocities only
-        const va = Number.isFinite(s.vx[i]) ? s.vx[i] : 0;
-        const vb = Number.isFinite(s.vx[i + 1]) ? s.vx[i + 1] : 0;
-        const vRel = va - vb; // Positive when approaching each other
-        if (vRel > 0) {
-          s.vx[i] = va - vRel * 0.5;
-          s.vx[i + 1] = vb + vRel * 0.5;
-        }
-      }
-    }
-  }
-}
-
-function paintRailFrame(i) {
-  const { sim: s, layout: lay, shapes: list, elements: el } = railState;
-  const shape = list[i];
-  if (!shape || !lay) return;
-
-  const w = shape.w * lay.unit;
-  let x = s.x[i];
-  if (!Number.isFinite(x)) {
-    x = s.tx[i] ?? (lay.width / 2);
-    s.x[i] = x;
-    s.vx[i] = 0;
-  }
-  let theta = s.sw[i];
-  if (!Number.isFinite(theta)) {
-    theta = railRestTilt(i);
-    s.sw[i] = theta;
-    s.vsw[i] = 0;
-  }
-  let e = s.e[i];
-  if (!Number.isFinite(e)) {
-    e = s.te[i] ?? 0;
-    s.e[i] = e;
-    s.ve[i] = 0;
-  }
-
-  e = Math.max(0, Math.min(1.2, e));
-  const lit = Math.max(0, Math.min(1, e));
-  const ty = (Number.isFinite(s.ty[i]) ? s.ty[i] : 0) * lit;
-  const left = `translate3d(${(x - w / 2).toFixed(2)}px, 0, 0)`;
-
-  const hang = el.hangs[i];
-  if (hang) {
-    hang.style.transform = left;
-    const distanceToActive = Math.abs(i - (railState.active ?? 0));
-    hang.style.zIndex = lit > 0.4 ? "30" : String(Math.max(1, 20 - distanceToActive));
-    hang.setAttribute("data-active", lit > 0.4 ? "true" : "false");
-    const dot = hang.querySelector(".label-status-dot");
-    if (dot) dot.style.display = lit > 0.4 ? "inline-block" : "none";
-  }
-
-  const back = el.backs[i];
-  if (back) back.style.transform = `${left} rotate(${theta.toFixed(3)}deg)`;
-
-  const swing = el.swings[i];
-  if (swing) swing.style.transform = `rotate(${theta.toFixed(3)}deg)`;
-
-  const tilt = el.tilts[i];
-  if (tilt) {
-    const scaleVal = ((1 + RAIL_CONSTANTS.LIFT_SCALE * e) / RAIL_CONSTANTS.SUPERSAMPLE).toFixed(4);
-    tilt.style.transform = `perspective(${RAIL_CONSTANTS.PERSPECTIVE}px) translateZ(${(RAIL_CONSTANTS.LIFT_Z * e).toFixed(2)}px) rotateX(${(RAIL_CONSTANTS.TILT_X * e).toFixed(3)}deg) rotateY(${ty.toFixed(3)}deg) scale(${scaleVal})`;
-  }
-
-  const light = el.lights[i];
-  if (light) light.style.opacity = lit.toFixed(3);
-
-  const wash = el.washes[i];
-  if (wash) wash.style.opacity = lit.toFixed(3);
-
-  const glare = el.glares[i];
-  if (glare) glare.style.transform = `translate3d(${(-ty * 3 - theta * 1.6).toFixed(2)}%, 0, 0)`;
-
-  const shadow = el.shadows[i];
-  if (shadow) {
-    shadow.style.transform = `translate3d(${(-ty * 1.4).toFixed(2)}px, ${(lay.unit * 0.04 + 10 * e).toFixed(2)}px, 0) scale(${(1 + 0.035 * e).toFixed(4)}, ${(1 + 0.07 * e).toFixed(4)})`;
-    shadow.style.opacity = (1 - 0.3 * lit).toFixed(3);
-  }
-
-  let others = 0;
-  for (let k = 0; k < list.length; k++) if (k !== i) others = Math.max(others, s.e[k] ?? 0);
-  const dim = el.dims[i];
-  if (dim) dim.style.opacity = (0.08 * Math.max(0, Math.min(1, others)) * (1 - lit)).toFixed(4);
-}
-
-function stepRailSimulation(now) {
-  const { sim: s, layout: lay, shapes: list } = railState;
-  const n = list.length;
-  if (!lay || n === 0) return;
-
-  // Robust time delta: strictly clamp to [0.002s .. 0.05s] to eliminate 0/0 NaN and frame explosion
-  let dt = 1 / 60;
-  if (s.last && Number.isFinite(s.last)) {
-    const elapsed = (now - s.last) / 1000;
-    if (elapsed > 0.001 && elapsed < 0.2) {
-      dt = Math.min(0.05, elapsed);
-    }
-  }
-  s.last = now;
-
-  const sub = Math.max(3, Math.ceil(dt / 0.0115));
-  const h = dt / sub;
-
-  for (let k = 0; k < sub; k++) {
-    for (let i = 0; i < n; i++) {
-      const shape = list[i];
-      if (!shape) continue;
-      const len = Math.max(30, railPendulum(lay, shape, i));
-
-      // X translation spring
-      const tx = Number.isFinite(s.tx[i]) ? s.tx[i] : (lay.width / 2);
-      const currX = Number.isFinite(s.x[i]) ? s.x[i] : tx;
-      const beforeVx = Number.isFinite(s.vx[i]) ? s.vx[i] : 0;
-      const stiff = 140;
-      const damp = 2 * Math.sqrt(140) * 0.88;
-      const ax = -stiff * (currX - tx) - damp * beforeVx;
-      let newVx = beforeVx + ax * h;
-      newVx = Math.max(-2500, Math.min(2500, newVx));
-      s.vx[i] = newVx;
-      s.x[i] = currX + newVx * h;
-
-      // Lift spring
-      const te = Number.isFinite(s.te[i]) ? s.te[i] : 0;
-      const currE = Number.isFinite(s.e[i]) ? s.e[i] : te;
-      const currVe = Number.isFinite(s.ve[i]) ? s.ve[i] : 0;
-      const ae = -150 * (currE - te) - 2 * Math.sqrt(150) * 0.78 * currVe;
-      s.ve[i] = currVe + ae * h;
-      s.e[i] = currE + s.ve[i] * h;
-
-      // 3D tilt spring
-      const tty = Number.isFinite(s.tty[i]) ? s.tty[i] : 0;
-      const currTy = Number.isFinite(s.ty[i]) ? s.ty[i] : tty;
-      const currVty = Number.isFinite(s.vty[i]) ? s.vty[i] : 0;
-      const at = -110 * (currTy - tty) - 2 * Math.sqrt(110) * 0.72 * currVty;
-      s.vty[i] = currVty + at * h;
-      s.ty[i] = currTy + s.vty[i] * h;
-
-      // Swing angle spring
-      const rest = railRestTilt(i) * (1 - Math.max(0, Math.min(1, s.e[i] ?? 0)));
-      const currSw = Number.isFinite(s.sw[i]) ? s.sw[i] : rest;
-      const currVsw = Number.isFinite(s.vsw[i]) ? s.vsw[i] : 0;
-      const as = -(RAIL_CONSTANTS.SWING_G / len) * (currSw - rest) - RAIL_CONSTANTS.SWING_DAMP * currVsw;
-      let newVsw = currVsw + as * h;
-      newVsw = Math.max(-180, Math.min(180, newVsw));
-      s.vsw[i] = newVsw;
-      s.sw[i] = Math.max(-RAIL_CONSTANTS.SWING_MAX, Math.min(RAIL_CONSTANTS.SWING_MAX, currSw + newVsw * h));
-    }
-    resolveRailContacts(s, lay, list);
-  }
-
-  const follow = 1 - Math.exp(-dt / 0.035);
-  for (let i = 0; i < n; i++) {
-    const shape = list[i];
-    const x = Number.isFinite(s.x[i]) ? s.x[i] : (s.tx[i] ?? 0);
-    const lastHx = Number.isFinite(s.hx[i]) ? s.hx[i] : x;
-    const was = Number.isFinite(s.hv[i]) ? s.hv[i] : 0;
-    const rawV = dt > 0 ? (x - lastHx) / dt : 0;
-    const clampedV = Math.max(-1500, Math.min(1500, Number.isFinite(rawV) ? rawV : 0));
-    const hv = was + (clampedV - was) * follow;
-    s.hx[i] = x;
-    s.hv[i] = hv;
-    if (shape) {
-      const pen = railPendulum(lay, shape, i);
-      const deltaV = (hv - was) * (RAIL_CONSTANTS.DEG / Math.max(30, pen)) * RAIL_CONSTANTS.SWING_COUPLING;
-      const kick = Math.max(-25, Math.min(25, Number.isFinite(deltaV) ? deltaV : 0));
-      s.vsw[i] = Math.max(-120, Math.min(120, (s.vsw[i] ?? 0) + kick));
-    }
-  }
-
-  let busy = false;
-  for (let i = 0; i < n; i++) {
-    paintRailFrame(i);
-    const rest = railRestTilt(i) * (1 - Math.max(0, Math.min(1, s.e[i] ?? 0)));
-    if (
-      Math.abs(s.vx[i] ?? 0) > 0.4 ||
-      Math.abs((s.x[i] ?? 0) - (s.tx[i] ?? 0)) > 0.25 ||
-      Math.abs((s.e[i] ?? 0) - (s.te[i] ?? 0)) > 0.002 ||
-      Math.abs(s.ve[i] ?? 0) > 0.01 ||
-      Math.abs((s.ty[i] ?? 0) - (s.tty[i] ?? 0)) > 0.02 ||
-      Math.abs(s.vty[i] ?? 0) > 0.05 ||
-      Math.abs((s.sw[i] ?? 0) - rest) > 0.02 ||
-      Math.abs(s.vsw[i] ?? 0) > 0.05
-    ) {
-      busy = true;
-    }
-  }
-
-  if (busy) {
-    s.raf = requestAnimationFrame(stepRailSimulation);
-  } else {
-    s.raf = 0;
-    s.last = 0;
-    for (let i = 0; i < n; i++) {
-      s.x[i] = s.tx[i] ?? 0;
-      s.hx[i] = s.x[i] ?? 0;
-      s.hv[i] = 0;
-      s.vx[i] = 0;
-      s.e[i] = s.te[i] ?? 0;
-      s.ve[i] = 0;
-      s.ty[i] = s.tty[i] ?? 0;
-      s.vty[i] = 0;
-      s.sw[i] = railRestTilt(i) * (1 - Math.max(0, Math.min(1, s.e[i] ?? 0)));
-      s.vsw[i] = 0;
-      paintRailFrame(i);
-    }
-  }
-}
-
-function kickRailSimulation() {
-  const s = railState.sim;
-  if (!s.raf) {
-    s.last = 0;
-    s.raf = requestAnimationFrame(stepRailSimulation);
-  }
-}
-
-function impulseRail(i, amount) {
-  if (i < 0 || i >= railState.shapes.length) return;
-  railState.sim.vsw[i] = (railState.sim.vsw[i] ?? 0) + amount;
-  kickRailSimulation();
-}
-
-function chooseRailPrint(index) {
-  if (index === null || !Number.isFinite(index)) return;
-  const n = railState.shapes.length;
-  if (n === 0) return;
-  const nextIdx = Math.max(0, Math.min(n - 1, Math.round(index)));
-  const old = Number.isFinite(railState.active) ? railState.active : null;
-  railState.active = nextIdx;
-  railState.carouselIndex = nextIdx;
-
-  const { sim: s, layout: lay, shapes: list, items } = railState;
-  if (!lay) return;
-
-  const xs = computeRailTargets(lay, list, nextIdx, nextIdx);
-  for (let i = 0; i < n; i++) {
-    s.tx[i] = xs[i] ?? 0;
-    s.te[i] = i === nextIdx ? 1 : 0;
-    if (i !== nextIdx) s.tty[i] = 0;
-  }
-
-  impulseRail(nextIdx - 1, RAIL_CONSTANTS.NEIGHBOUR_KICK);
-  impulseRail(nextIdx + 1, -RAIL_CONSTANTS.NEIGHBOUR_KICK);
-  if (old !== null && old !== nextIdx) {
-    impulseRail(old, -RAIL_CONSTANTS.NEIGHBOUR_KICK * 0.5);
-  }
-
-  kickRailSimulation();
-
-  // Update Caption & Buttons
-  const currentItem = items[nextIdx];
-  const capTitle = document.getElementById("rail-caption-title");
-  const capByline = document.getElementById("rail-caption-byline");
-  const openBtn = document.getElementById("rail-open-detail-btn");
-
-  if (currentItem) {
-    if (capTitle) capTitle.textContent = currentItem.title;
-    if (capByline) {
-      const byline = [[currentItem.categoryLabel, currentItem.year || "2026"].filter(Boolean).join(" • "), currentItem.tag].filter(Boolean).join(" · ");
-      capByline.textContent = `${byline} · Angkat karya untuk melihat sisi belakang`;
-    }
-    if (openBtn) {
-      openBtn.textContent = `Angkat & Balik Sisi Belakang (${currentItem.id})`;
-      openBtn.onclick = () => openWorkModal(currentItem.id);
-    }
-  }
-
-  // Update Pagination Dots
-  const dots = document.querySelectorAll(".rail-dot-btn");
-  dots.forEach((dot, dotIdx) => {
-    dot.classList.toggle("is-active", dotIdx === nextIdx);
-  });
-
-  // Update Prev / Next Buttons
-  const prevBtn = document.getElementById("rail-prev-btn");
-  const nextBtn = document.getElementById("rail-next-btn");
-  if (prevBtn) prevBtn.disabled = nextIdx <= 0;
-  if (nextBtn) nextBtn.disabled = nextIdx >= n - 1;
-}
-
-function prevRailPrint() {
-  const current = Number.isFinite(railState.active) ? railState.active : (Number.isFinite(railState.carouselIndex) ? railState.carouselIndex : 0);
-  if (current > 0) {
-    railState.playing = false;
-    chooseRailPrint(current - 1);
-  }
-}
-
-function nextRailPrint() {
-  const current = Number.isFinite(railState.active) ? railState.active : (Number.isFinite(railState.carouselIndex) ? railState.carouselIndex : 0);
-  if (current < railState.shapes.length - 1) {
-    railState.playing = false;
-    chooseRailPrint(current + 1);
-  }
-}
-
-function aimRail(index, clientX) {
-  const stage = railState.elements.stage;
-  const shape = railState.shapes[index];
-  if (!stage || !shape || !railState.layout) return;
-
-  const s = railState.sim;
-  const local = clientX - stage.getBoundingClientRect().left;
-  const half = (shape.w * railState.layout.unit) / 2;
-  for (let i = 0; i < railState.shapes.length; i++) {
-    s.tty[i] = i === index ? Math.max(-1, Math.min(1, (local - (s.x[index] ?? 0)) / half)) * RAIL_CONSTANTS.TILT_Y : 0;
-  }
-  kickRailSimulation();
-}
-
-function nearestRailPrint(clientX, clientY) {
-  const stage = railState.elements.stage;
-  if (!stage || !railState.layout) return null;
-
-  const box = stage.getBoundingClientRect();
-  const x = clientX - box.left;
-  const y = clientY - box.top;
-  const { layout: lay, shapes: list, sim: s } = railState;
-  const n = list.length;
-  let best = null;
-  let distance = Infinity;
-
-  for (let i = 0; i < n; i++) {
-    const shape = list[i];
-    if (!shape) continue;
-    const reachR = railReach(s, lay, shape, i);
-    const cx = s.x[i] ?? 0;
-    const bottom = (lay.tops[i] ?? 0) + shape.h * lay.unit + 30;
-    if (x < cx + reachR[0] - 4 || x > cx + reachR[1] + 4 || y < lay.railTop - 4 || y > bottom) continue;
-    const d = Math.abs(x - cx);
-    if (d < distance) {
-      best = i;
-      distance = d;
-    }
-  }
-  return best;
-}
-
-function initPictureRailGallery(filterKey = "all", initialIndex = 0) {
-  const stage = document.getElementById("picture-rail-stage");
-  const dotsContainer = document.getElementById("picture-rail-dots");
-  if (!stage) return;
-
-  cancelAnimationFrame(railState.sim.raf);
-  clearTimeout(railState.beatTimer);
+  if (!stage || !wrap) return;
 
   const filtered = filterKey === "all"
     ? PORTFOLIO_WORKS
     : PORTFOLIO_WORKS.filter((item) => item.category === filterKey);
 
-  railState.items = filtered;
-  railState.shapes = filtered.map(shapeOfWork);
-  railState.drops = filtered.map((item) => item.drop ?? 0);
-  railState.elements.stage = stage;
-  railState.elements.dots = dotsContainer;
+  const items = filtered.length > 0 ? filtered : PORTFOLIO_WORKS;
+  fanCarouselState.items = items;
+  fanCarouselState.activeIndex = Math.max(0, Math.min(items.length - 1, initialIndex));
 
-  function resizeAndMount(initial = false) {
-    const width = Math.max(320, stage.clientWidth || window.innerWidth || 980);
-    railState.width = width;
-    const lay = computeRailLayout(railState.shapes, railState.drops, width);
-    railState.layout = lay;
-    stage.style.height = `${lay.stageH}px`;
+  // Render cards into stage
+  stage.innerHTML = items.map((item, idx) => `
+    <div class="fan-poster-card" data-index="${idx}" data-id="${item.id}" role="button" tabindex="0" aria-label="${item.title}">
+      <img src="${item.image}" alt="${item.title}" loading="lazy" width="540" height="763" />
+      <div class="fan-poster-overlay"></div>
+    </div>
+  `).join("");
 
-    // Initialize Sim
-    const count = filtered.length;
-    const s = railState.sim;
-    s.x = new Array(count).fill(0);
-    s.vx = new Array(count).fill(0);
-    s.tx = new Array(count).fill(0);
-    s.sw = new Array(count).fill(0);
-    s.vsw = new Array(count).fill(0);
-    s.e = new Array(count).fill(0);
-    s.ve = new Array(count).fill(0);
-    s.te = new Array(count).fill(0);
-    s.ty = new Array(count).fill(0);
-    s.vty = new Array(count).fill(0);
-    s.tty = new Array(count).fill(0);
-    s.hx = new Array(count).fill(0);
-    s.hv = new Array(count).fill(0);
-    s.drag = -1;
-    s.free = 0;
-    s.last = 0;
+  // Render dots
+  if (dotsContainer) {
+    dotsContainer.innerHTML = items.map((item, idx) => `
+      <button type="button" class="fan-dot ${idx === fanCarouselState.activeIndex ? 'is-active' : ''}" data-dot-index="${idx}" aria-label="Lihat ${item.title}"></button>
+    `).join("");
+  }
 
-    const activeIdx = Number.isFinite(initialIndex) ? Math.max(0, Math.min(count - 1, Math.round(initialIndex))) : 0;
-    const xs = computeRailTargets(lay, railState.shapes, activeIdx, activeIdx);
-    for (let i = 0; i < count; i++) {
-      s.x[i] = xs[i] ?? 0;
-      s.tx[i] = xs[i] ?? 0;
-      s.hx[i] = xs[i] ?? 0;
-      s.sw[i] = railRestTilt(i);
+  const cardEls = Array.from(stage.querySelectorAll(".fan-poster-card"));
+  fanCarouselState.cards = cardEls;
+
+  function getLayoutConfig() {
+    const w = window.innerWidth;
+    if (w >= 1024) return FAN_CAROUSEL_CONFIG.desktop;
+    if (w >= 640) return FAN_CAROUSEL_CONFIG.tablet;
+    return FAN_CAROUSEL_CONFIG.mobile;
+  }
+
+  function getCardGeometry(shortestDiff, config) {
+    const strDiff = String(shortestDiff);
+    if (strDiff in config.offsets) {
+      return config.offsets[strDiff];
+    }
+    const sign = shortestDiff > 0 ? 1 : -1;
+    return {
+      scale: 0.7,
+      rot: sign * 22,
+      x: sign * (config.cardWidth * 1.55),
+      y: 110,
+      zIndex: 1,
+      opacity: 0
+    };
+  }
+
+  function renderFan(immediate = false) {
+    const N = items.length;
+    const config = getLayoutConfig();
+    const active = fanCarouselState.activeIndex;
+    const activeItem = items[active];
+
+    if (titleEl && activeItem) titleEl.textContent = activeItem.title;
+    if (categoryEl && activeItem) categoryEl.textContent = activeItem.categoryLabel || (activeItem.specs ? activeItem.specs.join(" • ") : "A4 POSTER PRINT");
+    if (modalBtn && activeItem) {
+      modalBtn.onclick = () => openWorkModal(activeItem.id);
     }
 
-    // Render DOM Elements
-    renderRailDOMElements();
-
     if (dotsContainer) {
-      dotsContainer.innerHTML = filtered.map((item, i) => `
-        <button type="button" class="rail-dot-btn ${i === activeIdx ? "is-active" : ""}" aria-label="${item.title}" data-rail-dot="${i}"></button>
-      `).join("");
-
-      dotsContainer.querySelectorAll("[data-rail-dot]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          railState.playing = false;
-          const idx = parseInt(btn.getAttribute("data-rail-dot"), 10);
-          chooseRailPrint(idx);
-        });
+      const dots = dotsContainer.querySelectorAll(".fan-dot");
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle("is-active", idx === active);
       });
     }
 
-    chooseRailPrint(activeIdx);
+    const hasGsap = typeof window.gsap !== "undefined";
 
-    if (initial && !railState.brushed) {
-      railState.brushed = true;
-      for (let i = 0; i < count; i++) {
-        setTimeout(() => impulseRail(i, 18 - i * 1.2), 160 + i * 65);
+    cardEls.forEach((card, idx) => {
+      // Circular shortest difference modulo N
+      const diff = ((idx - active + N + Math.floor(N / 2)) % N) - Math.floor(N / 2);
+      const geom = getCardGeometry(diff, config);
+      const isActive = diff === 0;
+
+      card.classList.toggle("is-active", isActive);
+      card.style.zIndex = String(geom.zIndex);
+      card.style.pointerEvents = geom.opacity > 0.05 ? "auto" : "none";
+
+      card.style.setProperty("--fan-x", `${geom.x}px`);
+      card.style.setProperty("--fan-y", `${geom.y}px`);
+      card.style.setProperty("--fan-rot", `${geom.rot}deg`);
+      card.style.setProperty("--fan-scale", String(geom.scale));
+
+      if (hasGsap && !immediate) {
+        window.gsap.to(card, {
+          xPercent: -50,
+          yPercent: -50,
+          x: geom.x,
+          y: geom.y,
+          rotation: geom.rot,
+          scale: geom.scale,
+          opacity: geom.opacity,
+          duration: 0.55,
+          ease: "power3.out",
+          overwrite: "auto"
+        });
+      } else {
+        card.style.opacity = String(geom.opacity);
+        card.style.transform = `translate3d(calc(-50% + ${geom.x}px), calc(-50% + ${geom.y}px), 0) rotate(${geom.rot}deg) scale(${geom.scale})`;
       }
-    }
+    });
   }
 
-  function renderRailDOMElements() {
-    const { items, shapes, layout: lay } = railState;
-    const U = lay.unit;
-    const blur = Math.max(3, U * 0.05);
-
-    let html = `
-      <div aria-hidden="true" data-rail style="top: ${lay.railTop}px; height: ${lay.railT}px;">
-        <div class="rail-drop-shadow"></div>
-        <div class="rail-body"></div>
-        <div class="rail-ridge-top"></div>
-        <div class="rail-ridge-bottom"></div>
-      </div>
-      <div aria-hidden="true" class="rail-backdrop-layer">
-    `;
-
-    items.forEach((item, i) => {
-      const shape = shapes[i];
-      const w = shape.w * U;
-      const h = shape.h * U;
-      const top = lay.tops[i] ?? 0;
-      html += `
-        <div data-back="${i}" class="rail-back" style="position: absolute; left: 0; top: 0; width: ${w}px; height: 0; transform-origin: ${w / 2}px ${lay.pivotY + 1}px;">
-          <span data-wash="${i}" data-wash style="position: absolute; left: ${-w * 0.5}px; width: ${w * 2}px; top: ${top - h * 0.5}px; height: ${h * 1.75}px;"></span>
-          <span style="position: absolute; left: 0; top: ${top}px; width: ${w}px; height: ${h}px; filter: blur(${blur.toFixed(1)}px); opacity: 0.5;">
-            <span data-shadow="${i}" style="position: absolute; inset: 0; border-radius: 2px; background: #000;"></span>
-          </span>
-        </div>
-      `;
-    });
-
-    html += `</div>`;
-
-    items.forEach((item, i) => {
-      const shape = shapes[i];
-      const w = shape.w * U;
-      const h = shape.h * U;
-      const top = lay.tops[i] ?? 0;
-      const ringY = top + h * 0.07;
-      const m = Math.max(2, shape.mold * U);
-      const mat = shape.mat * U;
-      const matB = shape.matB * U;
-      const fixture = Math.max(30, Math.min(190, shape.w * U * 0.46));
-      const hood = Math.max(4, Math.min(12, U * 0.05));
-      const arm = Math.max(5, Math.min(20, U * 0.07));
-      const above = arm + hood;
-
-      html += `
-        <div data-hang="${i}" style="position: absolute; left: 0; top: 0; width: ${w}px; height: 0; z-index: ${10 + i};">
-          <span class="hook-plate" style="position: absolute; left: ${w / 2 - 5}px; top: ${lay.railTop - 3}px; width: 10px; height: ${lay.pivotY - lay.railTop + 6}px;" aria-hidden="true">
-            <span style="position: absolute; inset-inline: 0; top: 0; height: 4px; border-radius: 999px; background: linear-gradient(to bottom, #ecd27c, #8b6508); box-shadow: 0 1px 1px rgba(0,0,0,0.4);"></span>
-            <span style="position: absolute; top: 3px; left: 2.5px; width: 5px; bottom: 5px; border-radius: 0 0 1px 1px; background: linear-gradient(to right, #ecd27c, #8b6508);"></span>
-            <svg style="position: absolute; bottom: 0; left: 0; overflow: visible; color: #5a3c03;" width="10" height="7">
-              <path d="M 3.1 0 Q 3.1 6.2 5 6.2 Q 6.9 6.2 6.9 2.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-            </svg>
-          </span>
-
-          <span data-label style="top: ${top + h + 10}px; right: 0;">
-            <span class="label-status-dot" style="display: none;"></span>${item.tag || "Print"}
-          </span>
-
-          <span data-swing="${i}" style="position: absolute; left: 0; top: 0; width: ${w}px; height: 0; transform-origin: ${w / 2}px ${lay.pivotY + 1}px;">
-            <svg style="pointer-events: none; position: absolute; left: 0; top: 0; overflow: visible;" width="${Math.max(1, w)}" height="${Math.max(1, ringY)}" aria-hidden="true">
-              <g>
-                <line x1="${w / 2 + 0.7}" y1="${lay.pivotY + 1.8}" x2="${w * 0.2 + 0.7}" y2="${ringY + 0.8}" stroke="black" stroke-opacity="0.25" stroke-width="1.4"></line>
-                <line x1="${w / 2}" y1="${lay.pivotY + 1}" x2="${w * 0.2}" y2="${ringY}" stroke="var(--text-primary)" stroke-opacity="0.65" stroke-width="1"></line>
-                <line x1="${w / 2 - 0.3}" y1="${lay.pivotY + 1}" x2="${w * 0.2 - 0.3}" y2="${ringY}" stroke="white" stroke-opacity="0.35" stroke-width="0.4"></line>
-              </g>
-              <g>
-                <line x1="${w / 2 + 0.7}" y1="${lay.pivotY + 1.8}" x2="${w * 0.8 + 0.7}" y2="${ringY + 0.8}" stroke="black" stroke-opacity="0.25" stroke-width="1.4"></line>
-                <line x1="${w / 2}" y1="${lay.pivotY + 1}" x2="${w * 0.8}" y2="${ringY}" stroke="var(--text-primary)" stroke-opacity="0.65" stroke-width="1"></line>
-                <line x1="${w / 2 - 0.3}" y1="${lay.pivotY + 1}" x2="${w * 0.8 - 0.3}" y2="${ringY}" stroke="white" stroke-opacity="0.35" stroke-width="0.4"></line>
-              </g>
-            </svg>
-
-            <button type="button" data-frame="${i}" data-work-id="${item.id}" style="left: 0; top: ${top}px; width: ${w}px; height: ${h}px;" aria-label="${item.title}">
-              <span data-tilt="${i}" style="left: ${(-(RAIL_CONSTANTS.SUPERSAMPLE - 1) * w) / 2}px; top: ${(-(RAIL_CONSTANTS.SUPERSAMPLE - 1) * h) / 2}px; width: ${w * RAIL_CONSTANTS.SUPERSAMPLE}px; height: ${h * RAIL_CONSTANTS.SUPERSAMPLE}px; transform: scale(${1 / RAIL_CONSTANTS.SUPERSAMPLE});">
-                <span style="position: absolute; inset: 0; display: block; zoom: ${RAIL_CONSTANTS.SUPERSAMPLE};">
-                  <span class="picture-lamp-fixture" style="bottom: 100%; width: ${fixture}px; height: ${above}px;" aria-hidden="true">
-                    <span class="lamp-stem" style="left: calc(26% - 0.75px); width: 1.5px; height: ${arm + hood * 0.5}px;"></span>
-                    <span class="lamp-stem" style="left: calc(74% - 0.75px); width: 1.5px; height: ${arm + hood * 0.5}px;"></span>
-                    <span class="lamp-hood" style="height: ${hood}px;"></span>
-                    <span class="lamp-hood-highlight" style="height: ${Math.max(1, hood * 0.22)}px; margin-top: ${hood * 0.12}px;"></span>
-                  </span>
-
-                  <span style="position: absolute; inset: 0; border-radius: 1.5px; box-shadow: 0 0 0 0.6px rgba(0,0,0,0.45);">
-                    <span class="moulding-side moulding-${shape.frame} moulding-t" style="left:0; right:0; top:0; height:${m}px; clip-path: polygon(0 0, 100% 0, calc(100% - ${m}px) 100%, ${m}px 100%);"></span>
-                    <span class="moulding-side moulding-${shape.frame} moulding-l" style="left:0; top:0; bottom:0; width:${m}px; clip-path: polygon(0 0, 100% ${m}px, 100% calc(100% - ${m}px), 0 100%);"></span>
-                    <span class="moulding-side moulding-${shape.frame} moulding-r" style="right:0; top:0; bottom:0; width:${m}px; clip-path: polygon(0 ${m}px, 100% 0, 100% 100%, 0 calc(100% - ${m}px));"></span>
-                    <span class="moulding-side moulding-${shape.frame} moulding-b" style="left:0; right:0; bottom:0; height:${m}px; clip-path: polygon(${m}px 0, calc(100% - ${m}px) 0, 100% 100%, 0 100%);"></span>
-
-                    <span class="rail-mat-board" style="inset: ${m}px;">
-                      <span class="rail-artwork-box" style="left: ${mat}px; right: ${mat}px; top: ${mat}px; bottom: ${mat + matB}px;">
-                        <img src="${item.image}" alt="${item.title}" class="rail-poster-img" loading="lazy" draggable="false">
-                      </span>
-                      <span data-glare="${i}" class="rail-glass-glare"></span>
-                    </span>
-
-                    <span data-light="${i}" style="left: 0; right: 0; top: -${above}px; bottom: 0;">
-                      <span class="light-bulb-glow" style="top: ${hood * 0.6}px; width: ${fixture * 0.86}px; height: ${Math.max(2, hood * 0.45)}px;"></span>
-                      <span class="light-cone-wash" style="top: ${above - 1}px; height: ${h * 0.9}px;"></span>
-                    </span>
-
-                    <span data-dim="${i}" style="position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none;"></span>
-                  </span>
-                </span>
-              </span>
-            </button>
-          </span>
-        </div>
-      `;
-    });
-
-    stage.innerHTML = html;
-
-    // Cache element references for zero GC overhead during 60fps raf loop
-    const el = railState.elements;
-    el.hangs = items.map((_, i) => stage.querySelector(`[data-hang="${i}"]`));
-    el.backs = items.map((_, i) => stage.querySelector(`[data-back="${i}"]`));
-    el.swings = items.map((_, i) => stage.querySelector(`[data-swing="${i}"]`));
-    el.slots = items.map((_, i) => stage.querySelector(`[data-frame="${i}"]`));
-    el.tilts = items.map((_, i) => stage.querySelector(`[data-tilt="${i}"]`));
-    el.lights = items.map((_, i) => stage.querySelector(`[data-light="${i}"]`));
-    el.glares = items.map((_, i) => stage.querySelector(`[data-glare="${i}"]`));
-    el.dims = items.map((_, i) => stage.querySelector(`[data-dim="${i}"]`));
-    el.shadows = items.map((_, i) => stage.querySelector(`[data-shadow="${i}"]`));
-    el.washes = items.map((_, i) => stage.querySelector(`[data-wash="${i}"]`));
-
-    // Paint all frames immediately to their calculated initial positions
-    for (let i = 0; i < items.length; i++) {
-      paintRailFrame(i);
-    }
+  function goToIndex(newIdx) {
+    const N = items.length;
+    fanCarouselState.activeIndex = ((newIdx % N) + N) % N;
+    renderFan();
   }
 
-  // Wire Prev / Next Navigation buttons
-  const prevBtn = document.getElementById("rail-prev-btn");
-  const nextBtn = document.getElementById("rail-next-btn");
+  function next() {
+    goToIndex(fanCarouselState.activeIndex + 1);
+  }
+
+  function prev() {
+    goToIndex(fanCarouselState.activeIndex - 1);
+  }
+
+  // Card click / keyboard activation
+  cardEls.forEach((card, idx) => {
+    card.addEventListener("click", () => {
+      if (fanCarouselState.isDragging) return;
+      if (idx === fanCarouselState.activeIndex) {
+        const item = items[idx];
+        if (item) openWorkModal(item.id);
+      } else {
+        goToIndex(idx);
+      }
+    });
+
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        if (idx === fanCarouselState.activeIndex) {
+          const item = items[idx];
+          if (item) openWorkModal(item.id);
+        } else {
+          goToIndex(idx);
+        }
+      }
+    });
+  });
+
+  // Dots click
+  if (dotsContainer) {
+    dotsContainer.onclick = (e) => {
+      const target = e.target.closest(".fan-dot");
+      if (!target) return;
+      const idx = parseInt(target.getAttribute("data-dot-index"), 10);
+      if (!isNaN(idx)) goToIndex(idx);
+    };
+  }
+
+  // Navigation buttons
   if (prevBtn) {
     prevBtn.onclick = (e) => {
-      e.preventDefault();
       e.stopPropagation();
-      prevRailPrint();
+      prev();
     };
   }
   if (nextBtn) {
     nextBtn.onclick = (e) => {
-      e.preventDefault();
       e.stopPropagation();
-      nextRailPrint();
+      next();
     };
   }
 
-  // Keyboard navigation on stage
-  stage.tabIndex = 0;
-  stage.onkeydown = (e) => {
+  // Touch & pointer swipe gestures
+  let startX = 0;
+  let startY = 0;
+  let hasMoved = false;
+
+  wrap.onpointerdown = (e) => {
+    startX = e.clientX;
+    startY = e.clientY;
+    hasMoved = false;
+    fanCarouselState.isDragging = false;
+  };
+
+  wrap.onpointermove = (e) => {
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+      hasMoved = true;
+    }
+  };
+
+  wrap.onpointerup = (e) => {
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (hasMoved && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      fanCarouselState.isDragging = true;
+      setTimeout(() => { fanCarouselState.isDragging = false; }, 100);
+      if (dx < 0) {
+        next();
+      } else {
+        prev();
+      }
+    }
+  };
+
+  // Keyboard navigation
+  wrap.onkeydown = (e) => {
     if (e.key === "ArrowLeft") {
       e.preventDefault();
-      prevRailPrint();
+      prev();
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
-      nextRailPrint();
+      next();
     }
   };
 
-  // Pointer event interaction (smooth sideways swipe, drag & tap to center/open)
-  stage.onpointerdown = (event) => {
-    if (event.button !== 0) return;
-    const hit = nearestRailPrint(event.clientX, event.clientY);
-    const now = performance.now();
-    railState.pointer = {
-      id: event.pointerId,
-      index: hit ?? -1,
-      x: event.clientX,
-      y: event.clientY,
-      moved: false,
-      kind: event.pointerType,
-      swipe: 0,
-      lastX: event.clientX,
-      lastT: now,
-      v: 0
-    };
-  };
-
-  stage.onpointermove = (event) => {
-    const p = railState.pointer;
-    const s = railState.sim;
-    const lay = railState.layout;
-    if (!lay) return;
-
-    if (p.id === event.pointerId) {
-      const clientX = Number.isFinite(event.clientX) ? event.clientX : p.lastX;
-      const clientY = Number.isFinite(event.clientY) ? event.clientY : p.y;
-      const dx = clientX - p.x;
-      const now = performance.now();
-      if (!p.moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(clientY - p.y)) {
-        p.moved = true;
-        railState.playing = false;
-        if (stage.setPointerCapture && typeof stage.setPointerCapture === "function") {
-          try {
-            stage.setPointerCapture(event.pointerId);
-          } catch (_) {}
-        }
-      }
-      if (p.moved) {
-        const dt = Math.max(1, now - p.lastT);
-        const v = (clientX - p.lastX) / dt;
-        p.v = Number.isFinite(v) ? (p.v * 0.6 + v * 0.4) : p.v;
-        p.lastX = clientX;
-        p.lastT = now;
-        p.swipe = dx;
-
-        const currentCenter = Number.isFinite(railState.active) ? railState.active : (Number.isFinite(railState.carouselIndex) ? railState.carouselIndex : 0);
-        const xs = computeRailTargets(lay, railState.shapes, currentCenter, currentCenter);
-        for (let i = 0; i < railState.shapes.length; i++) {
-          s.tx[i] = (xs[i] ?? 0) + (Number.isFinite(dx) ? dx : 0);
-        }
-        kickRailSimulation();
-      }
-      return;
-    }
-
-    // Subtle 3D tilt when hovering active frame with mouse
-    if (event.pointerType !== "mouse") return;
-    const hit = nearestRailPrint(event.clientX, event.clientY);
-    if (hit !== null && hit === railState.active) {
-      aimRail(hit, event.clientX);
-    }
-  };
-
-  stage.onpointerup = (event) => finishRailPointer(event, false);
-  stage.onpointercancel = (event) => finishRailPointer(event, true);
-  stage.onpointerleave = (event) => {
-    if (event.pointerType !== "mouse" || railState.pointer.id >= 0) return;
-    for (let i = 0; i < railState.shapes.length; i++) railState.sim.tty[i] = 0;
-    kickRailSimulation();
-  };
-
-  function finishRailPointer(event, cancelled) {
-    const p = railState.pointer;
-    if (p.id !== event.pointerId) return;
-    const s = railState.sim;
-    const lay = railState.layout;
-
-    if (stage.hasPointerCapture && typeof stage.releasePointerCapture === "function") {
-      try {
-        if (stage.hasPointerCapture(event.pointerId)) {
-          stage.releasePointerCapture(event.pointerId);
-        }
-      } catch (_) {}
-    }
-
-    const wasMoved = p.moved;
-    const clientX = (event && Number.isFinite(event.clientX) && event.clientX !== 0) ? event.clientX : p.lastX;
-    const dx = clientX - p.x;
-    const v = Number.isFinite(p.v) ? p.v : 0;
-    const from = Number.isFinite(railState.active) ? railState.active : (Number.isFinite(railState.carouselIndex) ? railState.carouselIndex : 0);
-
-    railState.pointer = { ...p, id: -1, swipe: 0, moved: false };
-
-    if (wasMoved) {
-      let step = 0;
-      if (Math.abs(v) > 0.28) {
-        step = v < 0 ? 1 : -1;
-      } else if (Number.isFinite(dx) && Math.abs(dx) > 38) {
-        step = dx < 0 ? 1 : -1;
-      }
-      const next = Math.max(0, Math.min(railState.shapes.length - 1, from + step));
-      railState.carouselIndex = next;
-      chooseRailPrint(next);
-      return;
-    }
-
-    if (cancelled || p.index < 0) return;
-    railState.playing = false;
-    const hitIndex = p.index;
-    if (hitIndex !== railState.active) {
-      // Clicked a neighboring frame on the side -> slide to center that frame!
-      chooseRailPrint(hitIndex);
-    } else {
-      // Clicked the currently centered active frame -> open 3D inspection modal!
-      const hitWork = railState.items[hitIndex];
-      if (hitWork) {
-        openWorkModal(hitWork.id);
-      }
-    }
-  }
-
-  // Autoplay Loop (fixed cadence 2.6s)
-  function scheduleNextBeat() {
-    clearTimeout(railState.beatTimer);
-    if (!railState.playing || railState.items.length === 0) return;
-    railState.beatTimer = setTimeout(() => {
-      if (!railState.playing) return;
-      const current = railState.active ?? 0;
-      const next = (current + 1) % railState.items.length;
-      chooseRailPrint(next);
-      scheduleNextBeat();
-    }, 2600);
-  }
-  scheduleNextBeat();
-
-  // Resize handler
-  resizeAndMount(true);
+  renderFan(true);
 }
 
 function renderPortfolio(filterKey) {
@@ -1265,26 +636,26 @@ function initPortfolioControls() {
   const resetBtn = document.querySelector("[data-reset-filter]");
   const viewRailBtn = document.getElementById("view-rail-btn");
   const viewGridBtn = document.getElementById("view-grid-btn");
-  const railWrap = document.getElementById("picture-rail-wrap");
+  const fanWrap = document.getElementById("fan-carousel-wrap");
   const gridWrap = document.getElementById("portfolio-grid");
   const gridContainer = document.getElementById("portfolio-grid-container");
   let currentFilter = "all";
 
   function setViewMode(mode) {
-    const isRail = mode === "rail";
+    const isFan = mode === "fan" || mode === "rail";
     if (viewRailBtn) {
-      viewRailBtn.classList.toggle("is-active", isRail);
-      viewRailBtn.setAttribute("aria-pressed", String(isRail));
+      viewRailBtn.classList.toggle("is-active", isFan);
+      viewRailBtn.setAttribute("aria-pressed", String(isFan));
     }
     if (viewGridBtn) {
-      viewGridBtn.classList.toggle("is-active", !isRail);
-      viewGridBtn.setAttribute("aria-pressed", String(!isRail));
+      viewGridBtn.classList.toggle("is-active", !isFan);
+      viewGridBtn.setAttribute("aria-pressed", String(!isFan));
     }
-    if (railWrap) railWrap.hidden = !isRail;
-    if (gridWrap) gridWrap.hidden = isRail;
-    if (gridContainer) gridContainer.hidden = isRail;
-    if (isRail) {
-      initPictureRailGallery(currentFilter);
+    if (fanWrap) fanWrap.hidden = !isFan;
+    if (gridWrap) gridWrap.hidden = isFan;
+    if (gridContainer) gridContainer.hidden = isFan;
+    if (isFan) {
+      initFanPosterCarousel(currentFilter, fanCarouselState.activeIndex || 0);
     }
   }
 
@@ -1293,7 +664,7 @@ function initPortfolioControls() {
   }
 
   if (viewRailBtn) {
-    viewRailBtn.addEventListener("click", () => setViewMode("rail"));
+    viewRailBtn.addEventListener("click", () => setViewMode("fan"));
   }
   if (viewGridBtn) {
     viewGridBtn.addEventListener("click", () => setViewMode("grid"));
@@ -1306,7 +677,7 @@ function initPortfolioControls() {
       t.classList.toggle("is-active", active);
       t.setAttribute("aria-selected", String(active));
     });
-    initPictureRailGallery(filterKey);
+    initFanPosterCarousel(filterKey, 0);
     renderPortfolio(filterKey);
   }
 
@@ -1325,14 +696,13 @@ function initPortfolioControls() {
   window.addEventListener("resize", () => {
     if (resizeTimer) clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      if (railWrap && !railWrap.hidden) {
-        const preserveIdx = Number.isFinite(railState.active) ? railState.active : (Number.isFinite(railState.carouselIndex) ? railState.carouselIndex : 0);
-        initPictureRailGallery(currentFilter, preserveIdx);
+      if (fanWrap && !fanWrap.hidden) {
+        initFanPosterCarousel(currentFilter, fanCarouselState.activeIndex || 0);
       }
     }, 150);
   });
 
-  initPictureRailGallery("all");
+  initFanPosterCarousel("all", 0);
   renderPortfolio("all");
 }
 
