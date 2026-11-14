@@ -531,9 +531,9 @@ dialog {
   min-height: calc(100vh - 72px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding-top: clamp(1rem, 2.5vh, 2rem);
-  padding-bottom: clamp(1rem, 2vh, 1.5rem);
+  padding-bottom: 0;
   border-bottom: 1px solid var(--border-structural);
   position: relative;
   overflow: hidden;
@@ -542,7 +542,7 @@ dialog {
 .minimalist-hero-stage {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) auto minmax(240px, 1fr);
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   gap: clamp(1.5rem, 3.5vw, 4rem);
   width: 100%;
@@ -563,7 +563,9 @@ dialog {
   justify-content: center;
   align-items: flex-start;
   justify-self: end;
+  align-self: center;
   max-width: 26ch;
+  padding-bottom: clamp(2rem, 6vh, 5rem);
 }
 
 .hero-clean-text {
@@ -589,16 +591,19 @@ dialog {
   color: var(--accent-brand);
 }
 
-/* Center Column: Sukunaru Orange Halo Backdrop + Grounded Creator Portrait (Enlarged Scale) */
+/* Center Column: Sukunaru Orange Halo Backdrop + Grounded Creator Portrait (Flush to Bottom) */
 .hero-stage-center {
   display: flex;
   justify-content: center;
   align-items: flex-end;
   justify-self: center;
+  align-self: flex-end;
   position: relative;
-  height: clamp(520px, 72vh, 700px);
+  height: clamp(520px, 76vh, 740px);
   width: clamp(380px, 36vw, 540px);
   overflow: visible;
+  line-height: 0;
+  margin-bottom: -1px;
 }
 
 .hero-circle-backdrop {
@@ -623,16 +628,19 @@ dialog {
 .hero-portrait-img {
   position: relative;
   z-index: 2;
-  height: clamp(500px, 70vh, 680px);
+  display: block;
+  height: 100%;
   width: auto;
   max-width: none;
   object-fit: contain;
   object-position: bottom center;
+  vertical-align: bottom;
+  margin-bottom: 0;
   filter: drop-shadow(0 24px 44px rgba(0, 0, 0, 0.75));
   user-select: none;
   pointer-events: none;
   transform-origin: bottom center;
-  transform: scale(1.2);
+  transform: scale(1.18);
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
 }
 
@@ -641,7 +649,7 @@ dialog {
 }
 
 .hero-stage-center:hover .hero-portrait-img {
-  transform: scale(1.23) translateY(-4px);
+  transform: scale(1.21) translateY(-2px);
 }
 
 /* Right Column: 3-line Bold Typography */
@@ -650,6 +658,8 @@ dialog {
   justify-content: flex-start;
   align-items: center;
   justify-self: start;
+  align-self: center;
+  padding-bottom: clamp(2rem, 6vh, 5rem);
 }
 
 .hero-massive-title {
@@ -684,14 +694,23 @@ dialog {
 
 /* Hero Footer Bar: Social Links on Left, Location on Right */
 .hero-footer-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  position: absolute;
+  bottom: clamp(1rem, 2.5vh, 1.75rem);
+  left: 0;
+  right: 0;
   width: 100%;
   max-width: 1200px;
   margin-inline: auto;
-  padding-top: 1rem;
-  z-index: 3;
+  padding-inline: clamp(1rem, 2vw, 2rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.hero-footer-bar a {
+  pointer-events: auto;
 }
 
 .hero-social-links {
@@ -1726,7 +1745,14 @@ dialog {
   }
 
   .hero-footer-bar {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    padding-inline: 0;
     padding-top: 2rem;
+    padding-bottom: 1.5rem;
+    pointer-events: auto;
   }
 
   .hero-grid,
@@ -1884,7 +1910,8 @@ dialog {
   /* Minimalist Hero Mobile */
   .hero-section {
     min-height: auto;
-    padding-block: 1.75rem 1.25rem;
+    padding-top: 1.5rem;
+    padding-bottom: 0;
   }
 
   .minimalist-hero-stage {
