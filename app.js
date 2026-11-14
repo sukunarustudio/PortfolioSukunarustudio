@@ -1328,6 +1328,66 @@ function initDialogsAndTriggers() {
   const closeProductBtn = document.getElementById("close-product-dialog");
   const closeProductSecondary = document.getElementById("dialog-product-close-secondary");
 
+  const DIGITAL_PRODUCTS_DATA = {
+    vectonaru: {
+      code: "SKN-PRD-01 // PRODUCTION",
+      category: "VECTOR & STOCK TOOL",
+      name: "Vectonaru",
+      price: "Rp 149.000",
+      desc: "Aplikasi desktop untuk convert gambar raster ke vektor bersih dan menyusun metadata judul serta kata kunci CSV microstock secara otomatis.",
+      features: [
+        "Konversi raster ke format vektor EPS dan SVG bersih siap submit microstock.",
+        "Kurva presisi dan pemisahan warna otomatis tanpa anchor point berlebih.",
+        "Ekspor metadata CSV judul & keyword microstock sekali klik.",
+        "Mendukung konversi satuan gambar maupun mode pemrosesan batch banyak file sekaligus.",
+        "Lisensi permanen (lifetime) tanpa biaya langganan bulanan."
+      ],
+      waUrl: `https://wa.me/${STUDIO_WA_NUMBER}?text=` + encodeURIComponent("Halo Sukunaru Studio, saya ingin membeli lisensi resmi produk digital *Vectonaru* (Rp 149.000). Mohon info langkah aktivasi dan pembayarannya.")
+    },
+    filterstudio: {
+      code: "SKN-PRD-02 // STUDIO EDITION",
+      category: "PRINT & HALFTONE",
+      name: "Sukunaru Filter Studio",
+      price: "Rp 129.000",
+      desc: "Aplikasi olah tekstur cetak untuk memberi efek risograph, titik raster halftone, dan grain poster otentik pada artwork grafis.",
+      features: [
+        "Simulasi raster halftone & riso grain real-time dengan sudut dan frekuensi titik presisi.",
+        "Koleksi preset tekstur poster khas Sukunaru Studio siap pakai.",
+        "Ekspor gambar resolusi ultra-tinggi siap cetak (300 DPI CMYK) maupun web.",
+        "Pemrosesan instan tanpa beban render berat seperti pada plugin konvensional.",
+        "Lisensi permanen (lifetime) untuk penggunaan komersial maupun personal."
+      ],
+      waUrl: `https://wa.me/${STUDIO_WA_NUMBER}?text=` + encodeURIComponent("Halo Sukunaru Studio, saya ingin membeli lisensi resmi produk digital *Sukunaru Filter Studio* (Rp 129.000). Mohon info langkah aktivasi dan pembayarannya.")
+    }
+  };
+
+  function openProductModal(key) {
+    if (!productDialog) return;
+    const data = DIGITAL_PRODUCTS_DATA[key] || DIGITAL_PRODUCTS_DATA.vectonaru;
+
+    const codeEl = document.getElementById("dialog-product-code");
+    const catEl = document.getElementById("dialog-product-category");
+    const priceEl = document.getElementById("dialog-product-price");
+    const titleEl = document.getElementById("dialog-product-title");
+    const descEl = document.getElementById("dialog-product-desc");
+    const featuresEl = document.getElementById("dialog-product-features");
+    const waLinkEl = document.getElementById("dialog-product-wa-link");
+
+    if (codeEl) codeEl.textContent = data.code;
+    if (catEl) catEl.textContent = data.category;
+    if (priceEl) priceEl.textContent = data.price;
+    if (titleEl) titleEl.textContent = data.name;
+    if (descEl) descEl.textContent = data.desc;
+    if (featuresEl) {
+      featuresEl.innerHTML = data.features.map((f) => `<li>${f}</li>`).join("");
+    }
+    if (waLinkEl) {
+      waLinkEl.href = data.waUrl;
+    }
+
+    productDialog.showModal();
+  }
+
   const legalDialog = document.getElementById("legal-dialog");
   const closeLegalBtn = document.getElementById("close-legal-dialog");
   const closeLegalSecondary = document.getElementById("close-legal-secondary");
@@ -1443,17 +1503,27 @@ function initDialogsAndTriggers() {
       return;
     }
 
+    // If clicking directly on buy button, let link navigate to WhatsApp
+    const directBuyBtn = event.target.closest("[data-direct-buy]");
+    if (directBuyBtn) {
+      return;
+    }
+
+    // If clicking on product card, open product detail popup
+    const productCard = event.target.closest("[data-product-key]");
+    if (productCard) {
+      event.preventDefault();
+      const key = productCard.getAttribute("data-product-key");
+      openProductModal(key);
+      return;
+    }
+
     const directProductBtn = event.target.closest("[data-direct-product]");
     if (directProductBtn && productDialog) {
       event.preventDefault();
-      const productName = directProductBtn.getAttribute("data-direct-product");
-      document.getElementById("dialog-product-title").textContent = productName;
-      document.getElementById("dialog-product-url-chip").textContent = "Lisensi Resmi • Pemesanan via WhatsApp";
-      const waMsg = encodeURIComponent(
-        `Halo Sukunaru Studio, saya ingin membeli lisensi produk digital *${productName}*. Mohon info langkah pembayarannya.`
-      );
-      document.getElementById("dialog-product-wa-link").href = `https://wa.me/${STUDIO_WA_NUMBER}?text=${waMsg}`;
-      productDialog.showModal();
+      const productName = directProductBtn.getAttribute("data-direct-product") || "";
+      const key = productName.toLowerCase().includes("filter") ? "filterstudio" : "vectonaru";
+      openProductModal(key);
       return;
     }
 
@@ -1478,6 +1548,14 @@ function initDialogsAndTriggers() {
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " ") {
+      const productCard = event.target.closest("[data-product-key]");
+      if (productCard && !event.target.closest("a, button")) {
+        event.preventDefault();
+        const key = productCard.getAttribute("data-product-key");
+        openProductModal(key);
+        return;
+      }
+
       const workCanvas = event.target.closest(".work-canvas[data-work-id]");
       if (workCanvas) {
         event.preventDefault();
@@ -1509,6 +1587,22 @@ function initDialogsAndTriggers() {
     if (btn && legalDialog) {
       btn.addEventListener("click", () => legalDialog.close());
     }
+  });
+
+  [productDialog, legalDialog].forEach((dialogEl) => {
+    if (!dialogEl) return;
+    dialogEl.addEventListener("click", (event) => {
+      const rect = dialogEl.getBoundingClientRect();
+      const isInDialog = (
+        rect.top <= event.clientY &&
+        event.clientY <= rect.top + rect.height &&
+        rect.left <= event.clientX &&
+        event.clientX <= rect.left + rect.width
+      );
+      if (!isInDialog) {
+        dialogEl.close();
+      }
+    });
   });
 }
 

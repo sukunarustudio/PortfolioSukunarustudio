@@ -875,6 +875,18 @@ dialog {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  cursor: pointer;
+  transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.flagship-item:hover {
+  border-color: var(--accent-brand);
+  transform: translateY(-2px);
+}
+
+.flagship-item:focus-visible {
+  outline: 2px solid var(--accent-brand);
+  outline-offset: 2px;
 }
 
 .flagship-visual {
@@ -2715,6 +2727,32 @@ dialog {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.dialog-meta-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.dialog-features-box {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+}
+
+.dialog-features-heading {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--accent-text-on-surface);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.65rem;
 }
 
 /* Compact Desktop Scaling (1025px - 1240px) */

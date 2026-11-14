@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=2.1">
+  <link rel="stylesheet" href="styles.css?v=2.2">
 </head>
 <body>
   <canvas id="halftone-canvas" class="halftone-canvas" aria-hidden="true"></canvas>
@@ -154,7 +154,7 @@
         </div>
 
         <div class="flagship-duet" id="products-content">
-          <article class="flagship-item flagship-vectonaru scroll-reveal-item">
+          <article class="flagship-item flagship-vectonaru scroll-reveal-item" data-product-key="vectonaru" tabindex="0" role="button" aria-label="Buka detail lengkap produk Vectonaru">
             <div class="flagship-visual" aria-label="Ilustrasi teknis alur kerja Vectonaru">
               <div class="spec-frame-bar">
                 <span>SKN-PRD-01</span>
@@ -202,28 +202,16 @@
                 <span class="product-price">Rp 149.000</span>
               </div>
               <h3 class="flagship-name">Vectonaru</h3>
-              <p class="flagship-summary">
-                Aplikasi desktop untuk convert gambar raster ke vektor bersih dan susun metadata CSV microstock otomatis.
-              </p>
-
-              <ul class="feature-spec-list">
-                <li>Trace raster ke vektor EPS/SVG rapi</li>
-                <li>Kurva presisi tanpa anchor berlebih</li>
-                <li>Ekspor metadata CSV judul &amp; keyword</li>
-              </ul>
 
               <div class="flagship-actions">
-                <a href="https://wa.me/6289519203345?text=Halo%20Sukunaru%20Studio,%20saya%20ingin%20membeli%20lisensi%20produk%20digital%20*Vectonaru*." target="_blank" rel="noopener noreferrer" class="btn btn-accent" data-direct-product="Vectonaru" data-direct-url="https://wa.me/6289519203345?text=Halo%20Sukunaru%20Studio,%20saya%20ingin%20membeli%20lisensi%20produk%20digital%20*Vectonaru*.">
+                <a href="https://wa.me/6289519203345?text=Halo%20Sukunaru%20Studio,%20saya%20ingin%20membeli%20lisensi%20produk%20digital%20*Vectonaru*." target="_blank" rel="noopener noreferrer" class="btn btn-accent" data-direct-buy="vectonaru">
                   Beli Lisensi
                 </a>
-                <button type="button" class="btn btn-outline" data-open-brief="Tanya Produk Digital: Vectonaru">
-                  Tanya Fitur
-                </button>
               </div>
             </div>
           </article>
 
-          <article class="flagship-item flagship-filter scroll-reveal-item">
+          <article class="flagship-item flagship-filter scroll-reveal-item" data-product-key="filterstudio" tabindex="0" role="button" aria-label="Buka detail lengkap produk Sukunaru Filter Studio">
             <div class="flagship-visual" aria-label="Ilustrasi teknis efek Sukunaru Filter Studio">
               <div class="spec-frame-bar">
                 <span>SKN-PRD-02</span>
@@ -268,23 +256,11 @@
                 <span class="product-price">Rp 129.000</span>
               </div>
               <h3 class="flagship-name">Filter Studio</h3>
-              <p class="flagship-summary">
-                Aplikasi olah tekstur cetak untuk memberi efek risograph, titik raster halftone, dan grain poster pada artwork.
-              </p>
-
-              <ul class="feature-spec-list">
-                <li>Raster halftone &amp; riso grain real-time</li>
-                <li>Preset tekstur poster Sukunaru Studio</li>
-                <li>Ekspor resolusi tinggi siap cetak &amp; web</li>
-              </ul>
 
               <div class="flagship-actions">
-                <a href="https://wa.me/6289519203345?text=Halo%20Sukunaru%20Studio,%20saya%20ingin%20membeli%20lisensi%20produk%20digital%20*Sukunaru%20Filter%20Studio*." target="_blank" rel="noopener noreferrer" class="btn btn-accent" data-direct-product="Sukunaru Filter Studio" data-direct-url="https://wa.me/6289519203345?text=Halo%20Sukunaru%20Studio,%20saya%20ingin%20membeli%20lisensi%20produk%20digital%20*Sukunaru%20Filter%20Studio*.">
+                <a href="https://wa.me/6289519203345?text=Halo%20Sukunaru%20Studio,%20saya%20ingin%20membeli%20lisensi%20produk%20digital%20*Sukunaru%20Filter%20Studio*." target="_blank" rel="noopener noreferrer" class="btn btn-accent" data-direct-buy="filterstudio">
                   Beli Lisensi
                 </a>
-                <button type="button" class="btn btn-outline" data-open-brief="Tanya Produk Digital: Sukunaru Filter Studio">
-                  Tanya Fitur
-                </button>
               </div>
             </div>
           </article>
@@ -867,23 +843,29 @@
   <dialog class="studio-dialog" id="product-dialog" aria-labelledby="dialog-product-title">
     <div class="dialog-inner">
       <div class="dialog-top-bar">
-        <span class="dialog-code">DIRECT CHECKOUT GATEWAY</span>
+        <span class="dialog-code" id="dialog-product-code">SKN-PRD // PRODUCTION</span>
         <button type="button" class="dialog-close-btn" id="close-product-dialog" aria-label="Tutup jendela produk">
           Tutup [ESC]
         </button>
       </div>
       <div class="dialog-content">
-        <span class="dialog-category">PRODUK DIGITAL SUKUNARU STUDIO</span>
+        <div class="dialog-meta-line">
+          <span class="dialog-category" id="dialog-product-category">PRODUK DIGITAL SUKUNARU STUDIO</span>
+          <span class="product-price" id="dialog-product-price">Rp 0</span>
+        </div>
         <h2 class="dialog-title" id="dialog-product-title">Nama Produk</h2>
         <p class="dialog-desc" id="dialog-product-desc">
-          Pembelian lisensi resmi, file instalasi, dan panduan penggunaan dilayani langsung melalui WhatsApp resmi Sukunaru Studio.
+          Deskripsi lengkap produk digital studio.
         </p>
-        <div class="dialog-specs">
-          <span class="spec-chip" id="dialog-product-url-chip">Pesanan Resmi via WhatsApp</span>
+        <div class="dialog-features-box">
+          <span class="dialog-features-heading">Fitur &amp; Kemampuan Utama:</span>
+          <ul class="feature-spec-list" id="dialog-product-features">
+            <!-- Diisi dinamis via app.js -->
+          </ul>
         </div>
         <div class="dialog-actions">
           <a href="https://wa.me/6289519203345" target="_blank" rel="noopener noreferrer" class="btn btn-accent" id="dialog-product-wa-link">
-            Beli via WhatsApp
+            Beli Lisensi via WhatsApp
           </a>
           <button type="button" class="btn btn-outline" id="dialog-product-close-secondary">
             Tutup
@@ -916,6 +898,6 @@
     </div>
   </dialog>
 
-  <script src="app.js?v=2.1"></script>
+  <script src="app.js?v=2.2"></script>
 </body>
 </html>
