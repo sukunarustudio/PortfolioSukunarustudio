@@ -12,7 +12,7 @@ const MinimalistHeroDemo = () => {
 
   return (
     <MinimalistHero
-      mainText="Sukunaru Studio merancang poster cetak berkarakter editorial, visual media sosial, dan software kreator."
+      mainText="Desain poster cetak editorial, visual media sosial, dan software kreator."
       readMoreLink="#karya"
       imageSrc="/assets/creator-portrait.png"
       imageAlt="Portrait Kreator Sukunaru Studio"
