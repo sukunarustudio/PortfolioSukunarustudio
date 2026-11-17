@@ -531,7 +531,7 @@ function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
   wrap.onpointerup = (e) => {
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
-    if (hasMoved && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+    if (hasMoved && Math.abs(dx) > 35 && Math.abs(dx) > Math.abs(dy)) {
       fanCarouselState.isDragging = true;
       setTimeout(() => { fanCarouselState.isDragging = false; }, 100);
       if (dx < 0) {
@@ -542,7 +542,12 @@ function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
     }
   };
 
-  // Keyboard navigation
+  wrap.onpointercancel = () => {
+    hasMoved = false;
+    fanCarouselState.isDragging = false;
+  };
+
+  // Keyboard navigation for carousel wrap
   wrap.onkeydown = (e) => {
     if (e.key === "ArrowLeft") {
       e.preventDefault();
@@ -550,6 +555,19 @@ function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
       next();
+    } else if (e.key === "Enter" || e.key === " ") {
+      // If focus is directly on the wrap container, open active item detail
+      if (e.target === wrap) {
+        e.preventDefault();
+        const activeItem = items[fanCarouselState.activeIndex];
+        if (activeItem) {
+          if (typeof openWorkModal === "function") {
+            openWorkModal(activeItem.id);
+          } else if (typeof window.openWorkModal === "function") {
+            window.openWorkModal(activeItem.id);
+          }
+        }
+      }
     }
   };
 
@@ -719,6 +737,8 @@ function initDialogsAndTriggers() {
       category: "VECTOR & STOCK TOOL",
       name: "Vectonaru",
       price: "Rp 149.000",
+      image: "assets/products/vectonaru-snapshot.png",
+      imageAlt: "Tampilan antarmuka aplikasi Vectonaru",
       desc: "Aplikasi desktop untuk convert gambar raster ke vektor bersih dan menyusun metadata judul serta kata kunci CSV microstock secara otomatis.",
       features: [
         "Konversi raster ke format vektor EPS dan SVG bersih siap submit microstock.",
@@ -734,6 +754,8 @@ function initDialogsAndTriggers() {
       category: "PRINT & HALFTONE",
       name: "Sukunaru Filter Studio",
       price: "Rp 129.000",
+      image: "assets/products/filter-studio-snapshot.jpg",
+      imageAlt: "Tampilan antarmuka aplikasi Sukunaru Filter Studio",
       desc: "Aplikasi olah tekstur cetak untuk memberi efek risograph, titik raster halftone, dan grain poster otentik pada artwork grafis.",
       features: [
         "Simulasi raster halftone & riso grain real-time dengan sudut dan frekuensi titik presisi.",
@@ -755,6 +777,7 @@ function initDialogsAndTriggers() {
     const priceEl = document.getElementById("dialog-product-price");
     const titleEl = document.getElementById("dialog-product-title");
     const descEl = document.getElementById("dialog-product-desc");
+    const imgEl = document.getElementById("dialog-product-img");
     const featuresEl = document.getElementById("dialog-product-features");
     const waLinkEl = document.getElementById("dialog-product-wa-link");
 
@@ -763,6 +786,10 @@ function initDialogsAndTriggers() {
     if (priceEl) priceEl.textContent = data.price;
     if (titleEl) titleEl.textContent = data.name;
     if (descEl) descEl.textContent = data.desc;
+    if (imgEl && data.image) {
+      imgEl.src = data.image;
+      imgEl.alt = data.imageAlt || data.name;
+    }
     if (featuresEl) {
       featuresEl.innerHTML = data.features.map((f) => `<li>${f}</li>`).join("");
     }
@@ -1459,18 +1486,20 @@ function initCopyrightYear() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  initThemeToggle();
-  initScrollToTop();
-  initCopyrightYear();
-  initMobileMenu();
-  initProductStateControls();
-  initDialogsAndTriggers();
-  initPortfolioControls();
-  initBriefForm();
-  initInteractiveBackgroundAndCursor();
-  initScrollReveal();
-});
+if (typeof document !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
+    initThemeToggle();
+    initScrollToTop();
+    initCopyrightYear();
+    initMobileMenu();
+    initProductStateControls();
+    initDialogsAndTriggers();
+    initPortfolioControls();
+    initBriefForm();
+    initInteractiveBackgroundAndCursor();
+    initScrollReveal();
+  });
+}
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
