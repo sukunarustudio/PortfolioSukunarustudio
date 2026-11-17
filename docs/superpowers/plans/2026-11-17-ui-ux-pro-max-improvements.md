@@ -34,9 +34,9 @@
 - Modify/Stage: `git status` (hapus referensi file Next.js/React yang sudah didelete: `components/ui/*`, `lib/utils.ts`, `src/*`)
 
 **Steps:**
-- [ ] Stage file-file lama yang sudah dihapus dari workspace (`git add -u`).
-- [ ] Commit dengan pesan `chore(cleanup): hapus file eksperimen legacy nextjs/react agar repositori bersih` dan push ke `origin main`.
-- [ ] Verifikasi bahwa `git status` bersih (clean working tree).
+- [x] Stage file-file lama yang sudah dihapus dari workspace (`git add -u`).
+- [x] Commit dengan pesan `chore(cleanup): hapus file eksperimen legacy nextjs/react agar repositori bersih` dan push ke `origin main`.
+- [x] Verifikasi bahwa `git status` bersih (clean working tree).
 
 ---
 
@@ -47,11 +47,11 @@
 - Modify: `index.html` (memastikan icon dan tombol memiliki label aksesibel)
 
 **Steps:**
-- [ ] Perbesar tap target `.fan-nav-btn` pada mobile: visual ukuran proporsional namun area hit sentuh menggunakan pseudo-element atau padding minimal 44×44px.
-- [ ] Optimalkan `.fan-active-modal-btn` pada mobile agar nyaman ditekan dengan thumb zone yang pas.
-- [ ] Pastikan `.dialog-close-btn` dan action buttons di dalam modal memiliki min-height 44px dan focus indicator jelas.
-- [ ] Verifikasi dengan review CSS dan pengujian tampilan.
-- [ ] Commit `fix(ui): optimasi mobile touch targets minimal 44px dan ergonomi tombol` dan push ke `origin main`.
+- [x] Perbesar tap target `.fan-nav-btn` pada mobile: visual ukuran proporsional namun area hit sentuh menggunakan pseudo-element atau padding minimal 44×44px.
+- [x] Optimalkan `.fan-active-modal-btn` pada mobile agar nyaman ditekan dengan thumb zone yang pas.
+- [x] Pastikan `.dialog-close-btn` dan action buttons di dalam modal memiliki min-height 44px dan focus indicator jelas.
+- [x] Verifikasi dengan review CSS dan pengujian tampilan.
+- [x] Commit `fix(ui): optimasi mobile touch targets minimal 44px dan ergonomi tombol` dan push ke `origin main`.
 
 ---
 
@@ -62,14 +62,14 @@
 - Modify: `styles.css` (fokus ring pada `.fan-carousel-stage-wrap`)
 
 **Steps:**
-- [ ] Tambahkan event listener keyboard (`keydown`) pada `#fan-carousel-wrap`:
+- [x] Tambahkan event listener keyboard (`keydown`) pada `#fan-carousel-wrap`:
   - `ArrowLeft`: Navigasi ke poster sebelumnya (`prevCard()`).
   - `ArrowRight`: Navigasi ke poster selanjutnya (`nextCard()`).
   - `Enter` / `Space`: Buka modal poster aktif (`openWorkModal`).
-- [ ] Tambahkan `:focus-visible` styling yang rapi pada carousel wrap agar pengguna keyboard tahu elemen sedang aktif.
-- [ ] Tingkatkan kenyamanan gesture swipe pada layar sentuh dengan threshold dinamis (misal 35px) dan pencegahan scroll vertikal yang tidak disengaja.
-- [ ] Verifikasi sintaks JS dengan `node -c app.js`.
-- [ ] Commit `feat(carousel): tambahkan navigasi keyboard arrow dan penyempurnaan swipe mobile` dan push ke `origin main`.
+- [x] Tambahkan `:focus-visible` styling yang rapi pada carousel wrap agar pengguna keyboard tahu elemen sedang aktif.
+- [x] Tingkatkan kenyamanan gesture swipe pada layar sentuh dengan threshold dinamis (misal 35px) dan pencegahan scroll vertikal yang tidak disengaja.
+- [x] Verifikasi sintaks JS dengan `node -c app.js`.
+- [x] Commit `feat(carousel): tambahkan navigasi keyboard arrow dan penyempurnaan swipe mobile` dan push ke `origin main`.
 
 ---
 
@@ -80,14 +80,14 @@
 - Modify: `styles.css` (animasi dialog dan backdrop)
 
 **Steps:**
-- [ ] Implementasikan focus trap sederhana pada `<dialog>` native:
+- [x] Implementasikan focus trap sederhana pada `<dialog>` native:
   - Simpan elemen pemicu (`document.activeElement`) sebelum membuka modal.
   - Saat modal terbuka, otomatis fokuskan ke tombol close pertama atau judul dialog.
   - Tangani siklus tombol `Tab` dan `Shift + Tab` agar tetap berada di dalam modal saat terbuka.
   - Kembalikan fokus ke elemen pemicu saat modal ditutup.
-- [ ] Pastikan penutupan via tombol ESC dan klik backdrop bekerja mulus tanpa glitch visual.
-- [ ] Verifikasi sintaks JS dengan `node -c app.js`.
-- [ ] Commit `fix(a11y): implementasikan focus trap dan focus restoration pada modal dialog` dan push ke `origin main`.
+- [x] Pastikan penutupan via tombol ESC dan klik backdrop bekerja mulus tanpa glitch visual.
+- [x] Verifikasi sintaks JS dengan `node -c app.js`.
+- [x] Commit `fix(a11y): implementasikan focus trap dan focus restoration pada modal dialog` dan push ke `origin main`.
 
 ---
 
@@ -98,10 +98,10 @@
 - Modify: `index.html` (atribut aksesibilitas, tipografi heading)
 
 **Steps:**
-- [ ] Terapkan `text-wrap: balance` pada `.section-title`, `.hero-title`, `.dialog-title` untuk mencegah orphan words (kata menggantung).
-- [ ] Atur batas lebar baca optimal (`max-width: 65ch`) pada subjudul dan paragraf deskripsi agar mata pengunjung tidak lelah membaca di layar monitor lebar.
-- [ ] Pertajam kontras dan hierarki pada teks colophon teknis (`JetBrains Mono` metadata, chip kategori, tahun rilis).
-- [ ] Commit `style(typography): terapkan text-wrap balance dan perbaikan hierarki swiss editorial` dan push ke `origin main`.
+- [x] Terapkan `text-wrap: balance` pada `.section-title`, `.hero-title`, `.dialog-title` untuk mencegah orphan words (kata menggantung).
+- [x] Atur batas lebar baca optimal (`max-width: 65ch`) pada subjudul dan paragraf deskripsi agar mata pengunjung tidak lelah membaca di layar monitor lebar.
+- [x] Pertajam kontras dan hierarki pada teks colophon teknis (`JetBrains Mono` metadata, chip kategori, tahun rilis).
+- [x] Commit `style(typography): terapkan text-wrap balance dan perbaikan hierarki swiss editorial` dan push ke `origin main`.
 
 ---
 
@@ -113,12 +113,12 @@
 - Modify: `styles.css` (styling tombol salin dan animasi toast feedback)
 
 **Steps:**
-- [ ] Tambahkan tombol sekunder "Salin Pesan" di samping tombol kirim WhatsApp pada formulir brief.
-- [ ] Di `app.js`, tambahkan fitur `navigator.clipboard.writeText`:
+- [x] Tambahkan tombol sekunder "Salin Pesan" di samping tombol kirim WhatsApp pada formulir brief.
+- [x] Di `app.js`, tambahkan fitur `navigator.clipboard.writeText`:
   - Jika pengguna ingin menyalin pesan sebelum membuka WA, berikan feedback instan "✓ Pesan brief berhasil disalin ke clipboard!".
   - Tambahkan atribut aksesibilitas `aria-invalid="true"` pada input yang gagal validasi dan `aria-describedby` ke elemen pesan error terkait.
-- [ ] Verifikasi sintaks JS dengan `node -c app.js`.
-- [ ] Commit `feat(form): tambah opsi salin draft pesan WA dan perbaikan aksesibilitas formulir` dan push ke `origin main`.
+- [x] Verifikasi sintaks JS dengan `node -c app.js`.
+- [x] Commit `feat(form): tambah opsi salin draft pesan WA dan perbaikan aksesibilitas formulir` dan push ke `origin main`.
 
 ---
 
@@ -128,7 +128,7 @@
 - Review: `index.html`, `styles.css`, `app.js`
 
 **Steps:**
-- [ ] Jalankan validasi sintaks JavaScript pada `app.js` (`node -c app.js`).
-- [ ] Cek konsistensi markup HTML dan integritas link navigasi (`#karya`, `#produk`, `#jasa`, `#sosmed`).
-- [ ] Verifikasi responsivitas pada breakpoint mobile (360px, 480px) dan desktop (1280px+).
-- [ ] Push commit final jika ada penyesuaian akhir.
+- [x] Jalankan validasi sintaks JavaScript pada `app.js` (`node -c app.js`).
+- [x] Cek konsistensi markup HTML dan integritas link navigasi (`#karya`, `#produk`, `#jasa`, `#sosmed`).
+- [x] Verifikasi responsivitas pada breakpoint mobile (360px, 480px) dan desktop (1280px+).
+- [x] Push commit final jika ada penyesuaian akhir.
