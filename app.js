@@ -1054,47 +1054,109 @@ function initBriefForm() {
   const nameInput = document.getElementById("client-name");
   const topicInput = document.getElementById("inquiry-topic");
   const detailsInput = document.getElementById("project-details");
+  const copyBtn = document.getElementById("btn-copy-draft");
+  const copyText = document.getElementById("copy-draft-text");
 
   const errName = document.getElementById("error-client-name");
   const errTopic = document.getElementById("error-inquiry-topic");
   const errDetails = document.getElementById("error-project-details");
   const feedback = document.getElementById("form-feedback");
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
+  function clearFieldErrors() {
+    [nameInput, topicInput, detailsInput].forEach((input) => {
+      if (input) input.removeAttribute("aria-invalid");
+    });
+    if (errName) errName.hidden = true;
+    if (errTopic) errTopic.hidden = true;
+    if (errDetails) errDetails.hidden = true;
+    if (feedback) feedback.hidden = true;
+  }
 
-    errName.hidden = true;
-    errTopic.hidden = true;
-    errDetails.hidden = true;
-    feedback.hidden = true;
+  [nameInput, topicInput, detailsInput].forEach((input) => {
+    if (!input) return;
+    input.addEventListener("input", () => {
+      input.removeAttribute("aria-invalid");
+      const errEl = document.getElementById(`error-${input.id}`);
+      if (errEl) errEl.hidden = true;
+    });
+    if (input.tagName === "SELECT") {
+      input.addEventListener("change", () => {
+        input.removeAttribute("aria-invalid");
+        if (errTopic) errTopic.hidden = true;
+      });
+    }
+  });
 
+  function validateForm() {
+    clearFieldErrors();
     let hasError = false;
 
     if (!nameInput.value.trim()) {
       errName.textContent = "Mohon isi nama Anda atau nama brand terlebih dahulu.";
       errName.hidden = false;
+      nameInput.setAttribute("aria-invalid", "true");
       hasError = true;
     }
 
     if (!topicInput.value.trim()) {
       errTopic.textContent = "Pilih salah satu layanan desain atau produk digital yang ingin ditanyakan.";
       errTopic.hidden = false;
+      topicInput.setAttribute("aria-invalid", "true");
       hasError = true;
     }
 
     if (!detailsInput.value.trim()) {
       errDetails.textContent = "Tuliskan gambaran singkat kebutuhan atau pertanyaan Anda.";
       errDetails.hidden = false;
+      detailsInput.setAttribute("aria-invalid", "true");
       hasError = true;
     }
 
-    if (hasError) return;
+    if (hasError) {
+      const firstInvalid = form.querySelector('[aria-invalid="true"]');
+      if (firstInvalid) firstInvalid.focus();
+      return null;
+    }
 
-    const compiledText = [
+    return [
       `Halo Sukunaru Studio, saya *${nameInput.value.trim()}*.`,
       `Saya ingin berdiskusi mengenai: *${topicInput.value.trim()}*.`,
       `Rincian kebutuhan: ${detailsInput.value.trim()}`
     ].join("\n\n");
+  }
+
+  if (copyBtn) {
+    copyBtn.addEventListener("click", () => {
+      const compiledText = validateForm();
+      if (!compiledText) return;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(compiledText).then(() => {
+          if (copyText) {
+            const originalText = copyText.textContent;
+            copyText.textContent = "✓ Draft Tersalin!";
+            setTimeout(() => {
+              copyText.textContent = originalText;
+            }, 2500);
+          }
+          if (feedback) {
+            feedback.innerHTML = `✓ Format pesan draft berhasil disalin ke clipboard! Siap di-paste ke WhatsApp.`;
+            feedback.hidden = false;
+          }
+        }).catch(() => {
+          prompt("Salin draft pesan berikut:", compiledText);
+        });
+      } else {
+        prompt("Salin draft pesan berikut:", compiledText);
+      }
+    });
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const compiledText = validateForm();
+    if (!compiledText) return;
 
     const waUrl = `https://wa.me/${STUDIO_WA_NUMBER}?text=${encodeURIComponent(compiledText)}`;
 

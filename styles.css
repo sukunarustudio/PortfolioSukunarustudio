@@ -1664,6 +1664,20 @@ dialog {
   padding: 0.35rem 0.65rem;
 }
 
+.form-input[aria-invalid="true"],
+.form-select[aria-invalid="true"],
+.form-textarea[aria-invalid="true"] {
+  border-color: var(--error-border);
+  background-color: var(--error-surface);
+}
+
+.form-input[aria-invalid="true"]:focus,
+.form-select[aria-invalid="true"]:focus,
+.form-textarea[aria-invalid="true"]:focus {
+  outline: 2px solid var(--error-border);
+  outline-offset: 1px;
+}
+
 .form-feedback {
   padding: 0.85rem 1rem;
   font-family: "JetBrains Mono", monospace;
