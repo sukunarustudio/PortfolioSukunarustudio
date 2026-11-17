@@ -1591,12 +1591,14 @@ dialog {
   font-size: clamp(1.45rem, 2.3vw, 1.95rem);
   line-height: 1.2;
   margin-bottom: 0.75rem;
+  text-wrap: balance;
 }
 
 .hub-desc {
   color: var(--text-secondary);
   margin-bottom: 1.5rem;
-  max-width: 62ch;
+  max-width: 65ch;
+  line-height: 1.6;
 }
 
 .brief-form {
@@ -2307,12 +2309,16 @@ dialog {
   font-weight: 600;
   letter-spacing: -0.02em;
   font-size: 1.55rem;
+  line-height: 1.25;
   margin-bottom: 0.75rem;
+  text-wrap: balance;
 }
 
 .dialog-desc {
   color: var(--text-secondary);
   margin-bottom: 1.25rem;
+  max-width: 65ch;
+  line-height: 1.6;
 }
 
 .dialog-specs {
