@@ -731,6 +731,58 @@ function initDialogsAndTriggers() {
   const closeProductBtn = document.getElementById("close-product-dialog");
   const closeProductSecondary = document.getElementById("dialog-product-close-secondary");
 
+  const legalDialog = document.getElementById("legal-dialog");
+  const closeLegalBtn = document.getElementById("close-legal-dialog");
+  const closeLegalSecondary = document.getElementById("close-legal-secondary");
+
+  let lastActiveTrigger = null;
+
+  function setupDialogAccessibility(dialogEl, defaultFocusBtn) {
+    if (!dialogEl) return;
+
+    dialogEl.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        const focusable = dialogEl.querySelectorAll(
+          'button:not([disabled]):not([hidden]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+
+    dialogEl.addEventListener("close", () => {
+      if (lastActiveTrigger && typeof lastActiveTrigger.focus === "function") {
+        lastActiveTrigger.focus();
+        lastActiveTrigger = null;
+      }
+    });
+
+    dialogEl.addEventListener("click", (event) => {
+      const rect = dialogEl.getBoundingClientRect();
+      const isInDialog = (
+        rect.top <= event.clientY &&
+        event.clientY <= rect.top + rect.height &&
+        rect.left <= event.clientX &&
+        event.clientX <= rect.left + rect.width
+      );
+      if (!isInDialog) {
+        dialogEl.close();
+      }
+    });
+  }
+
+  setupDialogAccessibility(workDialog, closeWorkBtn);
+  setupDialogAccessibility(productDialog, closeProductBtn);
+  setupDialogAccessibility(legalDialog, closeLegalBtn);
+
   const DIGITAL_PRODUCTS_DATA = {
     vectonaru: {
       code: "SKN-PRD-01 // PRODUCTION",
@@ -797,12 +849,12 @@ function initDialogsAndTriggers() {
       waLinkEl.href = data.waUrl;
     }
 
+    lastActiveTrigger = document.activeElement;
     productDialog.showModal();
+    if (closeProductBtn) {
+      setTimeout(() => closeProductBtn.focus(), 30);
+    }
   }
-
-  const legalDialog = document.getElementById("legal-dialog");
-  const closeLegalBtn = document.getElementById("close-legal-dialog");
-  const closeLegalSecondary = document.getElementById("close-legal-secondary");
 
   const LEGAL_CONTENTS = {
     terms: {
@@ -882,7 +934,12 @@ function initDialogsAndTriggers() {
       found.category === "poster"
         ? "Paket Jasa: Key Visual & Event Poster Print"
         : "Paket Jasa: Sukunaru Feed Starter Pack";
+
+    lastActiveTrigger = document.activeElement;
     workDialog.showModal();
+    if (closeWorkBtn) {
+      setTimeout(() => closeWorkBtn.focus(), 30);
+    }
   }
 
   document.addEventListener("click", (event) => {
@@ -938,7 +995,11 @@ function initDialogsAndTriggers() {
       if (titleEl) titleEl.textContent = info.title;
       if (contentEl) contentEl.innerHTML = info.content;
 
+      lastActiveTrigger = document.activeElement;
       legalDialog.showModal();
+      if (closeLegalBtn) {
+        setTimeout(() => closeLegalBtn.focus(), 30);
+      }
     }
   });
 
@@ -983,22 +1044,6 @@ function initDialogsAndTriggers() {
     if (btn && legalDialog) {
       btn.addEventListener("click", () => legalDialog.close());
     }
-  });
-
-  [productDialog, legalDialog].forEach((dialogEl) => {
-    if (!dialogEl) return;
-    dialogEl.addEventListener("click", (event) => {
-      const rect = dialogEl.getBoundingClientRect();
-      const isInDialog = (
-        rect.top <= event.clientY &&
-        event.clientY <= rect.top + rect.height &&
-        rect.left <= event.clientX &&
-        event.clientX <= rect.left + rect.width
-      );
-      if (!isInDialog) {
-        dialogEl.close();
-      }
-    });
   });
 }
 
