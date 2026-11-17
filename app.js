@@ -1,5 +1,15 @@
 const STUDIO_WA_NUMBER = "6289519203345";
 
+function escapeHtml(str) {
+  if (str == null) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 const PORTFOLIO_WORKS = [
   {
     id: "SKN-01",
@@ -546,60 +556,6 @@ function initFanPosterCarousel(filterKey = "all", initialIndex = 0) {
   renderFan(true);
 }
 
-function renderPortfolio(filterKey) {
-  const grid = document.getElementById("portfolio-grid");
-  const emptyBox = document.getElementById("portfolio-state-empty");
-  const loadingBox = document.getElementById("portfolio-state-loading");
-
-  if (!grid || !emptyBox || !loadingBox) return;
-
-  loadingBox.hidden = true;
-
-  const items = filterKey === "all"
-    ? PORTFOLIO_WORKS
-    : PORTFOLIO_WORKS.filter((item) => item.category === filterKey);
-
-  if (items.length === 0) {
-    grid.innerHTML = "";
-    grid.hidden = true;
-    emptyBox.hidden = false;
-    return;
-  }
-
-  emptyBox.hidden = true;
-  grid.hidden = false;
-
-  grid.innerHTML = items
-    .map(
-      (work) => `
-      <article class="work-piece ${work.spanClass} scroll-reveal-item">
-        <div class="work-canvas" data-work-id="${work.id}" role="button" tabindex="0" aria-label="Perbesar karya ${work.title}">
-          <img src="${work.image}" alt="${work.title}" class="work-poster-img" loading="lazy" width="540" height="720">
-        </div>
-        <div class="work-info">
-          <div class="work-meta-line">
-            <span>${work.id}</span>
-            <span>${work.categoryLabel}</span>
-          </div>
-          <h3 class="work-title">${work.title}</h3>
-          <p class="work-summary">${work.summary}</p>
-          <div class="work-footer">
-            <span class="work-spec-tag">${work.specs.join(" • ")}</span>
-            <button type="button" class="btn btn-outline" data-work-id="${work.id}">
-              Lihat Poster Penuh
-            </button>
-          </div>
-        </div>
-      </article>
-    `
-    )
-    .join("");
-
-  if (typeof window.registerScrollRevealItems === "function") {
-    window.registerScrollRevealItems(grid.querySelectorAll(".scroll-reveal-item"));
-  }
-}
-
 function initThemeToggle() {
   const toggleBtn = document.getElementById("theme-toggle");
   const root = document.documentElement;
@@ -705,78 +661,19 @@ function initProductStateControls() {
 }
 
 function initPortfolioControls() {
-  const tabs = document.querySelectorAll(".filter-tab");
-  const resetBtn = document.querySelector("[data-reset-filter]");
-  const viewRailBtn = document.getElementById("view-rail-btn");
-  const viewGridBtn = document.getElementById("view-grid-btn");
   const fanWrap = document.getElementById("fan-carousel-wrap");
-  const gridWrap = document.getElementById("portfolio-grid");
-  const gridContainer = document.getElementById("portfolio-grid-container");
-  let currentFilter = "all";
-
-  function setViewMode(mode) {
-    const isFan = mode === "fan" || mode === "rail";
-    if (viewRailBtn) {
-      viewRailBtn.classList.toggle("is-active", isFan);
-      viewRailBtn.setAttribute("aria-pressed", String(isFan));
-    }
-    if (viewGridBtn) {
-      viewGridBtn.classList.toggle("is-active", !isFan);
-      viewGridBtn.setAttribute("aria-pressed", String(!isFan));
-    }
-    if (fanWrap) fanWrap.hidden = !isFan;
-    if (gridWrap) gridWrap.hidden = isFan;
-    if (gridContainer) gridContainer.hidden = isFan;
-    if (isFan) {
-      initFanPosterCarousel(currentFilter, fanCarouselState.activeIndex || 0);
-    }
-  }
-
-  if (gridContainer) {
-    gridContainer.hidden = true;
-  }
-
-  if (viewRailBtn) {
-    viewRailBtn.addEventListener("click", () => setViewMode("fan"));
-  }
-  if (viewGridBtn) {
-    viewGridBtn.addEventListener("click", () => setViewMode("grid"));
-  }
-
-  function activateFilter(filterKey) {
-    currentFilter = filterKey;
-    tabs.forEach((t) => {
-      const active = t.getAttribute("data-filter") === filterKey;
-      t.classList.toggle("is-active", active);
-      t.setAttribute("aria-selected", String(active));
-    });
-    initFanPosterCarousel(filterKey, 0);
-    renderPortfolio(filterKey);
-  }
-
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      const filterKey = tab.getAttribute("data-filter") || "all";
-      activateFilter(filterKey);
-    });
-  });
-
-  if (resetBtn) {
-    resetBtn.addEventListener("click", () => activateFilter("all"));
-  }
-
   let resizeTimer = null;
+
   window.addEventListener("resize", () => {
     if (resizeTimer) clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       if (fanWrap && !fanWrap.hidden) {
-        initFanPosterCarousel(currentFilter, fanCarouselState.activeIndex || 0);
+        initFanPosterCarousel("all", fanCarouselState.activeIndex || 0);
       }
     }, 150);
   });
 
   initFanPosterCarousel("all", 0);
-  renderPortfolio("all");
 }
 
 function prefillAndScrollToBrief(topicText) {
@@ -811,55 +708,6 @@ function initDialogsAndTriggers() {
   const closeWorkBtn = document.getElementById("close-work-dialog");
   const closeWorkSecondary = document.getElementById("dialog-close-secondary");
   const orderSimilarBtn = document.getElementById("dialog-order-similar");
-
-  const spinStage = document.getElementById("dialog-spin-stage");
-  const flipFrontBtn = document.getElementById("flip-front-btn");
-  const flipBackBtn = document.getElementById("flip-back-btn");
-  const flipArea = document.getElementById("dialog-flip-area");
-  const frameMoulding = document.getElementById("dialog-frame-moulding");
-  const frameMat = document.getElementById("dialog-frame-mat");
-
-  function setCardFlipped(isBack) {
-    if (spinStage) {
-      spinStage.classList.toggle("is-flipped", isBack);
-    }
-    if (flipFrontBtn) {
-      flipFrontBtn.classList.toggle("is-active", !isBack);
-      flipFrontBtn.setAttribute("aria-pressed", String(!isBack));
-    }
-    if (flipBackBtn) {
-      flipBackBtn.classList.toggle("is-active", isBack);
-      flipBackBtn.setAttribute("aria-pressed", String(isBack));
-    }
-  }
-
-  if (flipFrontBtn) {
-    flipFrontBtn.addEventListener("click", () => setCardFlipped(false));
-  }
-  if (flipBackBtn) {
-    flipBackBtn.addEventListener("click", () => setCardFlipped(true));
-  }
-
-  if (flipArea) {
-    let startX = 0;
-    let isPointerDown = false;
-    flipArea.addEventListener("pointerdown", (e) => {
-      startX = e.clientX;
-      isPointerDown = true;
-    });
-    flipArea.addEventListener("pointerup", (e) => {
-      if (!isPointerDown) return;
-      isPointerDown = false;
-      const diff = e.clientX - startX;
-      if (Math.abs(diff) > 25) {
-        const currentlyFlipped = spinStage ? spinStage.classList.contains("is-flipped") : false;
-        setCardFlipped(!currentlyFlipped);
-      }
-    });
-    flipArea.addEventListener("pointercancel", () => {
-      isPointerDown = false;
-    });
-  }
 
   const productDialog = document.getElementById("product-dialog");
   const closeProductBtn = document.getElementById("close-product-dialog");
@@ -997,36 +845,10 @@ function initDialogsAndTriggers() {
       imgEl.alt = found.title;
     }
 
-    if (frameMoulding) {
-      frameMoulding.setAttribute("data-frame", found.frame || "black");
-    }
-    if (frameMat) {
-      if (found.mat === false) {
-        frameMat.style.padding = "0px";
-      } else {
-        frameMat.style.padding = "";
-      }
-    }
-
-    const labelTitle = document.getElementById("dialog-label-title");
-    const labelEdition = document.getElementById("dialog-label-edition");
-    const labelDetails = document.getElementById("dialog-label-details");
-
-    if (labelTitle) labelTitle.textContent = found.title;
-    if (labelEdition) labelEdition.textContent = found.tag ? `${found.tag} • ARCHIVE ED.` : "STUDIO ARCHIVE";
-    if (labelDetails) {
-      const detailsList = found.details || found.specs || [];
-      labelDetails.innerHTML = detailsList.map((d) => `<li>${d}</li>`).join("");
-    }
-
-    if (typeof setCardFlipped === "function") {
-      setCardFlipped(false);
-    }
-
     const specsEl = document.getElementById("dialog-work-specs");
     if (specsEl) {
       specsEl.innerHTML = (found.specs || [])
-        .map((s) => `<span class="spec-chip">${s}</span>`)
+        .map((s) => `<span class="spec-chip">${escapeHtml(s)}</span>`)
         .join("");
     }
     activeWorkTopic =
@@ -1204,10 +1026,16 @@ function initBriefForm() {
 
     const waUrl = `https://wa.me/${STUDIO_WA_NUMBER}?text=${encodeURIComponent(compiledText)}`;
 
-    feedback.innerHTML = `Format pesan WhatsApp siap dikirim untuk <strong>${nameInput.value.trim()}</strong>. Membuka WhatsApp... <a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;font-weight:700;">Klik di sini jika WhatsApp belum terbuka</a>.`;
+    const safeName = escapeHtml(nameInput.value.trim());
+    feedback.innerHTML = `Format pesan WhatsApp siap dikirim untuk <strong>${safeName}</strong>. Membuka WhatsApp... <a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;font-weight:700;">Klik di sini jika WhatsApp belum terbuka</a>.`;
     feedback.hidden = false;
 
-    window.open(waUrl, "_blank", "noopener,noreferrer");
+    const isMobile = window.innerWidth <= 768 || (window.matchMedia && window.matchMedia("(max-width: 768px)").matches);
+    if (isMobile) {
+      window.location.href = waUrl;
+    } else {
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+    }
   });
 }
 
@@ -1429,7 +1257,7 @@ function initInteractiveBackgroundAndCursor() {
         if (coordsEl) {
           coordsEl.textContent = `X:${Math.round(event.clientX)} Y:${Math.round(event.clientY)}`;
         }
-        const interactiveTarget = event.target.closest("a, button, input, select, textarea, .work-piece, .flagship-item");
+        const interactiveTarget = event.target.closest("a, button, input, select, textarea, .fan-poster-card, .flagship-item");
         cursorEl.classList.toggle("is-interactive", Boolean(interactiveTarget));
       }
     },
@@ -1455,35 +1283,7 @@ function initInteractiveBackgroundAndCursor() {
   );
 
   window.addEventListener(
-    "touchstart",
-    (event) => {
-      if (event.touches && event.touches.length > 0) {
-        activatePoint(event.touches[0].clientX, event.touches[0].clientY, true);
-      }
-    },
-    { passive: true }
-  );
-
-  window.addEventListener(
-    "touchmove",
-    (event) => {
-      if (event.touches && event.touches.length > 0) {
-        activatePoint(event.touches[0].clientX, event.touches[0].clientY, true);
-      }
-    },
-    { passive: true }
-  );
-
-  window.addEventListener(
-    "touchend",
-    () => {
-      releasePoint(0);
-    },
-    { passive: true }
-  );
-
-  window.addEventListener(
-    "touchcancel",
+    "pointercancel",
     () => {
       releasePoint(0);
     },
@@ -1671,3 +1471,13 @@ document.addEventListener("DOMContentLoaded", () => {
   initInteractiveBackgroundAndCursor();
   initScrollReveal();
 });
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    STUDIO_WA_NUMBER,
+    PORTFOLIO_WORKS,
+    escapeHtml,
+    calcCircularDiff: (idx, active, N) => ((idx - active + N + Math.floor(N / 2)) % N) - Math.floor(N / 2),
+    wrapIndex: (newIdx, N) => ((newIdx % N) + N) % N
+  };
+}
